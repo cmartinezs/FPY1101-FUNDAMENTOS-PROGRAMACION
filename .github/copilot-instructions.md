@@ -7,7 +7,7 @@ Este repositorio contiene material educativo para ensenar Python desde cero a es
 - Construir una ruta progresiva de aprendizaje.
 - Explicar conceptos con lenguaje claro y ejemplos pequenos.
 - Relacionar cada concepto nuevo de Python con su equivalente en PSeInt cuando tenga sentido.
-- Mantener separados los materiales de teoria, ejercicios resueltos, practica y desafios.
+- Mantener separados los materiales de teoria, aplicacion y practica en cada leccion.
 
 ## Perfil del estudiante
 
@@ -32,9 +32,35 @@ Los estudiantes ya conocen en PSeInt:
 
 ## Estructura del repositorio
 
-- `docs/teoria/`: clases y explicaciones teoricas.
-- `docs/ejercicios-resueltos/`: guias paso a paso.
-- `docs/practica/`: ejercicios propuestos por clase.
-- `docs/desafios/`: desafios por nivel.
-- `docs/01-homologacion-pseint-python/`: puente inicial entre PSeInt y Python.
+- `docs/lessons/`: una carpeta por leccion, con contenido directo de clase.
+- `docs/extras/`: material de apoyo autonomo.
+
+## Estructura esperada por leccion
+
+Cada leccion en `docs/lessons/` puede incluir:
+
+- `README.md`
+- `teoria.md`
+- `aplicacion.md`
+- `practica.md`
+
+## Criterios para las lecciones
+
+- La teoria debe estar bien explicada, sin recortes innecesarios.
+- Cada concepto debe ir acompanado por ejemplos claros.
+- La aplicacion debe usar ejercicios resueltos paso a paso.
+- La practica debe proponer ejercicios alineados con lo visto en la leccion.
+
+## Extras sugeridos
+
+- ejercicios
+- entorno-python
+- errores-comunes
+- git-github
+- json
+- markdown
+- matematicas-para-programar
+- terminal
+- tips-de-programacion
+
 

@@ -6,30 +6,64 @@ Proyecto educativo para ensenar Python de forma progresiva a estudiantes que ya 
 
 La idea es acompanar la transicion desde pseudocodigo a un lenguaje real, manteniendo una ruta ordenada y gradual:
 
-- documentacion teorica con ejemplos
-- guias de ejercicios resueltos
-- guias de ejercicios para practicar en cada clase
-- desafios por nivel de ensenanza
+- teoria con ejemplos
+- aplicacion con ejercicios resueltos
+- practica por leccion
 
 ## Punto de partida del curso
 
-Se asume que el estudiante ya maneja conceptos basicos en PSeInt:
+Se asume que el estudiante ya maneja en PSeInt:
 
 - variables
-- entrada y salida
-- condicionales
-- seleccion multiple
-- ciclos
-- definicion de procesos
+- escribir y leer
+- si y sino
+- segun
+- mientras
+- repetir
+- para
+- definir
 
-La primera etapa del proyecto estara centrada en la homologacion entre PSeInt y Python.
+La primera etapa del proyecto se centra en la [homologacion entre PSeInt y Python](docs/lessons/01-homologacion-pseint-python/README.md).
 
-## Estructura inicial
+## Navegacion rapida
 
-- `docs/00-introduccion/`: presentacion general del curso.
-- `docs/01-homologacion-pseint-python/`: equivalencias y primeras diferencias.
-- `docs/teoria/`: clases y contenidos teoricos.
-- `docs/ejercicios-resueltos/`: ejercicios explicados paso a paso.
-- `docs/practica/`: ejercicios para resolver en clase o en casa.
-- `docs/desafios/`: desafios clasificados por nivel.
+- [Documentacion del curso](docs/README.md)
+- [Lessons](docs/lessons/README.md)
+- [Extras](docs/extras/README.md)
+- [Leccion 01 - Homologacion entre PSeInt y Python](docs/lessons/01-homologacion-pseint-python/README.md)
+
+## Estructura
+
+```text
+docs/
+├── lessons/
+│   ├── 01-homologacion-pseint-python/
+│   ├── 02-variables-entrada-y-salida/
+│   ├── 03-tipos-de-datos-y-conversion/
+│   ├── 04-condicionales/
+│   ├── 05-ciclos/
+│   └── 06-funciones/
+└── extras/
+    ├── ejercicios/
+    ├── entorno-python/
+    ├── errores-comunes/
+    ├── git-github/
+    ├── json/
+    ├── markdown/
+    ├── matematicas-para-programar/
+    ├── terminal/
+    └── tips-de-programacion/
+```
+
+## Criterio pedagogico
+
+Cada carpeta en `docs/lessons/` representa una leccion y contiene el material directo de esa clase.
+
+Cada leccion debe desarrollarse con esta estructura:
+
+- `teoria.md`: explicacion completa, clara y progresiva, con ejemplos
+- `aplicacion.md`: ejercicios resueltos para mostrar como se usa lo visto
+- `practica.md`: ejercicios para que el estudiante aplique la leccion por su cuenta
+
+La carpeta [`docs/extras/`](docs/extras/README.md) contiene material complementario para consulta autonoma.
 
