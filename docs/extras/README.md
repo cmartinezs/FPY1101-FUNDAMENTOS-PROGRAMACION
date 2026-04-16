@@ -4,6 +4,7 @@ Material de apoyo complementario para reforzar autonomia, contexto tecnico y hab
 
 ## Navegacion
 
+- [Conceptos de programacion](conceptos-de-programacion/README.md)
 - [Ejercicios](ejercicios/README.md)
 - [Entorno Python](entorno-python/README.md)
 - [Errores comunes](errores-comunes/README.md)
