@@ -1,10 +1,10 @@
-# Leccion 02 - Variables, entrada y salida
+# Leccion 06a - Tipado Opcional (Type Hints)
 
-Esta leccion profundiza en el uso de variables, entrada y salida en Python.
+Esta leccion introduce el tipado estatico opcional en Python (type hints).
 
 ## Idea central
 
-Las variables son espacios de memoria donde se guardan datos. En Python, no es necesario declarar el tipo, pero sí es importante entender qué tipo de dato se está trabajando.
+Python es un lenguaje de tipado dinamico, pero desde Python 3.5 es posible agregar "sugerencias de tipo" (type hints) para mejorar la legibilidad y el mantenimiento del codigo.
 
 ## Estructura de la leccion
 
