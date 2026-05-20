@@ -11,10 +11,12 @@ Los ciclos permiten repetir codigo multiple veces. Python ofrece dos tipos: `whi
 - [`teoria.md`](teoria.md): conceptos y ejemplos
 - [`aplicacion.md`](aplicacion.md): ejercicios resueltos
 - [`practica.md`](practica.md): ejercicios propuestos
+- [`soluciones.md`](soluciones.md): ejemplos de soluciones para comparar
 
 ## Navegacion
 
 - [Teoria](teoria.md)
 - [Aplicacion](aplicacion.md)
 - [Practica](practica.md)
+- [Soluciones](soluciones.md)
 - [Volver a lessons](../README.md)
