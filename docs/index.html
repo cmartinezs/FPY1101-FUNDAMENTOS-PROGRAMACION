@@ -257,6 +257,76 @@
 
     .open-link:hover { color: var(--blue); }
 
+    .material-card {
+      height: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 1rem;
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+
+    .material-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 34px rgba(16, 24, 40, .1);
+      border-color: #b9c4d3;
+    }
+
+    .material-kicker {
+      color: var(--blue);
+      font-family: var(--mono);
+      font-size: .72rem;
+      font-weight: 700;
+      margin-bottom: .45rem;
+    }
+
+    .material-card h3 {
+      font-size: 1rem;
+      font-weight: 800;
+      margin-bottom: .45rem;
+    }
+
+    .material-card p {
+      color: #667085;
+      font-size: .93rem;
+      margin-bottom: .8rem;
+    }
+
+    .material-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .mini-link {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink);
+      background: #f8fafc;
+      font-family: var(--mono);
+      font-size: .72rem;
+      font-weight: 700;
+      padding: 5px 10px;
+      text-decoration: none;
+    }
+
+    .mini-link:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+      background: #eef4ff;
+    }
+
+    .nav-pills .nav-link {
+      border-radius: 8px;
+      color: #475467;
+      font-weight: 800;
+    }
+
+    .nav-pills .nav-link.active {
+      background: var(--dark);
+      color: #fff;
+    }
+
     .path {
       border-top: 1px solid var(--line);
       background: #fff;
@@ -312,6 +382,7 @@
       <div class="collapse navbar-collapse" id="menu">
         <div class="navbar-nav ms-auto">
           <a class="nav-link" href="#actividades">Actividades</a>
+          <a class="nav-link" href="#material">Lecciones y extras</a>
           <a class="nav-link" href="#ruta">Ruta</a>
         </div>
       </div>
@@ -323,11 +394,11 @@
       <div class="row align-items-center g-5">
         <div class="col-lg-7">
           <div class="eyebrow">Fundamentos de Programación</div>
-          <h1>Practica Python resolviendo misiones.</h1>
+          <h1>Práctica de Python con misiones.</h1>
           <p class="lead">Un punto de partida para entrar a las actividades del curso, experimentar con lógica, tomar decisiones, repetir acciones y manejar errores sin perderse entre archivos.</p>
           <div class="d-flex flex-wrap gap-2 mt-4">
             <a class="btn btn-main" href="#actividades"><i class="bi bi-rocket-takeoff me-2"></i>Entrar a las actividades</a>
-            <a class="btn btn-ghost" href="#ruta"><i class="bi bi-map me-2"></i>Ver ruta sugerida</a>
+            <a class="btn btn-ghost" href="#material"><i class="bi bi-journal-code me-2"></i>Ver lecciones</a>
           </div>
         </div>
         <div class="col-lg-5">
@@ -409,6 +480,192 @@
               <div class="tag-row"><span class="tag">try/except</span><span class="tag">strings</span><span class="tag">ciclos</span></div>
               <a class="open-link" href="try-excepto.html">Abrir actividad <i class="bi bi-arrow-right"></i></a>
             </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="material" class="py-5">
+      <div class="container">
+        <h2 class="section-title">Lecciones y extras</h2>
+        <p class="section-copy">Accede al material base del curso y a recursos de apoyo. Los enlaces abren archivos Markdown del repositorio.</p>
+
+        <ul class="nav nav-pills gap-2 mb-4" id="materialTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="lessons-tab" data-bs-toggle="pill" data-bs-target="#lessons-pane" type="button" role="tab" aria-controls="lessons-pane" aria-selected="true">
+              <i class="bi bi-journal-text me-1"></i> Lecciones
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="extras-tab" data-bs-toggle="pill" data-bs-target="#extras-pane" type="button" role="tab" aria-controls="extras-pane" aria-selected="false">
+              <i class="bi bi-compass me-1"></i> Extras
+            </button>
+          </li>
+        </ul>
+
+        <div class="tab-content" id="materialTabsContent">
+          <div class="tab-pane fade show active" id="lessons-pane" role="tabpanel" aria-labelledby="lessons-tab" tabindex="0">
+            <div class="row g-3">
+              <div class="col-md-6 col-xl-4 resource-item">
+                <article class="material-card">
+                  <div class="material-kicker">Lección 01</div>
+                  <h3>Homologación PSeInt y Python</h3>
+                  <p>Primer puente entre pseudocódigo y programas reales en Python.</p>
+                  <div class="material-actions">
+                    <a class="mini-link" href="../lessons/01-homologacion-pseint-python/README.md">Inicio</a>
+                    <a class="mini-link" href="../lessons/01-homologacion-pseint-python/teoria.md">Teoría</a>
+                    <a class="mini-link" href="../lessons/01-homologacion-pseint-python/practica.md">Práctica</a>
+                  </div>
+                </article>
+              </div>
+
+              <div class="col-md-6 col-xl-4 resource-item">
+                <article class="material-card">
+                  <div class="material-kicker">Lección 02</div>
+                  <h3>Variables, entrada y salida</h3>
+                  <p>Datos, lectura con teclado, mensajes y primeras transformaciones.</p>
+                  <div class="material-actions">
+                    <a class="mini-link" href="../lessons/02-variables-entrada-y-salida/README.md">Inicio</a>
+                    <a class="mini-link" href="../lessons/02-variables-entrada-y-salida/teoria.md">Teoría</a>
+                    <a class="mini-link" href="../lessons/02-variables-entrada-y-salida/practica.md">Práctica</a>
+                  </div>
+                </article>
+              </div>
+
+              <div class="col-md-6 col-xl-4 resource-item">
+                <article class="material-card">
+                  <div class="material-kicker">Lección 03</div>
+                  <h3>Tipos de datos y conversión</h3>
+                  <p>Números, texto, conversiones y cuidado con los tipos de entrada.</p>
+                  <div class="material-actions">
+                    <a class="mini-link" href="../lessons/03-tipos-de-datos-y-conversion/README.md">Inicio</a>
+                    <a class="mini-link" href="../lessons/03-tipos-de-datos-y-conversion/teoria.md">Teoría</a>
+                    <a class="mini-link" href="../lessons/03-tipos-de-datos-y-conversion/practica.md">Práctica</a>
+                  </div>
+                </article>
+              </div>
+
+              <div class="col-md-6 col-xl-4 resource-item">
+                <article class="material-card">
+                  <div class="material-kicker">Lección 04</div>
+                  <h3>Condicionales</h3>
+                  <p>Decisiones con if, comparación de datos y caminos alternativos.</p>
+                  <div class="material-actions">
+                    <a class="mini-link" href="../lessons/04-condicionales/README.md">Inicio</a>
+                    <a class="mini-link" href="../lessons/04-condicionales/teoria.md">Teoría</a>
+                    <a class="mini-link" href="../lessons/04-condicionales/practica.md">Práctica</a>
+                  </div>
+                </article>
+              </div>
+
+              <div class="col-md-6 col-xl-4 resource-item">
+                <article class="material-card">
+                  <div class="material-kicker">Lección 05</div>
+                  <h3>Ciclos</h3>
+                  <p>Repetición controlada para resolver tareas que ocurren varias veces.</p>
+                  <div class="material-actions">
+                    <a class="mini-link" href="../lessons/05-ciclos/README.md">Inicio</a>
+                    <a class="mini-link" href="../lessons/05-ciclos/teoria.md">Teoría</a>
+                    <a class="mini-link" href="../lessons/05-ciclos/practica.md">Práctica</a>
+                  </div>
+                </article>
+              </div>
+
+              <div class="col-md-6 col-xl-4 resource-item">
+                <article class="material-card">
+                  <div class="material-kicker">Lección 06</div>
+                  <h3>Funciones y tipado opcional</h3>
+                  <p>Organiza soluciones en bloques reutilizables y mejora la lectura del código.</p>
+                  <div class="material-actions">
+                    <a class="mini-link" href="../lessons/06-funciones/README.md">Funciones</a>
+                    <a class="mini-link" href="../lessons/06a-tipado-opcional/README.md">Tipado</a>
+                    <a class="mini-link" href="../lessons/README.md">Ver todas</a>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-pane fade" id="extras-pane" role="tabpanel" aria-labelledby="extras-tab" tabindex="0">
+            <div class="row g-3">
+              <div class="col-md-6 col-xl-4 resource-item">
+                <article class="material-card">
+                  <div class="material-kicker">Apoyo</div>
+                  <h3>Ejercicios por nivel</h3>
+                  <p>Práctica progresiva para reforzar lógica y resolución de problemas.</p>
+                  <div class="material-actions">
+                    <a class="mini-link" href="../extras/ejercicios/README.md">Inicio</a>
+                    <a class="mini-link" href="../extras/ejercicios/nivel_1.md">Nivel 1</a>
+                    <a class="mini-link" href="../extras/ejercicios/nivel_5.md">Nivel 5</a>
+                  </div>
+                </article>
+              </div>
+
+              <div class="col-md-6 col-xl-4 resource-item">
+                <article class="material-card">
+                  <div class="material-kicker">Herramientas</div>
+                  <h3>Entorno, terminal y Git</h3>
+                  <p>Guías para trabajar con el computador como entorno de desarrollo.</p>
+                  <div class="material-actions">
+                    <a class="mini-link" href="../extras/entorno-python/README.md">Python</a>
+                    <a class="mini-link" href="../extras/terminal/README.md">Terminal</a>
+                    <a class="mini-link" href="../extras/git-github/README.md">GitHub</a>
+                  </div>
+                </article>
+              </div>
+
+              <div class="col-md-6 col-xl-4 resource-item">
+                <article class="material-card">
+                  <div class="material-kicker">Consulta</div>
+                  <h3>Errores comunes y tips</h3>
+                  <p>Material para destrabar problemas frecuentes mientras programas.</p>
+                  <div class="material-actions">
+                    <a class="mini-link" href="../extras/errores-comunes/README.md">Errores</a>
+                    <a class="mini-link" href="../extras/tips-de-programacion/README.md">Tips</a>
+                    <a class="mini-link" href="../extras/markdown/README.md">Markdown</a>
+                  </div>
+                </article>
+              </div>
+
+              <div class="col-md-6 col-xl-4 resource-item">
+                <article class="material-card">
+                  <div class="material-kicker">Fundamentos</div>
+                  <h3>Conceptos de programación</h3>
+                  <p>Vocabulario, paradigmas, estructuras de datos, recursividad y buen código.</p>
+                  <div class="material-actions">
+                    <a class="mini-link" href="../extras/conceptos-de-programacion/README.md">Índice</a>
+                    <a class="mini-link" href="../extras/conceptos-de-programacion/01_vocabulario_universal.md">Vocabulario</a>
+                    <a class="mini-link" href="../extras/conceptos-de-programacion/07_principios_de_buen_codigo.md">Buen código</a>
+                  </div>
+                </article>
+              </div>
+
+              <div class="col-md-6 col-xl-4 resource-item">
+                <article class="material-card">
+                  <div class="material-kicker">Refuerzo</div>
+                  <h3>Matemáticas para programar</h3>
+                  <p>Operaciones, contadores, porcentajes, redondeo y casos de uso reales.</p>
+                  <div class="material-actions">
+                    <a class="mini-link" href="../extras/matematicas-para-programar/README.md">Índice</a>
+                    <a class="mini-link" href="../extras/matematicas-para-programar/01_operaciones_basicas.md">Operaciones</a>
+                    <a class="mini-link" href="../extras/matematicas-para-programar/03_porcentajes_descuentos_y_cargos.md">Porcentajes</a>
+                  </div>
+                </article>
+              </div>
+
+              <div class="col-md-6 col-xl-4 resource-item">
+                <article class="material-card">
+                  <div class="material-kicker">Contexto</div>
+                  <h3>Historia y lógica</h3>
+                  <p>Lecturas para entender de dónde viene la computación y cómo pensar con lógica.</p>
+                  <div class="material-actions">
+                    <a class="mini-link" href="../extras/historia-de-la-computacion/README.md">Historia</a>
+                    <a class="mini-link" href="../extras/logica-proposicional/README.md">Lógica</a>
+                    <a class="mini-link" href="../extras/README.md">Ver extras</a>
+                  </div>
+                </article>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -521,7 +778,7 @@
         });
       }, { threshold: .18 });
 
-      document.querySelectorAll(".activity-item, .path-item").forEach((item) => {
+      document.querySelectorAll(".activity-item, .resource-item, .path-item").forEach((item) => {
         item.style.opacity = 0;
         reveal.observe(item);
       });

@@ -1,14 +1,14 @@
 # Python desde 0 para estudiantes con base en PSeInt
 
-Proyecto educativo para ensenar Python de forma progresiva a estudiantes que ya conocen fundamentos de programacion en PSeInt.
+Proyecto educativo para enseñar Python de forma progresiva a estudiantes que ya conocen fundamentos de programación en PSeInt.
 
-## Proposito
+## Propósito
 
-La idea es acompanar la transicion desde pseudocodigo a un lenguaje real, manteniendo una ruta ordenada y gradual:
+La idea es acompañar la transición desde pseudocódigo a un lenguaje real, manteniendo una ruta ordenada y gradual:
 
-- teoria con ejemplos
-- aplicacion con ejercicios resueltos
-- practica por leccion
+- teoría con ejemplos
+- aplicación con ejercicios resueltos
+- práctica por lección
 
 ## Punto de partida del curso
 
@@ -17,20 +17,20 @@ Se asume que el estudiante ya maneja en PSeInt:
 - variables
 - escribir y leer
 - si y sino
-- segun
+- según
 - mientras
 - repetir
 - para
 - definir
 
-La primera etapa del proyecto se centra en la [homologacion entre PSeInt y Python](docs/lessons/01-homologacion-pseint-python/README.md).
+La primera etapa del proyecto se centra en la [homologación entre PSeInt y Python](docs/lessons/01-homologacion-pseint-python/README.md).
 
-## Navegacion rapida
+## Navegación rápida
 
-- [Documentacion del curso](docs/README.md)
+- [Documentación del curso](docs/README.md)
 - [Lessons](docs/lessons/README.md)
 - [Extras](docs/extras/README.md)
-- [Leccion 01 - Homologacion entre PSeInt y Python](docs/lessons/01-homologacion-pseint-python/README.md)
+- [Lección 01 - Homologación entre PSeInt y Python](docs/lessons/01-homologacion-pseint-python/README.md)
 
 ## Estructura
 
@@ -55,15 +55,14 @@ docs/
     └── tips-de-programacion/
 ```
 
-## Criterio pedagogico
+## Criterio pedagógico
 
-Cada carpeta en `docs/lessons/` representa una leccion y contiene el material directo de esa clase.
+Cada carpeta en `docs/lessons/` representa una lección y contiene el material directo de esa clase.
 
-Cada leccion debe desarrollarse con esta estructura:
+Cada lección debe desarrollarse con esta estructura:
 
-- `teoria.md`: explicacion completa, clara y progresiva, con ejemplos
-- `aplicacion.md`: ejercicios resueltos para mostrar como se usa lo visto
-- `practica.md`: ejercicios para que el estudiante aplique la leccion por su cuenta
+- `teoria.md`: explicación completa, clara y progresiva, con ejemplos
+- `aplicacion.md`: ejercicios resueltos para mostrar cómo se usa lo visto
+- `practica.md`: ejercicios para que el estudiante aplique la lección por su cuenta
 
-La carpeta [`docs/extras/`](docs/extras/README.md) contiene material complementario para consulta autonoma.
-
+La carpeta [`docs/extras/`](docs/extras/README.md) contiene material complementario para consulta autónoma.
