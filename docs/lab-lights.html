@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarea: Luces del Laboratorio · FPY-1101</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:      #0a0c10;
+            --surface: #11141a;
+            --card:    #161b24;
+            --border:  #1f2733;
+            --cyan:    #00e5ff;
+            --amber:   #ffb300;
+            --green:   #00e676;
+            --red:     #ff4d6d;
+            --blue:    #448aff;
+            --purple:  #e040fb;
+            --white:   #e8eaf0;
+            --muted:   #5a6370;
+            --mono: 'Share Tech Mono', monospace;
+            --display: 'Orbitron', sans-serif;
+            --body: 'Inter', sans-serif;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { background: var(--bg); color: var(--white); font-family: var(--body); font-size: 0.95rem; line-height: 1.7; }
+        body::before {
+            content:''; position:fixed; inset:0; pointer-events:none; z-index:999;
+            background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,229,255,0.012) 3px,rgba(0,229,255,0.012) 4px);
+        }
+
+        /* HEADER */
+        header { background:var(--surface); border-bottom:1px solid var(--border); padding:3rem 0 2.5rem; position:relative; overflow:hidden; }
+        header::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--cyan),transparent); }
+        .badge-curso { font-family:var(--mono); font-size:0.72rem; color:var(--cyan); letter-spacing:0.15em; text-transform:uppercase; border:1px solid rgba(0,229,255,0.3); padding:3px 10px; border-radius:2px; display:inline-block; margin-bottom:1rem; }
+        h1.titulo { font-family:var(--display); font-size:clamp(1.6rem,4vw,2.6rem); font-weight:900; line-height:1.15; letter-spacing:-0.02em; margin-bottom:0.5rem; }
+        h1.titulo span { color:var(--cyan); }
+        .subtitulo { font-family:var(--mono); font-size:0.8rem; color:var(--muted); letter-spacing:0.08em; }
+
+        /* LAB DECO */
+        .lab-deco { display:grid; grid-template-columns:repeat(3,52px); grid-template-rows:repeat(3,52px); gap:4px; opacity:0.9; }
+        .lab-deco .cell { border:1px solid var(--border); border-radius:4px; display:flex; align-items:center; justify-content:center; font-family:var(--display); font-size:1.1rem; font-weight:700; background:var(--card); animation:pulse-cell 3s ease-in-out infinite; }
+        /* E = encendida → ámbar */
+        .lab-deco .cell.enc { color:var(--amber); border-color:rgba(255,179,0,0.4); background:rgba(255,179,0,0.07); }
+        .lab-deco .cell.apa { color:var(--muted); border-color:var(--border); }
+        .lab-deco .cell:nth-child(1){animation-delay:0s} .lab-deco .cell:nth-child(3){animation-delay:0.4s}
+        .lab-deco .cell:nth-child(5){animation-delay:0.8s} .lab-deco .cell:nth-child(7){animation-delay:1.2s}
+        .lab-deco .cell:nth-child(9){animation-delay:1.6s}
+        @keyframes pulse-cell { 0%,100%{box-shadow:none} 50%{box-shadow:0 0 10px currentColor} }
+
+        /* NAV */
+        .sticky-nav { position:sticky; top:0; background:rgba(10,12,16,0.92); backdrop-filter:blur(10px); border-bottom:1px solid var(--border); z-index:100; padding:0.6rem 0; }
+        .sticky-nav a { font-family:var(--mono); font-size:0.72rem; color:var(--muted); text-decoration:none; letter-spacing:0.1em; text-transform:uppercase; padding:4px 10px; border-radius:3px; transition:color 0.2s,background 0.2s; }
+        .sticky-nav a:hover { color:var(--cyan); background:rgba(0,229,255,0.08); }
+
+        /* SECTIONS */
+        main { padding:0 0 4rem; }
+        section { padding:2.5rem 0 1rem; }
+        h2.sec-title { font-family:var(--display); font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:var(--cyan); border-left:3px solid var(--cyan); padding-left:12px; margin-bottom:1.5rem; }
+        h3.nivel-title { font-family:var(--display); font-size:1rem; font-weight:700; letter-spacing:0.05em; margin-bottom:0.3rem; }
+
+        /* CARDS */
+        .card-dark { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:1.5rem; height:100%; }
+
+        /* NIVEL CARDS */
+        .nivel-card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:1.5rem 1.75rem; margin-bottom:1rem; position:relative; overflow:hidden; transition:border-color 0.2s; }
+        .nivel-card::before { content:''; position:absolute; top:0; left:0; width:4px; height:100%; }
+        .nivel-card:hover { border-color:rgba(255,255,255,0.15); }
+        .nivel-card.n1::before { background:var(--green); }
+        .nivel-card.n2::before { background:var(--blue); }
+        .nivel-card.n3::before { background:var(--amber); }
+        .nivel-card.n4::before { background:var(--red); }
+        .nivel-badge { font-family:var(--mono); font-size:0.68rem; letter-spacing:0.12em; padding:2px 10px; border-radius:2px; display:inline-block; margin-bottom:0.75rem; }
+        .n1 .nivel-badge { color:var(--green); border:1px solid rgba(0,230,118,0.3); background:rgba(0,230,118,0.07); }
+        .n2 .nivel-badge { color:var(--blue);  border:1px solid rgba(68,138,255,0.3); background:rgba(68,138,255,0.07); }
+        .n3 .nivel-badge { color:var(--amber); border:1px solid rgba(255,179,0,0.3);  background:rgba(255,179,0,0.07); }
+        .n4 .nivel-badge { color:var(--red);   border:1px solid rgba(255,77,109,0.3);  background:rgba(255,77,109,0.07); }
+        .n1 h3.nivel-title { color:var(--green); } .n2 h3.nivel-title { color:var(--blue); }
+        .n3 h3.nivel-title { color:var(--amber); } .n4 h3.nivel-title { color:var(--red); }
+        .decima-tag { font-family:var(--mono); font-size:0.72rem; color:var(--purple); border:1px solid rgba(224,64,251,0.3); background:rgba(224,64,251,0.07); padding:2px 10px; border-radius:2px; margin-left:8px; }
+
+        /* ALERTS */
+        .alerta { border-radius:6px; padding:0.8rem 1rem; font-size:0.88rem; border-left:3px solid; }
+        .alerta.warn   { background:rgba(255,179,0,0.07);  border-color:var(--amber); color:#f5d27a; }
+        .alerta.info   { background:rgba(0,229,255,0.06);  border-color:var(--cyan);  color:#7de8f5; }
+        .alerta.ok     { background:rgba(0,230,118,0.06);  border-color:var(--green); color:#7eedb6; }
+        .alerta.danger { background:rgba(255,77,109,0.07); border-color:var(--red);   color:#f5a0af; }
+
+        /* CODE */
+        pre.code-block { background:#090c11; border:1px solid var(--border); border-radius:6px; padding:1.1rem 1.25rem; font-family:var(--mono); font-size:0.82rem; color:#c9d1d9; overflow-x:auto; line-height:1.6; white-space:pre; }
+        pre.code-block .kw  { color:var(--cyan); }
+        pre.code-block .fn  { color:#ffd700; }
+        pre.code-block .str { color:var(--green); }
+        pre.code-block .cm  { color:var(--muted); }
+        pre.code-block .num { color:var(--amber); }
+
+        /* TABLE */
+        table.retro { width:100%; border-collapse:collapse; font-size:0.88rem; font-family:var(--mono); }
+        table.retro th { background:var(--surface); color:var(--cyan); font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; padding:10px 14px; border-bottom:1px solid var(--border); text-align:left; }
+        table.retro td { padding:10px 14px; border-bottom:1px solid var(--border); color:var(--white); vertical-align:top; }
+        table.retro tr:last-child td { border-bottom:none; }
+        table.retro tr:hover td { background:rgba(255,255,255,0.02); }
+
+        /* FLOOR EXAMPLE */
+        .floor-example { display:inline-grid; grid-template-columns:repeat(3,44px); grid-template-rows:repeat(3,44px); gap:4px; vertical-align:middle; }
+        .floor-example .c { border:1px solid var(--border); border-radius:3px; display:flex; align-items:center; justify-content:center; font-family:var(--display); font-size:0.9rem; font-weight:700; background:var(--card); }
+        /* E = encendida → ámbar */
+        .floor-example .c.enc { color:var(--amber); border-color:rgba(255,179,0,0.4); background:rgba(255,179,0,0.08); }
+        .floor-example .c.apa { color:var(--muted); }
+        .floor-example .c.hl  { color:var(--cyan); border-color:rgba(0,229,255,0.6); background:rgba(0,229,255,0.08); box-shadow:0 0 8px rgba(0,229,255,0.25); }
+
+        /* PROGRESS */
+        .progress-track { display:flex; gap:6px; margin-bottom:1.5rem; }
+        .progress-step { flex:1; height:4px; border-radius:2px; background:var(--border); }
+        .progress-step.n1{background:var(--green)} .progress-step.n2{background:var(--blue)}
+        .progress-step.n3{background:var(--amber)} .progress-step.n4{background:var(--red)}
+
+        /* LIST */
+        ul.req-list { list-style:none; padding:0; }
+        ul.req-list li { padding:0.35rem 0 0.35rem 1.6rem; position:relative; font-size:0.92rem; border-bottom:1px solid rgba(255,255,255,0.04); }
+        ul.req-list li:last-child { border-bottom:none; }
+        ul.req-list li::before { content:'▸'; position:absolute; left:0; color:var(--cyan); font-size:0.75rem; top:0.45rem; }
+
+        /* FOOTER */
+        footer { border-top:1px solid var(--border); background:var(--surface); padding:2rem 0; }
+        footer p { font-family:var(--mono); font-size:0.72rem; color:var(--muted); letter-spacing:0.06em; }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-4">
+            <div>
+                <div class="badge-curso">FPY-1101 · Fundamentos de Programación</div>
+                <h1 class="titulo">Tarea Programada:<br><span>Luces del Laboratorio</span></h1>
+                <p class="subtitulo">Lights-Out Puzzle · Python · Consola · Piso 3×3</p>
+            </div>
+            <div class="lab-deco d-none d-md-grid">
+                <div class="cell enc">E</div><div class="cell apa">A</div><div class="cell enc">E</div>
+                <div class="cell apa">A</div><div class="cell enc">E</div><div class="cell apa">A</div>
+                <div class="cell enc">E</div><div class="cell apa">A</div><div class="cell enc">E</div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- NAV -->
+<nav class="sticky-nav">
+    <div class="container d-flex gap-1 flex-wrap">
+        <a href="#descripcion">Descripción</a>
+        <a href="#tablero">Tablero</a>
+        <a href="#niveles">Niveles</a>
+        <a href="#conceptos">Conceptos</a>
+        <a href="#ejemplo">Ejemplo</a>
+        <a href="#restricciones">Restricciones</a>
+        <a href="#entrega">Entrega</a>
+    </div>
+</nav>
+
+<main>
+    <div class="container">
+
+        <!-- DESCRIPCIÓN -->
+        <section id="descripcion">
+            <h2 class="sec-title">Descripción del problema</h2>
+            <div class="row g-4">
+                <div class="col-md-8">
+                    <p class="mb-3">
+                        El laboratorio de computación tiene un piso con <strong style="color:var(--white)">9 salas distribuidas en una cuadrícula 3×3</strong>. Cada sala tiene una luz que puede estar <strong style="color:var(--amber)">encendida (E)</strong> o <strong style="color:var(--muted)">apagada (A)</strong>.
+                    </p>
+                    <p class="mb-3">
+                        Al llegar al turno de noche, el guardia nota que varias luces quedaron encendidas al azar. Tu programa debe ayudarle a apagarlas todas, pero hay un problema: <strong style="color:var(--white)">el panel de control invierte no solo la sala elegida, sino también todas sus salas adyacentes</strong> (arriba, abajo, izquierda, derecha).
+                    </p>
+                    <div class="alerta warn mb-3">
+                        ⚠ El guardia <strong>no puede ver el estado del piso</strong> después de elegir una sala. Solo se le indica cuántas salas quedaron encendidas y cuántas apagadas.
+                    </div>
+                    <div class="alerta ok">
+                        🎯 El objetivo es llegar a <strong>cero salas encendidas</strong>, en la menor cantidad de intentos posible.
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card-dark text-center">
+                        <p style="font-family:var(--mono);font-size:0.72rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:1rem;">Ejemplo de jugada</p>
+                        <div class="d-flex justify-content-center mb-1">
+                            <div class="floor-example">
+                                <div class="c enc">E</div><div class="c apa">A</div><div class="c enc">E</div>
+                                <div class="c enc">E</div><div class="c hl">E</div><div class="c apa">A</div>
+                                <div class="c apa">A</div><div class="c enc">E</div><div class="c apa">A</div>
+                            </div>
+                        </div>
+                        <p style="font-size:0.78rem;color:var(--muted);font-family:var(--mono);margin-bottom:1rem;">sala elegida = 5</p>
+                        <div class="d-flex justify-content-center mb-1">
+                            <div class="floor-example">
+                                <div class="c apa">A</div><div class="c enc">E</div><div class="c apa">A</div>
+                                <div class="c apa">A</div><div class="c apa">A</div><div class="c enc">E</div>
+                                <div class="c enc">E</div><div class="c apa">A</div><div class="c enc">E</div>
+                            </div>
+                        </div>
+                        <p style="font-size:0.78rem;color:var(--cyan);font-family:var(--mono);">sala 5 + adyacentes (2,4,6,8) invertidas</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TABLERO -->
+        <section id="tablero">
+            <h2 class="sec-title">Numeración del tablero</h2>
+            <div class="row g-4 align-items-start">
+                <div class="col-md-5">
+                    <div class="card-dark text-center">
+                        <p style="font-family:var(--mono);font-size:0.72rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:1.25rem;">Distribución de salas</p>
+                        <div class="floor-example" style="display:grid!important;margin:0 auto;">
+                            <div class="c" style="color:var(--cyan);border-color:rgba(0,229,255,0.3);">1</div>
+                            <div class="c" style="color:var(--cyan);border-color:rgba(0,229,255,0.3);">2</div>
+                            <div class="c" style="color:var(--cyan);border-color:rgba(0,229,255,0.3);">3</div>
+                            <div class="c" style="color:var(--cyan);border-color:rgba(0,229,255,0.3);">4</div>
+                            <div class="c" style="color:var(--cyan);border-color:rgba(0,229,255,0.3);">5</div>
+                            <div class="c" style="color:var(--cyan);border-color:rgba(0,229,255,0.3);">6</div>
+                            <div class="c" style="color:var(--cyan);border-color:rgba(0,229,255,0.3);">7</div>
+                            <div class="c" style="color:var(--cyan);border-color:rgba(0,229,255,0.3);">8</div>
+                            <div class="c" style="color:var(--cyan);border-color:rgba(0,229,255,0.3);">9</div>
+                        </div>
+                        <p style="font-family:var(--mono);font-size:0.78rem;color:var(--muted);margin-top:1rem;">El jugador ingresa un número del 1 al 9</p>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div class="card-dark">
+                        <p style="font-family:var(--mono);font-size:0.72rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:1rem;">Adyacencias por sala</p>
+                        <table class="retro">
+                            <thead><tr><th>Sala</th><th>Adyacentes</th><th>Posición</th></tr></thead>
+                            <tbody>
+                            <tr><td>1</td><td>2, 4</td><td>Esquina superior izquierda</td></tr>
+                            <tr><td>2</td><td>1, 3, 5</td><td>Borde superior centro</td></tr>
+                            <tr><td>3</td><td>2, 6</td><td>Esquina superior derecha</td></tr>
+                            <tr><td>4</td><td>1, 5, 7</td><td>Borde izquierdo centro</td></tr>
+                            <tr><td>5</td><td>2, 4, 6, 8</td><td>Centro (mayor impacto)</td></tr>
+                            <tr><td>6</td><td>3, 5, 9</td><td>Borde derecho centro</td></tr>
+                            <tr><td>7</td><td>4, 8</td><td>Esquina inferior izquierda</td></tr>
+                            <tr><td>8</td><td>7, 9, 5</td><td>Borde inferior centro</td></tr>
+                            <tr><td>9</td><td>6, 8</td><td>Esquina inferior derecha</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NIVELES -->
+        <section id="niveles">
+            <h2 class="sec-title">Niveles de dificultad</h2>
+            <div class="progress-track">
+                <div class="progress-step n1"></div><div class="progress-step n2"></div>
+                <div class="progress-step n3"></div><div class="progress-step n4"></div>
+            </div>
+            <div class="alerta info mb-4">💡 Cada nivel construye sobre el anterior. Guarda una copia funcional antes de avanzar.</div>
+
+            <!-- N1 -->
+            <div class="nivel-card n1">
+                <div class="nivel-badge">NIVEL 1 · BASE</div>
+                <h3 class="nivel-title">Juego básico funcional</h3>
+                <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1rem;">Implementa el juego completo en su forma esencial.</p>
+                <ul class="req-list">
+                    <li>Asignar estado inicial aleatorio: <code style="color:var(--amber);font-family:var(--mono);">E</code> (encendida) o <code style="color:var(--muted);font-family:var(--mono);">A</code> (apagada) usando <code style="color:var(--green);font-family:var(--mono);">random.randint(0,1)</code></li>
+                    <li>Mostrar <strong>solo</strong> la cantidad de salas encendidas y apagadas al inicio (no el estado del piso)</li>
+                    <li>Pedir al jugador que ingrese un número de sala del 1 al 9 en cada turno</li>
+                    <li>Validar que la entrada sea un dígito válido entre 1 y 9 usando <code style="color:var(--green);font-family:var(--mono);">.isdigit()</code></li>
+                    <li>Al elegir una sala: invertir la sala elegida y todas sus adyacentes (arriba, abajo, izquierda, derecha)</li>
+                    <li>Después de cada jugada mostrar cuántas salas quedan encendidas y cuántas apagadas</li>
+                    <li>El estado del piso <strong>no se muestra</strong> en ningún momento durante el juego</li>
+                    <li>Contar los intentos realizados</li>
+                    <li>Terminar cuando todas las salas estén apagadas y mostrar el total de intentos</li>
+                </ul>
+            </div>
+
+            <!-- N2 -->
+            <div class="nivel-card n2">
+                <div class="nivel-badge">NIVEL 2 · INTERMEDIO</div>
+                <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                    <h3 class="nivel-title" style="margin-bottom:0;">Historial de partidas</h3>
+                    <span class="decima-tag">+1 décima prueba</span>
+                </div>
+                <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1rem;">Agrega estadísticas acumuladas entre partidas.</p>
+                <ul class="req-list">
+                    <li>Todo lo del Nivel 1 funcionando correctamente</li>
+                    <li>Al terminar cada partida, preguntar si el jugador desea jugar otra vez</li>
+                    <li>Mantener durante toda la ejecución: total de partidas jugadas, partidas ganadas, mejor resultado (mínimo intentos) y total de intentos acumulados</li>
+                    <li>Al salir mostrar un resumen con todas las estadísticas</li>
+                    <li>Calcular y mostrar el promedio de intentos por partida ganada</li>
+                </ul>
+            </div>
+
+            <!-- N3 -->
+            <div class="nivel-card n3">
+                <div class="nivel-badge">NIVEL 3 · AVANZADO</div>
+                <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                    <h3 class="nivel-title" style="margin-bottom:0;">Modos de juego y pistas</h3>
+                    <span class="decima-tag">+0,8 décimas prueba</span>
+                </div>
+                <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1rem;">Agrega configuración antes de cada partida.</p>
+                <ul class="req-list">
+                    <li>Todo lo del Nivel 2 funcionando correctamente</li>
+                    <li>Menú antes de cada partida: [1] Modo normal (aleatorio) · [2] Modo difícil (todas encendidas) · [3] Modo personalizado (el jugador ingresa E o A por cada sala)</li>
+                    <li>Sistema de pistas: si el jugador lleva más de 10 intentos, ofrecerle ver cuántas salas cambiarían al elegir una sala específica (sin revelar el estado del piso)</li>
+                    <li>La pista es opcional y no tiene penalización</li>
+                    <li>Distinguir en las estadísticas las partidas ganadas con y sin pistas</li>
+                </ul>
+            </div>
+
+            <!-- N4 -->
+            <div class="nivel-card n4">
+                <div class="nivel-badge">NIVEL 4 · EXPERTO</div>
+                <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                    <h3 class="nivel-title" style="margin-bottom:0;">Modo demostración</h3>
+                    <span class="decima-tag">+0,5 décimas prueba</span>
+                </div>
+                <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1rem;">El programa resuelve el puzzle automáticamente.</p>
+                <ul class="req-list">
+                    <li>Todo lo del Nivel 3 funcionando correctamente</li>
+                    <li>Opción [4] Ver demostración: el programa intenta salas en orden (1 a 9, repetidamente) hasta apagar todas las luces</li>
+                    <li>Mostrar cada jugada automática: sala elegida y cuántas quedaron encendidas</li>
+                    <li>Si supera 50 intentos sin resolver, detenerse e informarlo</li>
+                    <li>El jugador puede comparar su resultado con el de la demostración</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- CONCEPTOS -->
+        <section id="conceptos">
+            <h2 class="sec-title">Mapa de conceptos requeridos</h2>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="card-dark">
+                        <p style="font-family:var(--mono);font-size:0.72rem;color:var(--green);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:1rem;">▸ Nivel 1</p>
+                        <table class="retro" style="font-family:var(--body);font-size:0.88rem;">
+                            <thead><tr><th>Concepto</th><th>Uso</th></tr></thead>
+                            <tbody>
+                            <tr><td><code style="color:var(--cyan);font-family:var(--mono);">random.randint</code></td><td>Estado inicial aleatorio</td></tr>
+                            <tr><td><code style="color:var(--cyan);font-family:var(--mono);">.isdigit()</code></td><td>Validar número de sala</td></tr>
+                            <tr><td><code style="color:var(--cyan);font-family:var(--mono);">while</code></td><td>Bucle principal del juego</td></tr>
+                            <tr><td><code style="color:var(--cyan);font-family:var(--mono);">if / elif / else</code></td><td>Condicionales de adyacencia e inversión</td></tr>
+                            <tr><td>Contadores</td><td>Intentos y conteo de salas</td></tr>
+                            <tr><td>Operadores lógicos</td><td>Verificar condición de victoria</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card-dark">
+                        <p style="font-family:var(--mono);font-size:0.72rem;color:var(--blue);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:1rem;">▸ Niveles 2–4</p>
+                        <table class="retro" style="font-family:var(--body);font-size:0.88rem;">
+                            <thead><tr><th>Concepto</th><th>Uso</th></tr></thead>
+                            <tbody>
+                            <tr><td>Acumuladores</td><td>Partidas, intentos totales</td></tr>
+                            <tr><td><code style="color:var(--cyan);font-family:var(--mono);">int / float</code></td><td>Conversión y promedios</td></tr>
+                            <tr><td>Menú con <code style="color:var(--cyan);font-family:var(--mono);">while</code></td><td>Selección de modo</td></tr>
+                            <tr><td>Validación de rango</td><td>Opciones de menú</td></tr>
+                            <tr><td>Condicionales anidados</td><td>Lógica de pistas y modos</td></tr>
+                            <tr><td>Operaciones aritméticas</td><td>Promedios, porcentajes</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="alerta warn mt-3">
+                <strong>Solo puedes usar:</strong> <code style="font-family:var(--mono);">input, int, float, str, isdigit(), if, else, elif, while, for, random.randint, operadores aritméticos y lógicos</code>. Representa el estado con 9 variables separadas (s1…s9), no con listas.
+            </div>
+        </section>
+
+        <!-- EJEMPLO -->
+        <section id="ejemplo">
+            <h2 class="sec-title">Ejemplo de ejecución (Nivel 1)</h2>
+            <pre class="code-block"><span class="cm">===================================</span>
+<span class="cm">  LUCES DEL LABORATORIO · Nivel 1  </span>
+<span class="cm">===================================</span>
+<span class="cm">  E = encendida   |   A = apagada  </span>
+<span class="cm">===================================</span>
+
+<span class="kw">Estado inicial</span>:
+  <span class="cm">Salas encendidas (E)</span>: <span class="num">5</span>
+  <span class="cm">Salas apagadas  (A)</span>: <span class="num">4</span>
+
+<span class="cm">Recuerda: no puedes ver el piso.</span>
+
+<span class="fn">Ingresa el número de sala</span> (1-9): <span class="str">5</span>
+
+<span class="kw">Jugada 1</span> — elegiste sala <span class="num">5</span>
+  <span class="cm">Salas encendidas (E)</span>: <span class="num">3</span>
+  <span class="cm">Salas apagadas  (A)</span>: <span class="num">6</span>
+
+<span class="fn">Ingresa el número de sala</span> (1-9): <span class="str">hola</span>
+  <span class="cm">⚠ Entrada inválida. Ingresa un número entre 1 y 9.</span>
+
+<span class="fn">Ingresa el número de sala</span> (1-9): <span class="str">2</span>
+
+<span class="kw">Jugada 2</span> — elegiste sala <span class="num">2</span>
+  <span class="cm">Salas encendidas (E)</span>: <span class="num">1</span>
+  <span class="cm">Salas apagadas  (A)</span>: <span class="num">8</span>
+
+<span class="fn">Ingresa el número de sala</span> (1-9): <span class="str">1</span>
+
+<span class="kw">Jugada 3</span> — elegiste sala <span class="num">1</span>
+  <span class="cm">Salas encendidas (E)</span>: <span class="num">0</span>
+  <span class="cm">Salas apagadas  (A)</span>: <span class="num">9</span>
+
+<span class="cm">===================================</span>
+<span class="kw">  ¡LABORATORIO EN SILENCIO!        </span>
+<span class="cm">===================================</span>
+<span class="cm">  Intentos realizados</span>: <span class="num">3</span>
+<span class="cm">===================================</span></pre>
+            <div class="alerta info mt-3">
+                ℹ El ejemplo muestra una partida ideal. Tu programa debe funcionar con cualquier estado inicial aleatorio, incluyendo el caso en que todas las salas ya estén apagadas desde el inicio.
+            </div>
+        </section>
+
+        <!-- RESTRICCIONES -->
+        <section id="restricciones">
+            <h2 class="sec-title">Restricciones técnicas</h2>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="card-dark">
+                        <p style="font-family:var(--mono);font-size:0.72rem;color:var(--red);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:1rem;">✗ No está permitido</p>
+                        <ul class="req-list" style="color:#f5a0af;">
+                            <li>Listas, tuplas, diccionarios o cualquier colección</li>
+                            <li>Funciones definidas por el usuario (<code style="font-family:var(--mono);">def</code>)</li>
+                            <li>Manejo de excepciones (<code style="font-family:var(--mono);">try / except</code>)</li>
+                            <li>Módulos externos (solo <code style="font-family:var(--mono);">random</code> está permitido)</li>
+                            <li>Clases u orientación a objetos</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card-dark">
+                        <p style="font-family:var(--mono);font-size:0.72rem;color:var(--green);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:1rem;">✓ Sí está permitido</p>
+                        <ul class="req-list" style="color:#7eedb6;">
+                            <li><code style="font-family:var(--mono);">input(), int(), float(), str()</code></li>
+                            <li><code style="font-family:var(--mono);">.isdigit()</code> para validación</li>
+                            <li><code style="font-family:var(--mono);">if, elif, else, while, for</code></li>
+                            <li>Operadores aritméticos y lógicos</li>
+                            <li><code style="font-family:var(--mono);">random.randint(0, 1)</code></li>
+                            <li>9 variables simples: <code style="font-family:var(--mono);">s1, s2, …, s9</code></li>
+                            <li><code style="font-family:var(--mono);">print()</code> con formato</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="card-dark mt-3">
+                <p style="font-family:var(--mono);font-size:0.72rem;color:var(--amber);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:1rem;">⚡ Sugerencia de estructura</p>
+                <p style="font-size:0.9rem;color:var(--muted);margin-bottom:0.75rem;">Usa 9 variables <code style="font-family:var(--mono);color:var(--cyan);">s1…s9</code> con valor <code style="font-family:var(--mono);">"E"</code> (encendida) o <code style="font-family:var(--mono);">"A"</code> (apagada). La inversión y el conteo se hacen con condicionales:</p>
+                <pre class="code-block"><span class="cm"># Invertir sala: E → A o A → E</span>
+<span class="kw">if</span> s1 == <span class="str">"E"</span>:
+    s1 = <span class="str">"A"</span>
+<span class="kw">else</span>:
+    s1 = <span class="str">"E"</span>
+
+<span class="cm"># Contar salas encendidas (E)</span>
+encendidas = <span class="num">0</span>
+<span class="kw">if</span> s1 == <span class="str">"E"</span>: encendidas = encendidas + <span class="num">1</span>
+<span class="kw">if</span> s2 == <span class="str">"E"</span>: encendidas = encendidas + <span class="num">1</span>
+<span class="cm"># ... (repetir para s3 a s9)</span></pre>
+            </div>
+        </section>
+
+        <!-- ENTREGA -->
+        <section id="entrega">
+            <h2 class="sec-title">Rúbrica y entrega</h2>
+            <div class="row g-4">
+                <div class="col-md-7">
+                    <table class="retro">
+                        <thead><tr><th>Criterio</th><th>Puntaje</th></tr></thead>
+                        <tbody>
+                        <tr><td>Estado inicial aleatorio correcto (E/A)</td><td style="color:var(--green);font-family:var(--mono);">10 pts</td></tr>
+                        <tr><td>Inversión correcta de sala + adyacentes</td><td style="color:var(--green);font-family:var(--mono);">25 pts</td></tr>
+                        <tr><td>Validación de entrada (rango + tipo)</td><td style="color:var(--green);font-family:var(--mono);">15 pts</td></tr>
+                        <tr><td>Conteo y mensaje de encendidas/apagadas</td><td style="color:var(--green);font-family:var(--mono);">10 pts</td></tr>
+                        <tr><td>Condición de victoria y mensaje final</td><td style="color:var(--green);font-family:var(--mono);">15 pts</td></tr>
+                        <tr><td>Conteo de intentos</td><td style="color:var(--green);font-family:var(--mono);">10 pts</td></tr>
+                        <tr><td>Código ordenado con comentarios</td><td style="color:var(--green);font-family:var(--mono);">15 pts</td></tr>
+                        <tr style="background:rgba(0,229,255,0.04)">
+                            <td style="color:var(--white);font-weight:500;">Total Nivel 1</td>
+                            <td style="color:var(--cyan);font-family:var(--mono);font-weight:700;">100 pts</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-5">
+                    <div class="card-dark">
+                        <p style="font-family:var(--mono);font-size:0.72rem;color:var(--cyan);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:1rem;">📋 Checklist antes de entregar</p>
+                        <ul class="req-list">
+                            <li>El programa ejecuta sin errores con Python 3</li>
+                            <li>El estado inicial usa E (encendida) y A (apagada)</li>
+                            <li>Elegir sala 5 invierte salas 5, 2, 4, 6 y 8</li>
+                            <li>Elegir sala 1 invierte salas 1, 2 y 4 únicamente</li>
+                            <li>Entradas inválidas muestran error y vuelven a pedir</li>
+                            <li>El juego termina correctamente con 0 encendidas</li>
+                            <li>El archivo se llama <code style="font-family:var(--mono);">luces_laboratorio.py</code></li>
+                            <li>El código tiene comentarios en las partes clave</li>
+                        </ul>
+                    </div>
+                    <div class="alerta danger mt-3">
+                        ⚠ Entregar código con <code style="font-family:var(--mono);">def</code>, listas o librerías no autorizadas descuenta 20 puntos por cada uso.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+<footer>
+    <div class="container d-flex justify-content-between flex-wrap gap-2">
+        <p>FPY-1101 · TALLER DE FUNDAMENTOS DE PROGRAMACIÓN</p>
+        <p>ESCUELA DE INGENIERÍA EN INFORMÁTICA Y TELECOMUNICACIONES</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Actividad: Cajero Automático Simplificado — FPY-1101</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+
+    <style>
+        :root {
+            --navy:    #0b1120;
+            --panel:   #111827;
+            --card:    #1a2236;
+            --border:  #263048;
+            --accent:  #3b82f6;
+            --accent2: #06b6d4;
+            --green:   #10b981;
+            --yellow:  #f59e0b;
+            --red:     #ef4444;
+            --text:    #e2e8f0;
+            --muted:   #64748b;
+            --mono:    'Space Mono', monospace;
+            --sans:    'DM Sans', sans-serif;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            background: var(--navy);
+            color: var(--text);
+            font-family: var(--sans);
+            font-weight: 300;
+            min-height: 100vh;
+            /* subtle grid texture */
+            background-image:
+                    linear-gradient(rgba(59,130,246,.04) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(59,130,246,.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* ── HERO ───────────────────────────────────── */
+        .hero {
+            background: linear-gradient(135deg, #0d1b35 0%, #0b1120 60%, #071020 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 3.5rem 0 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 70% 120% at 80% -10%, rgba(59,130,246,.18) 0%, transparent 65%);
+            pointer-events: none;
+        }
+        .hero-tag {
+            font-family: var(--mono);
+            font-size: .7rem;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: var(--accent);
+            border: 1px solid rgba(59,130,246,.3);
+            display: inline-block;
+            padding: .25rem .75rem;
+            border-radius: 2px;
+            margin-bottom: 1.25rem;
+        }
+        .hero h1 {
+            font-family: var(--mono);
+            font-size: clamp(1.6rem, 4vw, 2.6rem);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: .5rem;
+        }
+        .hero h1 span { color: var(--accent); }
+        .hero .subtitle {
+            color: var(--muted);
+            font-size: 1rem;
+            font-weight: 400;
+        }
+        .atm-icon {
+            font-size: 5rem;
+            color: var(--accent);
+            opacity: .15;
+            position: absolute;
+            right: 6%;
+            top: 50%;
+            transform: translateY(-50%);
+            display: none;
+        }
+        @media(min-width:768px){ .atm-icon { display: block; } }
+
+        /* ── META BADGES ────────────────────────────── */
+        .meta-bar {
+            background: var(--panel);
+            border-bottom: 1px solid var(--border);
+            padding: .75rem 0;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: .45rem;
+            font-size: .82rem;
+            color: var(--muted);
+        }
+        .meta-item i { color: var(--accent); font-size: .95rem; }
+
+        /* ── SECTION TITLES ─────────────────────────── */
+        .sec-title {
+            font-family: var(--mono);
+            font-size: .68rem;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1.25rem;
+        }
+        .sec-title::before {
+            content: '//';
+            margin-right: .4rem;
+            opacity: .6;
+        }
+
+        /* ── CARDS ──────────────────────────────────── */
+        .card-dark {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.75rem;
+        }
+        .card-dark h5 {
+            font-family: var(--mono);
+            font-size: .95rem;
+            font-weight: 700;
+            margin-bottom: .75rem;
+        }
+        .card-dark p, .card-dark li {
+            font-size: .92rem;
+            line-height: 1.7;
+            color: #b0bdd0;
+        }
+
+        /* ── STEP BLOCKS ────────────────────────────── */
+        .step-num {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(59,130,246,.15);
+            border: 1px solid rgba(59,130,246,.4);
+            font-family: var(--mono);
+            font-size: .85rem;
+            font-weight: 700;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* ── OPERATION CARDS ────────────────────────── */
+        .op-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1.25rem 1.4rem;
+            height: 100%;
+            transition: border-color .2s, transform .2s;
+        }
+        .op-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-3px);
+        }
+        .op-card .op-num {
+            font-family: var(--mono);
+            font-size: .7rem;
+            color: var(--accent2);
+            opacity: .8;
+            letter-spacing: .1em;
+            margin-bottom: .35rem;
+        }
+        .op-card h6 {
+            font-family: var(--mono);
+            font-size: .88rem;
+            font-weight: 700;
+            margin-bottom: .5rem;
+        }
+        .op-card ul {
+            margin: 0;
+            padding-left: 1.1rem;
+        }
+        .op-card li { font-size: .82rem; color: #8da0b8; line-height: 1.6; }
+
+        /* ── KEYWORD CHIPS ──────────────────────────── */
+        .chip {
+            display: inline-block;
+            font-family: var(--mono);
+            font-size: .72rem;
+            padding: .2rem .65rem;
+            border-radius: 3px;
+            margin: .2rem;
+        }
+        .chip-allow {
+            background: rgba(16,185,129,.12);
+            border: 1px solid rgba(16,185,129,.3);
+            color: var(--green);
+        }
+        .chip-deny {
+            background: rgba(239,68,68,.1);
+            border: 1px solid rgba(239,68,68,.3);
+            color: var(--red);
+        }
+
+        /* ── EVAL TABLE ─────────────────────────────── */
+        .eval-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .eval-table th {
+            font-family: var(--mono);
+            font-size: .72rem;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            padding: .6rem 1rem;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255,255,255,.03);
+        }
+        .eval-table td {
+            font-size: .87rem;
+            padding: .7rem 1rem;
+            border-bottom: 1px solid rgba(38,48,72,.6);
+            color: #b0bdd0;
+        }
+        .eval-table tr:last-child td { border-bottom: none; }
+        .eval-table .weight {
+            font-family: var(--mono);
+            color: var(--accent2);
+            font-size: .82rem;
+        }
+
+        /* ── FOOTER ─────────────────────────────────── */
+        footer {
+            background: var(--panel);
+            border-top: 1px solid var(--border);
+            padding: 1.5rem 0;
+            font-size: .8rem;
+            color: var(--muted);
+            text-align: center;
+        }
+        footer strong { color: var(--text); font-weight: 600; }
+
+        /* ── MISC ───────────────────────────────────── */
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2.5rem 0;
+        }
+        .highlight-box {
+            background: rgba(59,130,246,.08);
+            border-left: 3px solid var(--accent);
+            padding: 1rem 1.25rem;
+            border-radius: 0 6px 6px 0;
+            font-size: .9rem;
+            color: #a8c0dd;
+        }
+        .warn-box {
+            background: rgba(245,158,11,.08);
+            border-left: 3px solid var(--yellow);
+            padding: 1rem 1.25rem;
+            border-radius: 0 6px 6px 0;
+            font-size: .9rem;
+            color: #c8a96a;
+        }
+
+        /* scroll animation */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity .5s ease, transform .5s ease;
+        }
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══════════════════ HERO ══════════════════ -->
+<header class="hero">
+    <i class="bi bi-cash-coin atm-icon"></i>
+    <div class="container">
+        <div class="hero-tag">FPY-1101 &nbsp;·&nbsp; Fundamentos de Programación</div>
+        <h1>Cajero Automático<br><span>Simplificado</span> en Python</h1>
+        <p class="subtitle mt-2">Actividad de programación — aplicación de estructuras básicas</p>
+    </div>
+</header>
+
+<!-- ══════════════════ META BAR ══════════════ -->
+<div class="meta-bar">
+    <div class="container">
+        <div class="row g-3 g-md-0">
+            <div class="col-6 col-md-auto me-md-4">
+                <div class="meta-item"><i class="bi bi-mortarboard"></i> Ingeniería en Informática · Analista en Programación</div>
+            </div>
+            <div class="col-6 col-md-auto me-md-4">
+                <div class="meta-item"><i class="bi bi-code-slash"></i> Python — Consola</div>
+            </div>
+            <div class="col-6 col-md-auto me-md-4">
+                <div class="meta-item"><i class="bi bi-file-earmark-code"></i> Entrega: archivo <code style="color:var(--accent2);">.py</code></div>
+            </div>
+            <div class="col-6 col-md-auto">
+                <div class="meta-item"><i class="bi bi-person-check"></i> Trabajo individual</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════ MAIN ══════════════════ -->
+<main class="container py-5">
+
+    <!-- OBJETIVO -->
+    <section class="mb-5 fade-up">
+        <p class="sec-title">Objetivo</p>
+        <div class="card-dark">
+            <p class="mb-0">
+                Desarrollar un programa en Python que simule el funcionamiento básico de un cajero automático simplificado,
+                <strong>aplicando los contenidos trabajados previamente en PSeInt</strong> y llevándolos ahora a código real.
+                El programa considerará dos etapas: <em>inicialización de la información de operación</em> y <em>funcionamiento del cajero</em>.
+            </p>
+        </div>
+    </section>
+
+    <!-- CONTEXTO -->
+    <section class="mb-5 fade-up">
+        <p class="sec-title">Contexto del Problema</p>
+        <div class="highlight-box">
+            Un banco necesita una versión simple de un cajero automático para realizar pruebas iniciales.
+            Antes de usar el cajero se debe registrar la información básica de una cuenta. Luego, el sistema
+            debe permitir la autenticación del usuario y mostrar un menú de acciones bancarias.
+        </div>
+    </section>
+
+    <hr class="divider"/>
+
+    <!-- PASO 1 -->
+    <section class="mb-5 fade-up">
+        <p class="sec-title">Paso 1 — Inicializar Información de Operación</p>
+        <div class="d-flex gap-3 mb-3">
+            <div class="step-num">1</div>
+            <div>
+                <p class="mb-2" style="font-size:.93rem;">Al comenzar el programa, se debe solicitar y guardar la siguiente información:</p>
+                <ul style="font-size:.9rem; color:#b0bdd0; padding-left:1.1rem; line-height:1.8;">
+                    <li><strong>RUT</strong> del cliente</li>
+                    <li><strong>Clave numérica</strong> de acceso</li>
+                    <li><strong>Monto inicial</strong> de la cuenta</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card-dark mt-3">
+            <h5><i class="bi bi-shield-check text-info me-2"></i>Consideraciones del Paso 1</h5>
+            <ul class="mb-0">
+                <li>El <strong>RUT</strong> debe guardarse como texto (<code>str</code>).</li>
+                <li>La <strong>clave</strong> puede trabajarse como texto o número, pero debe ser consistente en todo el programa.</li>
+                <li>El <strong>monto inicial</strong> debe guardarse como número entero (<code>int</code>).</li>
+                <li>Deben validarse los datos ingresados en la medida de lo posible.</li>
+                <li>No se puede continuar al Paso 2 si la información mínima no fue correctamente ingresada.</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- PASO 2 -->
+    <section class="mb-5 fade-up">
+        <p class="sec-title">Paso 2 — Funcionamiento del Cajero</p>
+
+        <!-- 2.1 Autenticación -->
+        <div class="d-flex gap-3 mb-3">
+            <div class="step-num">2</div>
+            <div class="w-100">
+                <h6 class="mb-3" style="font-family:var(--mono); font-size:.95rem;">2.1 &nbsp;Autenticación</h6>
+
+                <p style="font-size:.9rem; color:#b0bdd0;">Antes de mostrar el menú, el sistema debe pedir:</p>
+                <ul style="font-size:.9rem; color:#b0bdd0; padding-left:1.1rem; line-height:1.8; margin-bottom:1rem;">
+                    <li>RUT</li>
+                    <li>Clave</li>
+                </ul>
+
+                <div class="warn-box mb-0">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <strong>Si la autenticación falla</strong>, el sistema debe informar que los datos son inválidos
+                    y ofrecer una alternativa clara: volver a intentar <em>o</em> salir del sistema.
+                </div>
+            </div>
+        </div>
+
+        <!-- 2.2 Menú -->
+        <div class="d-flex gap-3 mt-4">
+            <div class="step-num" style="opacity:0; pointer-events:none;">2</div>
+            <div class="w-100">
+                <h6 class="mb-3" style="font-family:var(--mono); font-size:.95rem;">2.2 &nbsp;Menú de Acciones</h6>
+                <p style="font-size:.9rem; color:#b0bdd0; margin-bottom:1.25rem;">
+                    Si el usuario se autentica correctamente, el cajero muestra un menú con las siguientes operaciones.
+                    El menú se repite mientras el usuario no decida salir.
+                </p>
+
+                <div class="row g-3">
+
+                    <!-- Op 1 -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="op-card">
+                            <div class="op-num">OPCIÓN 1</div>
+                            <h6><i class="bi bi-wallet2 me-1" style="color:var(--accent2);"></i>Consultar Saldo</h6>
+                            <ul><li>Muestra el saldo actual disponible en la cuenta.</li></ul>
+                        </div>
+                    </div>
+
+                    <!-- Op 2 -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="op-card">
+                            <div class="op-num">OPCIÓN 2</div>
+                            <h6><i class="bi bi-arrow-up-circle me-1" style="color:var(--red);"></i>Retirar Dinero</h6>
+                            <ul>
+                                <li>Pide el monto a retirar.</li>
+                                <li>Monto debe ser mayor que 0.</li>
+                                <li>Debe existir saldo suficiente.</li>
+                                <li>Si es válido, se descuenta del saldo.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Op 3 -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="op-card">
+                            <div class="op-num">OPCIÓN 3</div>
+                            <h6><i class="bi bi-arrow-down-circle me-1" style="color:var(--green);"></i>Depositar Dinero</h6>
+                            <ul>
+                                <li>Pide el monto a depositar.</li>
+                                <li>Monto debe ser mayor que 0.</li>
+                                <li>Si es válido, se suma al saldo actual.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Op 4 -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="op-card">
+                            <div class="op-num">OPCIÓN 4</div>
+                            <h6><i class="bi bi-key me-1" style="color:var(--yellow);"></i>Cambiar Clave</h6>
+                            <ul>
+                                <li>Solicita la clave antigua.</li>
+                                <li>La nueva clave no puede quedar vacía.</li>
+                                <li>La nueva clave debe ser distinta a la anterior.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Op 5 -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="op-card">
+                            <div class="op-num">OPCIÓN 5</div>
+                            <h6><i class="bi bi-send me-1" style="color:var(--accent);"></i>Transferencia</h6>
+                            <ul>
+                                <li>Pide RUT de destino y monto.</li>
+                                <li>RUT de destino no debe estar vacío.</li>
+                                <li>Monto debe ser mayor que 0.</li>
+                                <li>Debe existir saldo suficiente.</li>
+                                <li>Si es válida, se descuenta del saldo.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Op 6 -->
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="op-card">
+                            <div class="op-num">OPCIÓN 6</div>
+                            <h6><i class="bi bi-box-arrow-right me-1" style="color:var(--muted);"></i>Salir</h6>
+                            <ul>
+                                <li>El usuario puede terminar la ejecución desde el menú.</li>
+                                <li>Se recomienda confirmar con: <em>"¿Está seguro que desea salir?"</em></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div><!-- /row -->
+            </div>
+        </div>
+    </section>
+
+    <hr class="divider"/>
+
+    <!-- VALIDACIONES -->
+    <section class="mb-5 fade-up">
+        <p class="sec-title">Validaciones Mínimas Esperadas</p>
+        <div class="card-dark">
+            <div class="row g-2">
+                <div class="col-12 col-md-6">
+                    <ul class="mb-0" style="font-size:.9rem; padding-left:1.1rem; line-height:1.9;">
+                        <li>Autenticación correcta (RUT + clave)</li>
+                        <li>Opción de menú válida</li>
+                        <li>Montos positivos en todas las operaciones</li>
+                    </ul>
+                </div>
+                <div class="col-12 col-md-6">
+                    <ul class="mb-0" style="font-size:.9rem; padding-left:1.1rem; line-height:1.9;">
+                        <li>Saldo suficiente en retiros y transferencias</li>
+                        <li>RUT de destino no vacío en transferencia</li>
+                        <li>Mensajes claros al usuario cuando ocurra un error</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <hr class="divider"/>
+
+    <!-- RESTRICCIONES -->
+    <section class="mb-5 fade-up">
+        <p class="sec-title">Restricciones de Implementación</p>
+        <div class="row g-4">
+
+            <div class="col-12 col-md-6">
+                <div class="card-dark h-100">
+                    <h5 class="text-success mb-3"><i class="bi bi-check2-circle me-2"></i>Deben usar</h5>
+                    <div>
+                        <span class="chip chip-allow">variables</span>
+                        <span class="chip chip-allow">input()</span>
+                        <span class="chip chip-allow">int()</span>
+                        <span class="chip chip-allow">str()</span>
+                        <span class="chip chip-allow">if / elif / else</span>
+                        <span class="chip chip-allow">while</span>
+                        <span class="chip chip-allow">for</span>
+                        <span class="chip chip-allow">asignación</span>
+                        <span class="chip chip-allow">op. aritméticas</span>
+                        <span class="chip chip-allow">op. lógicos</span>
+                        <span class="chip chip-allow">op. de comparación</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <div class="card-dark h-100">
+                    <h5 class="text-danger mb-3"><i class="bi bi-x-circle me-2"></i>No deben usar</h5>
+                    <div>
+                        <span class="chip chip-deny">funciones propias</span>
+                        <span class="chip chip-deny">listas</span>
+                        <span class="chip chip-deny">tuplas</span>
+                        <span class="chip chip-deny">diccionarios</span>
+                        <span class="chip chip-deny">sets</span>
+                        <span class="chip chip-deny">colecciones</span>
+                        <span class="chip chip-deny">POO / clases</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <hr class="divider"/>
+
+    <!-- ENTREGABLE -->
+    <section class="mb-5 fade-up">
+        <p class="sec-title">Entregable</p>
+        <div class="card-dark">
+            <div class="row align-items-center g-3">
+                <div class="col-auto">
+                    <div style="font-size:2.8rem; color:var(--accent); opacity:.7;"><i class="bi bi-file-earmark-code-fill"></i></div>
+                </div>
+                <div class="col">
+                    <p class="mb-1" style="font-size:.92rem;">Cada estudiante debe entregar un único archivo:</p>
+                    <ul class="mb-0" style="font-size:.9rem; color:#b0bdd0; padding-left:1.1rem; line-height:1.8;">
+                        <li>Archivo <strong><code>.py</code></strong> con la solución completa.</li>
+                        <li>Código que se ejecute sin errores desde consola.</li>
+                        <li>Uso correcto de las estructuras vistas en clases.</li>
+                        <li>Cumplimiento de las restricciones indicadas.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CRITERIOS DE EVALUACIÓN -->
+    <section class="mb-5 fade-up">
+        <p class="sec-title">Criterios de Evaluación</p>
+        <div class="card-dark p-0">
+            <table class="eval-table">
+                <thead>
+                <tr>
+                    <th>Criterio</th>
+                    <th style="text-align:right;">Ponderación</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><i class="bi bi-check-circle text-info me-2"></i>Cumplimiento general del enunciado</td>
+                    <td class="weight" style="text-align:right;">Alto</td>
+                </tr>
+                <tr>
+                    <td><i class="bi bi-check-circle text-info me-2"></i>Correcta inicialización de datos (Paso 1)</td>
+                    <td class="weight" style="text-align:right;">Medio</td>
+                </tr>
+                <tr>
+                    <td><i class="bi bi-check-circle text-info me-2"></i>Autenticación funcional</td>
+                    <td class="weight" style="text-align:right;">Medio</td>
+                </tr>
+                <tr>
+                    <td><i class="bi bi-check-circle text-info me-2"></i>Funcionamiento correcto del menú y operaciones</td>
+                    <td class="weight" style="text-align:right;">Alto</td>
+                </tr>
+                <tr>
+                    <td><i class="bi bi-check-circle text-info me-2"></i>Validación de entradas y operaciones</td>
+                    <td class="weight" style="text-align:right;">Medio</td>
+                </tr>
+                <tr>
+                    <td><i class="bi bi-check-circle text-info me-2"></i>Claridad y orden de los mensajes al usuario</td>
+                    <td class="weight" style="text-align:right;">Medio</td>
+                </tr>
+                <tr>
+                    <td><i class="bi bi-check-circle text-info me-2"></i>Uso correcto de estructuras y respeto por restricciones</td>
+                    <td class="weight" style="text-align:right;">Alto</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- SUGERENCIAS -->
+    <section class="mb-2 fade-up">
+        <p class="sec-title">Sugerencias de Diseño</p>
+        <div class="highlight-box">
+            <ul class="mb-0" style="padding-left:1.1rem; line-height:2;">
+                <li>Separar mentalmente el problema en los dos pasos solicitados.</li>
+                <li>Usar <strong>nombres de variables descriptivos</strong> (evitar <code>x</code>, <code>a</code>, etc.).</li>
+                <li>Controlar bien la repetición del menú con <code>while</code>.</li>
+                <li>Validar cada operación <em>antes</em> de modificar el saldo.</li>
+                <li>Cuidar la presentación de los mensajes en pantalla para facilitar la corrección.</li>
+            </ul>
+        </div>
+    </section>
+
+</main>
+
+<!-- ══════════════════ FOOTER ═════════════════ -->
+<footer>
+    <div class="container">
+        <strong>Escuela de Ingeniería en Informática y Telecomunicaciones</strong><br>
+        Fundamentos de Programación · FPY-1101 &nbsp;
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Scroll-reveal
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.classList.add('visible');
+                observer.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

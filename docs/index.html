@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FPY-1101 · Portal de Actividades</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #101828;
+      --paper: #f8fafc;
+      --line: #d8e0ea;
+      --blue: #2563eb;
+      --teal: #0f766e;
+      --rose: #be123c;
+      --amber: #b45309;
+      --green: #15803d;
+      --violet: #6d28d9;
+      --dark: #111827;
+      --muted: #667085;
+      --mono: "Space Mono", monospace;
+      --sans: "DM Sans", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(37, 99, 235, .06) 1px, transparent 1px),
+        linear-gradient(rgba(15, 118, 110, .06) 1px, transparent 1px),
+        var(--paper);
+      background-size: 34px 34px;
+      font-family: var(--sans);
+    }
+
+    .navbar {
+      background: rgba(248, 250, 252, .88);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(14px);
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--blue), var(--teal));
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-weight: 700;
+    }
+
+    .hero {
+      min-height: 92vh;
+      display: flex;
+      align-items: center;
+      padding: 6rem 0 4rem;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .eyebrow {
+      color: var(--blue);
+      font-family: var(--mono);
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 780px;
+      font-size: clamp(2.45rem, 7vw, 5.9rem);
+      font-weight: 800;
+      line-height: .94;
+      letter-spacing: 0;
+      margin: .8rem 0 1.15rem;
+    }
+
+    .lead {
+      max-width: 650px;
+      color: #475467;
+      font-size: clamp(1.05rem, 2vw, 1.25rem);
+    }
+
+    .btn-main {
+      border: 0;
+      border-radius: 8px;
+      background: var(--dark);
+      color: #fff;
+      font-weight: 700;
+      padding: .9rem 1.1rem;
+    }
+
+    .btn-main:hover { background: #000; color: #fff; }
+
+    .btn-ghost {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font-weight: 700;
+      padding: .9rem 1.1rem;
+    }
+
+    .learn-scene {
+      position: relative;
+      min-height: 430px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 24px 70px rgba(16, 24, 40, .12);
+      overflow: hidden;
+    }
+
+    .console-top {
+      height: 42px;
+      border-bottom: 1px solid var(--line);
+      background: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 14px;
+    }
+
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot.red { background: #ef4444; }
+    .dot.yellow { background: #f59e0b; }
+    .dot.green { background: #22c55e; }
+
+    .code-panel {
+      padding: 24px;
+      font-family: var(--mono);
+      font-size: .86rem;
+      line-height: 1.9;
+      color: #334155;
+    }
+
+    .code-line {
+      display: block;
+      transform-origin: left center;
+      white-space: nowrap;
+    }
+
+    .kw { color: var(--blue); font-weight: 700; }
+    .fn { color: var(--violet); }
+    .str { color: var(--green); }
+    .num { color: var(--amber); }
+
+    .floating-chip {
+      position: absolute;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 132px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 12px 34px rgba(16, 24, 40, .14);
+      padding: 10px 12px;
+      font-family: var(--mono);
+      font-size: .78rem;
+      font-weight: 700;
+    }
+
+    .chip-a { top: 92px; right: 22px; color: var(--blue); }
+    .chip-b { bottom: 92px; left: 22px; color: var(--teal); }
+    .chip-c { bottom: 24px; right: 36px; color: var(--rose); }
+
+    .section-title {
+      font-weight: 800;
+      font-size: clamp(1.8rem, 4vw, 3.2rem);
+      line-height: 1;
+      margin-bottom: .7rem;
+    }
+
+    .section-copy {
+      color: var(--muted);
+      max-width: 680px;
+      margin-bottom: 2rem;
+    }
+
+    .activity-card {
+      height: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .92);
+      padding: 1.25rem;
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+
+    .activity-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 18px 44px rgba(16, 24, 40, .12);
+      border-color: #b9c4d3;
+    }
+
+    .activity-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .bg-blue { background: var(--blue); }
+    .bg-teal { background: var(--teal); }
+    .bg-rose { background: var(--rose); }
+    .bg-amber { background: var(--amber); }
+    .bg-violet { background: var(--violet); }
+
+    .activity-card h3 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-bottom: .55rem;
+    }
+
+    .activity-card p {
+      color: #5b677a;
+      min-height: 72px;
+      margin-bottom: 1rem;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-height: 28px;
+      margin-bottom: 1rem;
+    }
+
+    .tag {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #f8fafc;
+      color: #475467;
+      font-family: var(--mono);
+      font-size: .7rem;
+      padding: 3px 9px;
+    }
+
+    .open-link {
+      color: var(--ink);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .open-link:hover { color: var(--blue); }
+
+    .path {
+      border-top: 1px solid var(--line);
+      background: #fff;
+      padding: 4rem 0;
+      margin-top: 4rem;
+    }
+
+    .step {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .step-number {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      flex: 0 0 36px;
+      background: var(--ink);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-weight: 700;
+    }
+
+    footer {
+      padding: 2rem 0;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .82rem;
+    }
+
+    @media (max-width: 991px) {
+      .hero { padding-top: 5rem; }
+      .learn-scene { min-height: 360px; margin-top: 2rem; }
+      .floating-chip { position: static; margin: 8px 0 0 24px; }
+      .code-line { white-space: normal; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="#">
+        <span class="brand-mark">Py</span>
+        <span>FPY-1101</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Abrir navegación">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="menu">
+        <div class="navbar-nav ms-auto">
+          <a class="nav-link" href="#actividades">Actividades</a>
+          <a class="nav-link" href="#ruta">Ruta</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="container">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-7">
+          <div class="eyebrow">Fundamentos de Programación</div>
+          <h1>Practica Python resolviendo misiones.</h1>
+          <p class="lead">Un punto de partida para entrar a las actividades del curso, experimentar con lógica, tomar decisiones, repetir acciones y manejar errores sin perderse entre archivos.</p>
+          <div class="d-flex flex-wrap gap-2 mt-4">
+            <a class="btn btn-main" href="#actividades"><i class="bi bi-rocket-takeoff me-2"></i>Entrar a las actividades</a>
+            <a class="btn btn-ghost" href="#ruta"><i class="bi bi-map me-2"></i>Ver ruta sugerida</a>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <div class="learn-scene" aria-label="Escena visual de programación">
+            <div class="console-top">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+            </div>
+            <div class="code-panel">
+              <span class="code-line"><span class="kw">def</span> <span class="fn">resolver_mision</span>():</span>
+              <span class="code-line">&nbsp;&nbsp;energia = <span class="num">100</span></span>
+              <span class="code-line">&nbsp;&nbsp;<span class="kw">while</span> energia &gt; <span class="num">0</span>:</span>
+              <span class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;idea = <span class="str">"probar"</span></span>
+              <span class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> idea == <span class="str">"probar"</span>:</span>
+              <span class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> <span class="str">"aprendizaje desbloqueado"</span></span>
+            </div>
+            <div class="floating-chip chip-a"><i class="bi bi-lightning-charge-fill"></i> ciclos</div>
+            <div class="floating-chip chip-b"><i class="bi bi-signpost-split-fill"></i> if / else</div>
+            <div class="floating-chip chip-c"><i class="bi bi-bug-fill"></i> errores</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="actividades" class="py-5">
+      <div class="container">
+        <h2 class="section-title">Actividades disponibles</h2>
+        <p class="section-copy">Cada misión abre una página independiente con el desafío, restricciones y criterios de evaluación.</p>
+
+        <div class="row g-4">
+          <div class="col-md-6 col-xl-4 activity-item">
+            <article class="activity-card">
+              <div class="activity-icon bg-blue"><i class="bi bi-bank2"></i></div>
+              <h3>Cajero automático</h3>
+              <p>Construye un flujo de opciones para consultar saldo, girar dinero y validar decisiones del usuario.</p>
+              <div class="tag-row"><span class="tag">condicionales</span><span class="tag">menú</span><span class="tag">validación</span></div>
+              <a class="open-link" href="atm.html">Abrir actividad <i class="bi bi-arrow-right"></i></a>
+            </article>
+          </div>
+
+          <div class="col-md-6 col-xl-4 activity-item">
+            <article class="activity-card">
+              <div class="activity-icon bg-teal"><i class="bi bi-building-check"></i></div>
+              <h3>Reserva de hotel</h3>
+              <p>Modela una reserva simple calculando noches, valores y reglas básicas de disponibilidad.</p>
+              <div class="tag-row"><span class="tag">variables</span><span class="tag">cálculos</span><span class="tag">decisiones</span></div>
+              <a class="open-link" href="hotel-booking.html">Abrir actividad <i class="bi bi-arrow-right"></i></a>
+            </article>
+          </div>
+
+          <div class="col-md-6 col-xl-4 activity-item">
+            <article class="activity-card">
+              <div class="activity-icon bg-amber"><i class="bi bi-lightbulb-fill"></i></div>
+              <h3>Luces del laboratorio</h3>
+              <p>Resuelve un tablero 3x3 donde cada movimiento cambia el estado de varias luces vecinas.</p>
+              <div class="tag-row"><span class="tag">matrices</span><span class="tag">ciclos</span><span class="tag">lógica</span></div>
+              <a class="open-link" href="lab-lights.html">Abrir actividad <i class="bi bi-arrow-right"></i></a>
+            </article>
+          </div>
+
+          <div class="col-md-6 col-xl-4 activity-item">
+            <article class="activity-card">
+              <div class="activity-icon bg-violet"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+              <h3>Juego del gato</h3>
+              <p>Programa el clásico tablero por turnos con validaciones de jugada, victoria y empate.</p>
+              <div class="tag-row"><span class="tag">listas</span><span class="tag">funciones</span><span class="tag">turnos</span></div>
+              <a class="open-link" href="tic-tac-toe.html">Abrir actividad <i class="bi bi-arrow-right"></i></a>
+            </article>
+          </div>
+
+          <div class="col-md-6 col-xl-4 activity-item">
+            <article class="activity-card">
+              <div class="activity-icon bg-rose"><i class="bi bi-shield-exclamation"></i></div>
+              <h3>Ciclos, strings y excepciones</h3>
+              <p>Entrena repetición, procesamiento de texto y manejo de errores con ejercicios cortos.</p>
+              <div class="tag-row"><span class="tag">try/except</span><span class="tag">strings</span><span class="tag">ciclos</span></div>
+              <a class="open-link" href="try-excepto.html">Abrir actividad <i class="bi bi-arrow-right"></i></a>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="ruta" class="path">
+      <div class="container">
+        <h2 class="section-title">Ruta sugerida</h2>
+        <p class="section-copy">Avanza desde programas con decisiones simples hasta desafíos con estados, turnos y manejo de errores.</p>
+        <div class="row g-4">
+          <div class="col-md-4 path-item">
+            <div class="step">
+              <span class="step-number">1</span>
+              <div>
+                <h3 class="h5 fw-bold">Entrada y condiciones</h3>
+                <p class="text-secondary mb-0">Comienza con cajero y hotel para practicar datos, cálculos y bifurcaciones.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 path-item">
+            <div class="step">
+              <span class="step-number">2</span>
+              <div>
+                <h3 class="h5 fw-bold">Estados y ciclos</h3>
+                <p class="text-secondary mb-0">Sigue con laboratorio y gato para controlar tableros, turnos y repeticiones.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 path-item">
+            <div class="step">
+              <span class="step-number">3</span>
+              <div>
+                <h3 class="h5 fw-bold">Errores controlados</h3>
+                <p class="text-secondary mb-0">Cierra con excepciones para fortalecer programas que responden bien ante entradas inesperadas.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container d-flex flex-wrap justify-content-between gap-2">
+      <span>FPY-1101 · Fundamentos de Programación</span>
+      <span>Python desde cero con práctica aplicada</span>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+  <script>
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (!reduceMotion && window.anime) {
+      anime({
+        targets: ".eyebrow, h1, .lead, .hero .btn",
+        translateY: [28, 0],
+        opacity: [0, 1],
+        delay: anime.stagger(110),
+        duration: 780,
+        easing: "easeOutExpo"
+      });
+
+      anime({
+        targets: ".learn-scene",
+        translateX: [42, 0],
+        opacity: [0, 1],
+        duration: 920,
+        delay: 260,
+        easing: "easeOutExpo"
+      });
+
+      anime({
+        targets: ".code-line",
+        translateX: [-16, 0],
+        opacity: [0, 1],
+        delay: anime.stagger(95, { start: 580 }),
+        duration: 520,
+        easing: "easeOutQuad"
+      });
+
+      anime({
+        targets: ".floating-chip",
+        translateY: [
+          { value: -8, duration: 1300 },
+          { value: 8, duration: 1300 }
+        ],
+        rotate: [
+          { value: -1.2, duration: 1300 },
+          { value: 1.2, duration: 1300 }
+        ],
+        delay: anime.stagger(180),
+        loop: true,
+        direction: "alternate",
+        easing: "easeInOutSine"
+      });
+
+      const reveal = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          anime({
+            targets: entry.target,
+            translateY: [26, 0],
+            opacity: [0, 1],
+            duration: 650,
+            easing: "easeOutExpo"
+          });
+          reveal.unobserve(entry.target);
+        });
+      }, { threshold: .18 });
+
+      document.querySelectorAll(".activity-item, .path-item").forEach((item) => {
+        item.style.opacity = 0;
+        reveal.observe(item);
+      });
+    }
+  </script>
+</body>
+</html>

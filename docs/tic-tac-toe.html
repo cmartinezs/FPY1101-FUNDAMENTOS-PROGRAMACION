@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarea: Juego del Gato — FPY-1101</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon: #39ff6e;
+            --neon-dim: #1a7a35;
+            --amber: #ffb347;
+            --red: #ff4d6d;
+            --blue: #4db8ff;
+            --bg: #0a0e0d;
+            --surface: #111713;
+            --card: #141c16;
+            --border: #1f3024;
+            --text: #c8e6cc;
+            --muted: #5a7a5e;
+            --white: #f0f7f1;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
+            pointer-events: none; z-index: 0;
+        }
+        .mono { font-family: 'Share Tech Mono', monospace; }
+        .orb { font-family: 'Orbitron', monospace; }
+
+        /* HEADER */
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--neon-dim);
+            padding: 2.5rem 0 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        header::after {
+            content: '';
+            position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--neon), transparent);
+        }
+        .badge-curso {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            background: transparent;
+            border: 1px solid var(--neon-dim);
+            color: var(--neon);
+            padding: 4px 12px;
+            border-radius: 2px;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        h1.titulo {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(1.6rem, 4vw, 2.8rem);
+            font-weight: 900;
+            color: var(--white);
+            line-height: 1.2;
+            margin-bottom: 0.4rem;
+        }
+        h1.titulo span { color: var(--neon); }
+        .subtitulo {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--muted);
+            font-size: 0.85rem;
+            letter-spacing: 0.08em;
+        }
+
+        /* TABLERO DECORATIVO */
+        .board-deco {
+            display: grid;
+            grid-template-columns: repeat(3, 36px);
+            grid-template-rows: repeat(3, 36px);
+            gap: 4px;
+            opacity: 0.6;
+        }
+        .board-deco div {
+            background: var(--border);
+            border: 1px solid var(--neon-dim);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem; font-weight: 700;
+        }
+        .board-deco div.x { color: var(--neon); border-color: var(--neon); background: rgba(57,255,110,0.08); }
+        .board-deco div.o { color: var(--amber); border-color: var(--amber); background: rgba(255,179,71,0.08); }
+
+        /* SECCIONES */
+        main { position: relative; z-index: 1; }
+        section { padding: 2.5rem 0; }
+        section + section { border-top: 1px solid var(--border); }
+
+        h2.sec-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--neon);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            display: flex; align-items: center; gap: 10px;
+        }
+        h2.sec-title::before {
+            content: '';
+            display: inline-block; width: 6px; height: 6px;
+            background: var(--neon); border-radius: 50%;
+            box-shadow: 0 0 6px var(--neon);
+        }
+
+        /* CARDS DE NIVEL */
+        .nivel-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 1.5rem;
+            position: relative;
+            transition: border-color 0.2s;
+            height: 100%;
+        }
+        .nivel-card:hover { border-color: var(--neon-dim); }
+        .nivel-tag {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 2px;
+            margin-bottom: 0.75rem;
+            display: inline-block;
+        }
+        .tag-base { background: rgba(57,255,110,0.12); color: var(--neon); border: 1px solid var(--neon-dim); }
+        .tag-med  { background: rgba(77,184,255,0.12); color: var(--blue); border: 1px solid rgba(77,184,255,0.3); }
+        .tag-high { background: rgba(255,179,71,0.12); color: var(--amber); border: 1px solid rgba(255,179,71,0.3); }
+        .tag-max  { background: rgba(255,77,109,0.12); color: var(--red); border: 1px solid rgba(255,77,109,0.3); }
+
+        .nivel-card h3 {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 0.75rem;
+        }
+        .nivel-card p { color: var(--text); font-size: 0.9rem; margin-bottom: 0; }
+
+        .puntos-badge {
+            position: absolute; top: 1rem; right: 1rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 2px;
+            font-weight: bold;
+        }
+        .pb-base { background: rgba(57,255,110,0.15); color: var(--neon); }
+        .pb-med  { background: rgba(77,184,255,0.15); color: var(--blue); }
+        .pb-high { background: rgba(255,179,71,0.15); color: var(--amber); }
+        .pb-max  { background: rgba(255,77,109,0.15); color: var(--red); }
+
+        .nivel-num {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            font-weight: 900;
+            opacity: 0.07;
+            position: absolute; bottom: 0.75rem; right: 1rem;
+            line-height: 1;
+        }
+
+        /* REQUISITOS */
+        .req-list {
+            list-style: none; padding: 0;
+        }
+        .req-list li {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text);
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: flex-start; gap: 10px;
+        }
+        .req-list li:last-child { border-bottom: none; }
+        .req-list li::before {
+            content: '›';
+            color: var(--neon);
+            font-size: 1rem;
+            flex-shrink: 0;
+            margin-top: 0px;
+        }
+
+        /* CÓDIGO PERMITIDO */
+        .allowed-grid {
+            display: flex; flex-wrap: wrap; gap: 8px;
+        }
+        code.kw {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            background: rgba(57,255,110,0.1);
+            color: var(--neon);
+            border: 1px solid var(--neon-dim);
+            padding: 3px 10px;
+            border-radius: 2px;
+        }
+        code.kw.restricted {
+            background: rgba(255,77,109,0.1);
+            color: var(--red);
+            border-color: rgba(255,77,109,0.3);
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        /* EJEMPLO TABLERO */
+        .board-example {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 1.25rem 1.5rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 2;
+            color: var(--text);
+            overflow-x: auto;
+        }
+        .board-example .x { color: var(--neon); }
+        .board-example .o { color: var(--amber); }
+        .board-example .sep { color: var(--muted); }
+        .board-example .prompt { color: var(--blue); }
+        .board-example .ok { color: var(--neon); }
+        .board-example .err { color: var(--red); }
+
+        /* TABLA NOTAS */
+        .tabla-notas {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+        .tabla-notas thead tr {
+            background: var(--surface);
+            border-bottom: 1px solid var(--neon-dim);
+        }
+        .tabla-notas th {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--neon);
+            padding: 0.75rem 1rem;
+            text-align: left;
+        }
+        .tabla-notas td {
+            padding: 0.7rem 1rem;
+            border-bottom: 1px solid var(--border);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.82rem;
+            color: var(--text);
+            vertical-align: middle;
+        }
+        .tabla-notas tr:last-child td { border-bottom: none; }
+        .tabla-notas tr:hover td { background: rgba(57,255,110,0.03); }
+        td.nota-val {
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            text-align: center;
+        }
+        td.nota-val.nv-neon { color: var(--neon); }
+        td.nota-val.nv-blue { color: var(--blue); }
+        td.nota-val.nv-amber { color: var(--amber); }
+        td.nota-val.nv-red  { color: var(--red); }
+
+        /* ALERTA */
+        .alerta {
+            background: rgba(57,255,110,0.07);
+            border: 1px solid var(--neon-dim);
+            border-left: 3px solid var(--neon);
+            border-radius: 2px;
+            padding: 1rem 1.25rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.82rem;
+            color: var(--neon);
+        }
+        .alerta.warn {
+            background: rgba(255,179,71,0.07);
+            border-color: rgba(255,179,71,0.3);
+            border-left-color: var(--amber);
+            color: var(--amber);
+        }
+        .alerta.danger {
+            background: rgba(255,77,109,0.07);
+            border-color: rgba(255,77,109,0.3);
+            border-left-color: var(--red);
+            color: var(--red);
+        }
+
+        /* FOOTER */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem 0;
+            background: var(--surface);
+        }
+        footer p {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--muted);
+            letter-spacing: 0.05em;
+        }
+
+        /* BARRA DE PROGRESO */
+        .progress-track {
+            display: flex; gap: 6px; align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .progress-step {
+            flex: 1; height: 4px;
+            border-radius: 2px;
+            background: var(--border);
+        }
+        .progress-step.done { background: var(--neon); }
+        .progress-step.med  { background: var(--blue); }
+        .progress-step.high { background: var(--amber); }
+        .progress-step.max  { background: var(--red); }
+
+        .nivel-connector {
+            display: flex; align-items: center; justify-content: center;
+            color: var(--muted); font-size: 1.2rem;
+            font-family: 'Share Tech Mono', monospace;
+            padding: 0.25rem 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .niveles-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 560px) {
+            .niveles-grid { grid-template-columns: 1fr !important; }
+            .board-deco { display: none; }
+        }
+        @media (max-width: 768px) {
+            .board-deco { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <div>
+                <div class="badge-curso">FPY-1101 · Fundamentos de Programación</div>
+                <h1 class="titulo">Tarea Programada:<br><span>Juego del Gato</span></h1>
+                <p class="subtitulo">Tic-Tac-Toe · Python · Consola · 2 Jugadores → CPU</p>
+            </div>
+            <div class="board-deco">
+                <div class="x">X</div><div></div><div class="o">O</div>
+                <div></div><div class="x">X</div><div></div>
+                <div class="o">O</div><div></div><div class="x">X</div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="container">
+
+        <!-- DESCRIPCIÓN GENERAL -->
+        <section>
+            <h2 class="sec-title">Descripción del problema</h2>
+            <div class="row g-4">
+                <div class="col-md-8">
+                    <p class="mb-3" style="font-size:0.95rem;">
+                        Deberás implementar el clásico juego del Gato (Tic-Tac-Toe / 3 en raya) en <strong style="color:var(--white)">Python puro</strong>, ejecutándose completamente en consola. El programa debe permitir que dos jugadores se alternen para marcar casillas en un tablero 3×3, mostrando el estado del tablero tras cada movimiento y detectando automáticamente si hay ganador o empate.
+                    </p>
+                    <div class="alerta warn mb-3">
+                        ⚠ Esta tarea tiene <strong>4 niveles de dificultad</strong>. Resolver todos los niveles te sube la nota del curso. Cada nivel adicional otorga décimas para tu próxima prueba.
+                    </div>
+                    <p style="font-size:0.9rem; color:var(--muted)">
+                        Lee cada nivel cuidadosamente — están pensados para que construyas sobre lo anterior. Guarda una copia funcional de cada nivel antes de avanzar al siguiente.
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <div style="background:var(--card); border:1px solid var(--border); border-radius:4px; padding:1.25rem; overflow:hidden; min-width:0;">
+                        <p style="font-family:'Orbitron',monospace; font-size:0.7rem; letter-spacing:0.1em; color:var(--neon); text-transform:uppercase; margin-bottom:0.75rem;">Datos de entrega</p>
+                        <ul class="req-list">
+                            <li>Archivo(s) <code class="kw">.py</code> por nivel</li>
+                            <li style="flex-wrap:wrap;">Nombrar: <code class="kw">gato_n1.py</code> <code class="kw">gato_n2.py</code> <code class="kw">gato_n3.py</code> ...</li>
+                            <li>Comentario al inicio con nombre y sección</li>
+                            <li>Subir al aula virtual antes del plazo</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HERRAMIENTAS PERMITIDAS -->
+        <section>
+            <h2 class="sec-title">Herramientas permitidas en Python</h2>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <p style="font-size:0.85rem; color:var(--muted); margin-bottom:1rem; font-family:'Share Tech Mono',monospace;">✓ PUEDES usar únicamente:</p>
+                    <div class="allowed-grid">
+                        <code class="kw">input()</code>
+                        <code class="kw">print()</code>
+                        <code class="kw">int()</code>
+                        <code class="kw">float()</code>
+                        <code class="kw">str()</code>
+                        <code class="kw">abs()</code>
+                        <code class="kw">if</code>
+                        <code class="kw">else</code>
+                        <code class="kw">elif</code>
+                        <code class="kw">while</code>
+                        <code class="kw">for</code>
+                        <code class="kw">try / except</code>
+                        <code class="kw" style="background:rgba(255,179,71,0.1);color:var(--amber);border-color:rgba(255,179,71,0.3)">def</code>
+                    </div>
+                    <div class="mt-2" style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--muted);">
+                        * <code style="color:var(--amber)">def</code> es <strong style="color:var(--amber)">opcional</strong> — no es requisito, pero puedes usarlo si lo consideras conveniente.
+                    </div>
+                    <div class="mt-3 alerta" style="font-size:0.78rem;">
+                        Para el nivel 3 y 4 también se permite: <code style="color:var(--white)">random.random()</code> y <code style="color:var(--white)">random.randint()</code> del módulo <code style="color:var(--white)">random</code> (visto en prueba anterior).
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <p style="font-size:0.85rem; color:var(--muted); margin-bottom:1rem; font-family:'Share Tech Mono',monospace;">✗ NO puedes usar:</p>
+                    <div class="allowed-grid">
+                        <code class="kw restricted">listas / listas 2D</code>
+                        <code class="kw restricted">diccionarios</code>
+                        <code class="kw restricted">tuplas</code>
+                        <code class="kw" style="background:rgba(255,179,71,0.1);color:var(--amber);border-color:rgba(255,179,71,0.3)">def (opcional)</code>
+                        <code class="kw restricted">clases</code>
+                        <code class="kw restricted">import os</code>
+                        <code class="kw restricted">import sys</code>
+                        <code class="kw restricted">numpy / pandas</code>
+                    </div>
+                    <div class="mt-3 alerta danger" style="font-size:0.78rem;">
+                        Usar colecciones (listas, dicts, etc.) o definir funciones anulará el puntaje del nivel correspondiente.
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <p style="font-size:0.85rem; color:var(--muted); margin-bottom:0.75rem; font-family:'Share Tech Mono',monospace;">Pista de implementación — tablero sin listas:</p>
+                <div class="board-example">
+                    <span class="sep"># Puedes representar el tablero con 9 variables independientes:</span><br>
+                    c11 = <span class="x">"X"</span> &nbsp;&nbsp; c12 = <span class="sep">" "</span> &nbsp;&nbsp; c13 = <span class="o">"O"</span><br>
+                    c21 = <span class="sep">" "</span> &nbsp;&nbsp; c22 = <span class="x">"X"</span> &nbsp;&nbsp; c23 = <span class="sep">" "</span><br>
+                    c31 = <span class="o">"O"</span> &nbsp;&nbsp; c32 = <span class="sep">" "</span> &nbsp;&nbsp; c33 = <span class="x">"X"</span><br>
+                    <br>
+                    <span class="sep"># O con una sola cadena de 9 caracteres que representa el estado:</span><br>
+                    tablero = <span class="x">"X"</span> + <span class="sep">" "</span> + <span class="o">"O"</span> + <span class="sep">" "</span> + <span class="x">"X"</span> + <span class="sep">"...."</span> &nbsp;<span class="sep"># posición por índice</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- REQUISITOS BASE -->
+        <section>
+            <h2 class="sec-title">Comportamiento esperado — todos los niveles</h2>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <ul class="req-list">
+                        <li>El tablero muestra las casillas numeradas del 1 al 9 (o fila/columna) antes de la primera jugada</li>
+                        <li>Se muestra el tablero actualizado <strong style="color:var(--white)">después de cada jugada</strong></li>
+                        <li>Las fichas <code class="kw">X</code> y <code class="kw">O</code> se asignan automáticamente (no el jugador las elige en niveles 1 y 2)</li>
+                        <li>El Jugador 1 <strong style="color:var(--white)">siempre parte primero</strong> en el nivel base</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <ul class="req-list">
+                        <li>Se debe validar que la casilla ingresada sea válida y no esté ocupada</li>
+                        <li>Tras cada jugada indicar si hay ganador, y <strong style="color:var(--white)">en qué fila, columna o diagonal</strong></li>
+                        <li>Si no hay ganador después de 9 jugadas → indicar empate</li>
+                        <li>El programa debe permitir jugar varias partidas (preguntar al final si se desea continuar)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <p style="font-size:0.85rem; color:var(--muted); margin-bottom:0.75rem; font-family:'Share Tech Mono',monospace;">Ejemplo de ejecución esperada:</p>
+                <div class="board-example">
+                    <span class="sep">===== JUEGO DEL GATO =====</span><br>
+                    <span class="sep">Jugador 1: X  |  Jugador 2: O</span><br>
+                    <br>
+                    <span class="sep"> 1 | 2 | 3 </span><br>
+                    <span class="sep">---+---+---</span><br>
+                    <span class="sep"> 4 | 5 | 6 </span><br>
+                    <span class="sep">---+---+---</span><br>
+                    <span class="sep"> 7 | 8 | 9 </span><br>
+                    <br>
+                    <span class="prompt">Jugador 1 (X), ingresa casilla (1-9): </span><span class="ok">5</span><br>
+                    <br>
+                    <span class="sep"> 1 | 2 | 3 </span><br>
+                    <span class="sep">---+---+---</span><br>
+                    <span class="sep"> 4 | </span><span class="x">X</span><span class="sep"> | 6 </span><br>
+                    <span class="sep">---+---+---</span><br>
+                    <span class="sep"> 7 | 8 | 9 </span><br>
+                    <br>
+                    <span class="sep">Sin ganador aún.</span><br>
+                    <br>
+                    <span class="prompt">Jugador 2 (O), ingresa casilla (1-9): </span><span class="ok">1</span><br>
+                    <span class="sep">  ...</span><br>
+                    <br>
+                    <span class="ok">¡Jugador 1 (X) gana! — Diagonal principal (↘)</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- NIVELES -->
+        <section>
+            <h2 class="sec-title">Niveles de dificultad</h2>
+
+            <div class="niveles-grid" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:1rem;">
+
+                <!-- N1 -->
+                <div class="nivel-card">
+                    <span class="nivel-tag tag-base">Nivel 1</span>
+                    <span class="puntos-badge pb-base">+0.5 pts prueba</span>
+                    <h3>Juego completo</h3>
+                    <p>Implementa el juego completo: tablero, turnos alternados, detección de ganador (fila, columna, diagonal) y empate. Fichas asignadas automáticamente. Parte siempre el Jugador 1.</p>
+                    <div class="nivel-num">1</div>
+                </div>
+
+                <!-- N2 -->
+                <div class="nivel-card">
+                    <span class="nivel-tag tag-med">Nivel 2</span>
+                    <span class="puntos-badge pb-med">+0.8 pts prueba</span>
+                    <h3>Estadísticas de sesión</h3>
+                    <p>Mantén durante toda la ejecución el conteo de: partidas jugadas, victorias del Jugador 1, victorias del Jugador 2 y empates. Muéstralas al final de cada partida y al salir.</p>
+                    <div class="nivel-num">2</div>
+                </div>
+
+                <!-- N3 -->
+                <div class="nivel-card">
+                    <span class="nivel-tag tag-high">Nivel 3</span>
+                    <span class="puntos-badge pb-high">+1.0 pto prueba</span>
+                    <h3>Configuración de partida</h3>
+                    <p>Al inicio de cada partida: permite elegir qué ficha quiere cada jugador (o asignar al azar), y quién parte primero (o elegirlo aleatoriamente). Usa <code style="color:var(--amber)">random</code>.</p>
+                    <div class="nivel-num">3</div>
+                </div>
+
+                <!-- N4 -->
+                <div class="nivel-card">
+                    <span class="nivel-tag tag-max">Nivel 4</span>
+                    <span class="puntos-badge pb-max">Reemplaza nota más baja</span>
+                    <h3>Jugar vs CPU</h3>
+                    <p>Permite elegir modo: Jugador vs Jugador o Jugador vs CPU. La CPU elige su casilla automáticamente. Puede ser aleatoria o con algo de estrategia (bloquear al rival). Tú decides.</p>
+                    <div class="nivel-num">4</div>
+                </div>
+
+            </div>
+
+            <div class="mt-4 alerta">
+                💡 Cada nivel incluye las funcionalidades del anterior. Los beneficios son <strong>acumulativos</strong>: completar el nivel 3 otorga los puntos de los niveles 1, 2 y 3 (hasta 2.3 pts sobre la próxima prueba). El nivel 4 reemplaza la nota más baja del curso <strong>además</strong> de los beneficios anteriores.
+            </div>
+        </section>
+
+        <!-- TABLA DE NOTAS -->
+        <section>
+            <h2 class="sec-title">Tabla de evaluación</h2>
+            <div style="overflow-x:auto;">
+                <table class="tabla-notas">
+                    <thead>
+                    <tr>
+                        <th>Nivel</th>
+                        <th>Contenido</th>
+                        <th style="text-align:center">Beneficio</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><span class="nivel-tag tag-base" style="margin:0">Nivel 1</span></td>
+                        <td>Juego funcional básico 2 jugadores</td>
+                        <td class="nota-val nv-neon" style="font-size:0.85rem">+0.5 pts próx. prueba</td>
+                    </tr>
+                    <tr>
+                        <td><span class="nivel-tag tag-med" style="margin:0">Nivel 2</span></td>
+                        <td>Incluye nivel 1 + estadísticas de sesión</td>
+                        <td class="nota-val nv-blue" style="font-size:0.85rem">+0.8 pts próx. prueba</td>
+                    </tr>
+                    <tr>
+                        <td><span class="nivel-tag tag-high" style="margin:0">Nivel 3</span></td>
+                        <td>Incluye niveles anteriores + configuración / random</td>
+                        <td class="nota-val nv-amber" style="font-size:0.85rem">+1.0 pto próx. prueba</td>
+                    </tr>
+                    <tr>
+                        <td><span class="nivel-tag tag-max" style="margin:0">Nivel 4</span></td>
+                        <td>Incluye niveles anteriores + modo Jugador vs CPU</td>
+                        <td class="nota-val nv-red" style="font-size:0.85rem; line-height:1.4">Reemplaza la nota<br>más baja del curso</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p style="font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:var(--muted); margin-top:0.75rem;">
+                * Los puntos/décimas de los niveles 1–3 se suman a la nota de la próxima prueba escrita, con tope según reglamento. El nivel 4 reemplaza la nota más baja registrada en el libro de clases, sin importar cuál sea.
+            </p>
+        </section>
+
+        <!-- RECOMENDACIONES -->
+        <section>
+            <h2 class="sec-title">Recomendaciones de desarrollo</h2>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <ul class="req-list">
+                        <li>Empieza por dibujar el tablero en consola y verificar que se ve bien antes de agregar lógica</li>
+                        <li>Piensa en cómo numerarás las 9 casillas para que el usuario las identifique fácilmente</li>
+                        <li>Las 8 combinaciones ganadoras (3 filas + 3 columnas + 2 diagonales) se pueden verificar con <code class="kw">if</code> encadenados</li>
+                        <li>Valida siempre: ¿es un número? ¿está en rango 1-9? ¿está libre?</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <ul class="req-list">
+                        <li>Para el Nivel 2, inicializa los contadores <strong style="color:var(--white)">antes del bucle</strong> principal de partidas</li>
+                        <li>Para el Nivel 3, decide los turnos y fichas al inicio de cada partida, no durante</li>
+                        <li>Para la CPU (Nivel 4), una estrategia simple: primero intenta ganar, luego bloquear, si no elige al azar</li>
+                        <li>Prueba con casos borde: empate exacto, ganar en la última casilla, entradas inválidas repetidas</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </div><!-- /container -->
+</main>
+
+<footer>
+    <div class="container">
+        <div class="d-flex justify-content-between flex-wrap gap-2">
+            <p>Escuela de Ingeniería en Informática y Telecomunicaciones · FPY-1101</p>
+            <p>Fundamentos de Programación — Tarea Programada: Juego del Gato</p>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

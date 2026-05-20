@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Actividad: Reserva de Hotel Simplificada — FPY-1101</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lato:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet"/>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+
+    <style>
+        :root {
+            --cream:    #faf7f2;
+            --warm:     #f0ebe0;
+            --panel:    #ffffff;
+            --border:   #e2d9c8;
+            --gold:     #b8943f;
+            --gold-lt:  #d4af6a;
+            --dark:     #1c1712;
+            --text:     #3d342a;
+            --muted:    #8a7b6a;
+            --accent:   #7a3b19;
+            --green:    #2d6a4f;
+            --red:      #9b2335;
+            --serif:    'Playfair Display', Georgia, serif;
+            --sans:     'Lato', sans-serif;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            background: var(--cream);
+            color: var(--text);
+            font-family: var(--sans);
+            font-weight: 300;
+        }
+
+        /* ── HERO ───────────────────────────────────── */
+        .hero {
+            background: var(--dark);
+            position: relative;
+            overflow: hidden;
+            padding: 4rem 0 3.5rem;
+        }
+        /* Ornamental corner lines */
+        .hero::before, .hero::after {
+            content: '';
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border: 1px solid rgba(184,148,63,.25);
+        }
+        .hero::before { top: 20px; left: 20px; border-right: none; border-bottom: none; }
+        .hero::after  { bottom: 20px; right: 20px; border-left: none; border-top: none; }
+
+        .hero-divider {
+            width: 80px;
+            height: 1px;
+            background: var(--gold);
+            margin: 1rem auto;
+            position: relative;
+        }
+        .hero-divider::before, .hero-divider::after {
+            content: '◆';
+            font-size: .45rem;
+            color: var(--gold);
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .hero-divider::before { left: -14px; }
+        .hero-divider::after  { right: -14px; }
+
+        .hero-tag {
+            font-family: var(--sans);
+            font-size: .7rem;
+            letter-spacing: .25em;
+            text-transform: uppercase;
+            color: var(--gold-lt);
+            margin-bottom: 1.5rem;
+        }
+        .hero h1 {
+            font-family: var(--serif);
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 900;
+            color: #ffffff;
+            line-height: 1.15;
+            margin: 0;
+        }
+        .hero h1 em {
+            color: var(--gold-lt);
+            font-style: italic;
+        }
+        .hero .subtitle {
+            color: rgba(255,255,255,.45);
+            font-size: .92rem;
+            letter-spacing: .04em;
+            margin-top: .75rem;
+        }
+
+        /* ── META BAR ───────────────────────────────── */
+        .meta-bar {
+            background: var(--gold);
+            padding: .65rem 0;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            font-size: .78rem;
+            font-weight: 700;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            color: var(--dark);
+        }
+        .meta-item i { font-size: .95rem; }
+
+        /* ── SECTION TITLES ─────────────────────────── */
+        .sec-title {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            font-family: var(--serif);
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+        }
+        .sec-title-line {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+        .sec-title-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold-lt);
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        /* ── CARDS ──────────────────────────────────── */
+        .card-hotel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 1.75rem;
+            box-shadow: 0 2px 12px rgba(28,23,18,.05);
+        }
+        .card-hotel p, .card-hotel li {
+            font-size: .92rem;
+            line-height: 1.8;
+            color: var(--text);
+        }
+
+        /* ── STEP BADGE ─────────────────────────────── */
+        .step-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            background: var(--dark);
+            color: var(--gold-lt);
+            font-family: var(--serif);
+            font-size: .85rem;
+            font-weight: 700;
+            padding: .3rem .9rem;
+            border-radius: 2px;
+            margin-bottom: 1rem;
+        }
+
+        /* ── PASSENGER CARDS ────────────────────────── */
+        .passenger-card {
+            background: var(--warm);
+            border: 1px solid var(--border);
+            border-top: 3px solid var(--gold);
+            border-radius: 4px;
+            padding: 1.25rem 1.5rem;
+            text-align: center;
+        }
+        .passenger-card .p-icon {
+            font-size: 2rem;
+            color: var(--gold);
+            margin-bottom: .4rem;
+        }
+        .passenger-card h6 {
+            font-family: var(--serif);
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: .25rem;
+            color: var(--dark);
+        }
+        .passenger-card p {
+            font-size: .82rem;
+            color: var(--muted);
+            margin: 0;
+        }
+
+        /* ── ROOM STATE VISUAL ──────────────────────── */
+        .room-state {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            padding: 1rem 1.5rem;
+            border-radius: 4px;
+            border: 1px dashed var(--border);
+            background: var(--warm);
+            font-size: .9rem;
+        }
+        .room-icon { font-size: 2.2rem; color: var(--gold); }
+
+        /* ── OP CARDS ───────────────────────────────── */
+        .op-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--gold);
+            border-radius: 4px;
+            padding: 1.25rem 1.4rem;
+            height: 100%;
+            transition: box-shadow .2s, transform .2s;
+        }
+        .op-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(28,23,18,.1);
+        }
+        .op-num {
+            font-size: .65rem;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: .3rem;
+            font-weight: 700;
+        }
+        .op-card h6 {
+            font-family: var(--serif);
+            font-size: .98rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: .6rem;
+        }
+        .op-card ul {
+            margin: 0;
+            padding-left: 1.1rem;
+        }
+        .op-card li { font-size: .83rem; line-height: 1.7; color: var(--muted); }
+
+        /* ── KEYWORD CHIPS ──────────────────────────── */
+        .chip {
+            display: inline-block;
+            font-family: 'Courier New', monospace;
+            font-size: .73rem;
+            padding: .2rem .65rem;
+            border-radius: 2px;
+            margin: .2rem;
+        }
+        .chip-allow {
+            background: rgba(45,106,79,.1);
+            border: 1px solid rgba(45,106,79,.3);
+            color: var(--green);
+        }
+        .chip-deny {
+            background: rgba(155,35,53,.08);
+            border: 1px solid rgba(155,35,53,.25);
+            color: var(--red);
+        }
+
+        /* ── EXAMPLE SCENARIO ───────────────────────── */
+        .scenario-step {
+            display: flex;
+            gap: .75rem;
+            align-items: flex-start;
+            padding: .65rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .scenario-step:last-child { border-bottom: none; }
+        .sc-num {
+            width: 26px;
+            height: 26px;
+            background: var(--dark);
+            color: var(--gold-lt);
+            border-radius: 50%;
+            font-size: .72rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .sc-text { font-size: .88rem; line-height: 1.6; color: var(--text); }
+
+        /* ── EVAL TABLE ─────────────────────────────── */
+        .eval-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .eval-table th {
+            font-size: .72rem;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            padding: .65rem 1.1rem;
+            border-bottom: 2px solid var(--gold);
+            background: var(--warm);
+            font-weight: 700;
+        }
+        .eval-table td {
+            font-size: .88rem;
+            padding: .75rem 1.1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+        }
+        .eval-table tr:last-child td { border-bottom: none; }
+        .eval-table .weight {
+            font-weight: 700;
+            color: var(--gold);
+            font-size: .82rem;
+            text-align: right;
+        }
+
+        /* ── HIGHLIGHT / WARN ───────────────────────── */
+        .highlight-box {
+            background: rgba(184,148,63,.08);
+            border-left: 3px solid var(--gold);
+            padding: 1rem 1.25rem;
+            border-radius: 0 4px 4px 0;
+            font-size: .9rem;
+        }
+        .warn-box {
+            background: rgba(155,35,53,.07);
+            border-left: 3px solid var(--red);
+            padding: 1rem 1.25rem;
+            border-radius: 0 4px 4px 0;
+            font-size: .88rem;
+            color: var(--red);
+        }
+
+        /* ── DIVIDER ────────────────────────────────── */
+        .ornamental-divider {
+            text-align: center;
+            margin: 2.5rem 0;
+            color: var(--border);
+            font-size: .8rem;
+            letter-spacing: .4em;
+        }
+        .ornamental-divider::before,
+        .ornamental-divider::after {
+            content: '─────────';
+            display: inline-block;
+            margin: 0 .75rem;
+            vertical-align: middle;
+        }
+
+        /* ── FOOTER ─────────────────────────────────── */
+        footer {
+            background: var(--dark);
+            color: rgba(255,255,255,.35);
+            padding: 2rem 0;
+            text-align: center;
+            font-size: .8rem;
+        }
+        footer strong { color: var(--gold-lt); font-weight: 700; }
+        footer .footer-divider {
+            width: 40px;
+            height: 1px;
+            background: var(--gold);
+            margin: .75rem auto;
+            opacity: .4;
+        }
+
+        /* ── ANIMATION ──────────────────────────────── */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(18px);
+            transition: opacity .5s ease, transform .5s ease;
+        }
+        .fade-up.visible { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+<!-- ══════════════════ HERO ══════════════════ -->
+<header class="hero text-center">
+    <div class="container position-relative">
+        <p class="hero-tag">FPY-1101 &nbsp;·&nbsp; Taller de Fundamentos de Programación</p>
+        <h1>Reserva de una Habitación<br>de Hotel <em>Simplificada</em></h1>
+        <div class="hero-divider"></div>
+        <p class="subtitle">Actividad de programación — aplicación de estructuras básicas en Python</p>
+    </div>
+</header>
+
+<!-- ══════════════════ META BAR ══════════════ -->
+<div class="meta-bar">
+    <div class="container">
+        <div class="row g-2 justify-content-center justify-content-md-start">
+            <div class="col-auto"><div class="meta-item"><i class="bi bi-mortarboard-fill"></i> Ing. en Informática · Analista en Programación</div></div>
+            <div class="col-auto d-none d-md-flex align-items-center" style="color:rgba(28,23,18,.3);">|</div>
+            <div class="col-auto"><div class="meta-item"><i class="bi bi-code-slash"></i> Python — Consola</div></div>
+            <div class="col-auto d-none d-md-flex align-items-center" style="color:rgba(28,23,18,.3);">|</div>
+            <div class="col-auto"><div class="meta-item"><i class="bi bi-file-earmark-code-fill"></i> Entrega: archivo .py</div></div>
+            <div class="col-auto d-none d-md-flex align-items-center" style="color:rgba(28,23,18,.3);">|</div>
+            <div class="col-auto"><div class="meta-item"><i class="bi bi-person-fill"></i> Trabajo individual</div></div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════ MAIN ══════════════════ -->
+<main class="container py-5">
+
+    <!-- OBJETIVO -->
+    <section class="mb-5 fade-up">
+        <div class="sec-title">
+            <div class="sec-title-icon"><i class="bi bi-bullseye"></i></div>
+            Objetivo
+            <div class="sec-title-line"></div>
+        </div>
+        <div class="card-hotel">
+            <p class="mb-0">
+                Desarrollar un programa en Python que simule la <strong>gestión básica de una reserva de hotel simplificada</strong>,
+                aplicando los contenidos trabajados previamente en PSeInt y llevándolos a código real.
+                El programa considerará dos etapas: <em>inicialización de la información de operación</em>
+                y <em>funcionamiento del sistema de reservas del hotel</em>.
+            </p>
+        </div>
+    </section>
+
+    <!-- CONTEXTO -->
+    <section class="mb-5 fade-up">
+        <div class="sec-title">
+            <div class="sec-title-icon"><i class="bi bi-info-circle"></i></div>
+            Contexto del Problema
+            <div class="sec-title-line"></div>
+        </div>
+
+        <div class="highlight-box mb-4">
+            Un hotel pequeño desea probar un sistema muy simple de reservas. El sistema trabajará únicamente con
+            <strong>2 pasajeros</strong> y <strong>1 habitación</strong>. La habitación solo puede estar reservada
+            por uno de los dos pasajeros a la vez.
+        </div>
+
+        <div class="row g-3">
+            <div class="col-12 col-md-4">
+                <div class="passenger-card">
+                    <div class="p-icon"><i class="bi bi-person-circle"></i></div>
+                    <h6>Pasajero 1</h6>
+                    <p>Nombre + RUT registrados al inicio</p>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="passenger-card">
+                    <div class="p-icon"><i class="bi bi-person-circle"></i></div>
+                    <h6>Pasajero 2</h6>
+                    <p>Nombre + RUT registrados al inicio</p>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="passenger-card" style="border-top-color: var(--accent);">
+                    <div class="p-icon" style="color:var(--accent);"><i class="bi bi-door-closed"></i></div>
+                    <h6>Habitación única</h6>
+                    <p>Solo puede tener un dueño de reserva a la vez</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="ornamental-divider">◆</div>
+
+    <!-- PASO 1 -->
+    <section class="mb-5 fade-up">
+        <div class="sec-title">
+            <div class="sec-title-icon"><i class="bi bi-1-circle"></i></div>
+            Paso 1 — Inicializar Información de Operación
+            <div class="sec-title-line"></div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-12 col-md-6">
+                <div class="card-hotel h-100">
+                    <div class="step-badge"><i class="bi bi-people-fill"></i> Datos de los Pasajeros</div>
+                    <p class="mb-2">Para <strong>cada uno de los 2 pasajeros</strong>, registrar:</p>
+                    <ul>
+                        <li><strong>Nombre</strong> del pasajero (texto)</li>
+                        <li><strong>RUT</strong> del pasajero (texto)</li>
+                    </ul>
+                    <p class="mb-0" style="font-size:.85rem; color:var(--muted);">
+                        Solo existen dos pasajeros en el sistema — no más, no menos.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <div class="card-hotel h-100">
+                    <div class="step-badge"><i class="bi bi-door-open"></i> Habitación Inicial</div>
+                    <p class="mb-2">Registrar la información inicial de la habitación:</p>
+                    <ul>
+                        <li><strong>Número o identificador</strong> de la habitación</li>
+                        <li><strong>Estado inicial:</strong> libre (sin reserva)</li>
+                    </ul>
+                    <p class="mb-0" style="font-size:.85rem; color:var(--muted);">
+                        Al finalizar el registro, se debe seleccionar cuál pasajero comenzará operando el menú.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PASO 2 -->
+    <section class="mb-5 fade-up">
+        <div class="sec-title">
+            <div class="sec-title-icon"><i class="bi bi-2-circle"></i></div>
+            Paso 2 — Sistema de Reservas del Hotel
+            <div class="sec-title-line"></div>
+        </div>
+
+        <!-- Regla principal -->
+        <div class="card-hotel mb-4">
+            <h5 class="mb-3" style="font-family:var(--serif); font-weight:700; color:var(--dark);">
+                <i class="bi bi-key-fill me-2" style="color:var(--gold);"></i>Regla Principal del Sistema
+            </h5>
+
+            <div class="room-state mb-3">
+                <i class="bi bi-door-open room-icon" style="color:var(--green);"></i>
+                <div>
+                    <strong style="color:var(--green);">Estado LIBRE</strong><br>
+                    <span style="font-size:.88rem; color:var(--muted);">Cualquiera de los dos pasajeros puede reservarla.</span>
+                </div>
+            </div>
+
+            <div class="room-state">
+                <i class="bi bi-door-closed room-icon" style="color:var(--red);"></i>
+                <div>
+                    <strong style="color:var(--red);">Estado RESERVADA</strong><br>
+                    <span style="font-size:.88rem; color:var(--muted);">
+            Queda asociada al pasajero que la reservó. El otro no puede tomarla hasta que sea liberada.
+          </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menú de acciones -->
+        <p style="font-size:.88rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-bottom:1rem;">
+            Opciones del menú
+        </p>
+
+        <div class="row g-3">
+
+            <!-- Op 1 -->
+            <div class="col-12 col-sm-6 col-xl-4">
+                <div class="op-card">
+                    <div class="op-num">Opción 1</div>
+                    <h6><i class="bi bi-eye me-1" style="color:var(--gold);"></i>Ver Estado de la Habitación</h6>
+                    <ul>
+                        <li>Número o nombre de la habitación.</li>
+                        <li>Si está libre o reservada.</li>
+                        <li>Si está reservada, indicar qué pasajero la tiene.</li>
+                        <li>Qué pasajero está operando el menú actualmente.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Op 2 -->
+            <div class="col-12 col-sm-6 col-xl-4">
+                <div class="op-card">
+                    <div class="op-num">Opción 2</div>
+                    <h6><i class="bi bi-bookmark-check me-1" style="color:var(--green);"></i>Reservar Habitación</h6>
+                    <ul>
+                        <li>Si está <strong>libre</strong>: la reserva se realiza correctamente.</li>
+                        <li>Si ya la tiene <strong>el mismo pasajero</strong>: informar que ya la tiene reservada.</li>
+                        <li>Si la tiene <strong>el otro pasajero</strong>: no se puede reservar, mensaje claro.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Op 3 -->
+            <div class="col-12 col-sm-6 col-xl-4">
+                <div class="op-card">
+                    <div class="op-num">Opción 3</div>
+                    <h6><i class="bi bi-bookmark-x me-1" style="color:var(--red);"></i>Liberar Habitación</h6>
+                    <ul>
+                        <li>Si está <strong>libre</strong>: informar que no hay reserva activa.</li>
+                        <li>Si la tiene <strong>el pasajero actual</strong>: se libera correctamente.</li>
+                        <li>Si la tiene <strong>el otro pasajero</strong>: no se permite liberarla.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Op 4 -->
+            <div class="col-12 col-sm-6 col-xl-4">
+                <div class="op-card">
+                    <div class="op-num">Opción 4</div>
+                    <h6><i class="bi bi-arrow-left-right me-1" style="color:var(--accent);"></i>Cambiar Pasajero que Opera</h6>
+                    <ul>
+                        <li>Si opera el Pasajero 1, cambia al Pasajero 2.</li>
+                        <li>Si opera el Pasajero 2, cambia al Pasajero 1.</li>
+                        <li>El cambio debe verse reflejado claramente en pantalla.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Op 5 -->
+            <div class="col-12 col-sm-6 col-xl-4">
+                <div class="op-card">
+                    <div class="op-num">Opción 5</div>
+                    <h6><i class="bi bi-box-arrow-right me-1" style="color:var(--muted);"></i>Salir</h6>
+                    <ul>
+                        <li>El usuario puede cerrar el sistema desde el menú.</li>
+                        <li>Se recomienda pedir confirmación antes de salir.</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <div class="ornamental-divider">◆</div>
+
+    <!-- EJEMPLO CONCEPTUAL -->
+    <section class="mb-5 fade-up">
+        <div class="sec-title">
+            <div class="sec-title-icon"><i class="bi bi-play-circle"></i></div>
+            Ejemplo Conceptual de Comportamiento
+            <div class="sec-title-line"></div>
+        </div>
+
+        <div class="card-hotel">
+            <div class="scenario-step">
+                <div class="sc-num">1</div>
+                <div class="sc-text">Se registran los datos de los dos pasajeros. La habitación comienza <strong>libre</strong>.</div>
+            </div>
+            <div class="scenario-step">
+                <div class="sc-num">2</div>
+                <div class="sc-text">El <strong>Pasajero 1</strong> entra al menú y <strong>reserva</strong> la habitación exitosamente.</div>
+            </div>
+            <div class="scenario-step">
+                <div class="sc-num">3</div>
+                <div class="sc-text">El sistema cambia al <strong>Pasajero 2</strong>.</div>
+            </div>
+            <div class="scenario-step">
+                <div class="sc-num">4</div>
+                <div class="sc-text">El Pasajero 2 intenta <strong>reservar</strong> la habitación → el sistema lo <strong>impide</strong> con mensaje claro.</div>
+            </div>
+            <div class="scenario-step">
+                <div class="sc-num">5</div>
+                <div class="sc-text">El Pasajero 2 intenta <strong>liberar</strong> la habitación → el sistema lo <strong>impide</strong> porque no es su reserva.</div>
+            </div>
+            <div class="scenario-step">
+                <div class="sc-num">6</div>
+                <div class="sc-text">Se vuelve al <strong>Pasajero 1</strong>, quien <strong>libera</strong> la habitación exitosamente.</div>
+            </div>
+            <div class="scenario-step">
+                <div class="sc-num">7</div>
+                <div class="sc-text">Con la habitación libre, el <strong>Pasajero 2</strong> ahora sí puede <strong>reservarla</strong>.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VALIDACIONES -->
+    <section class="mb-5 fade-up">
+        <div class="sec-title">
+            <div class="sec-title-icon"><i class="bi bi-shield-check"></i></div>
+            Validaciones Mínimas Esperadas
+            <div class="sec-title-line"></div>
+        </div>
+
+        <div class="card-hotel">
+            <div class="row g-0">
+                <div class="col-12 col-md-6">
+                    <ul style="font-size:.91rem; padding-left:1.1rem; line-height:2;">
+                        <li>Solo un pasajero puede tener la habitación reservada a la vez.</li>
+                        <li>No reservar una habitación ya ocupada por otro.</li>
+                    </ul>
+                </div>
+                <div class="col-12 col-md-6">
+                    <ul style="font-size:.91rem; padding-left:1.1rem; line-height:2;">
+                        <li>No liberar una habitación que pertenece a otro pasajero.</li>
+                        <li>Validar que la opción del menú sea válida.</li>
+                        <li>Mensajes claros y comprensibles en todo momento.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="ornamental-divider">◆</div>
+
+    <!-- RESTRICCIONES -->
+    <section class="mb-5 fade-up">
+        <div class="sec-title">
+            <div class="sec-title-icon"><i class="bi bi-sliders"></i></div>
+            Restricciones de Implementación
+            <div class="sec-title-line"></div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-12 col-md-6">
+                <div class="card-hotel h-100">
+                    <h6 class="mb-3" style="font-family:var(--serif); color:var(--green); font-weight:700;">
+                        <i class="bi bi-check2-circle me-2"></i>Deben usar
+                    </h6>
+                    <div>
+                        <span class="chip chip-allow">variables</span>
+                        <span class="chip chip-allow">input()</span>
+                        <span class="chip chip-allow">int()</span>
+                        <span class="chip chip-allow">str()</span>
+                        <span class="chip chip-allow">if / elif / else</span>
+                        <span class="chip chip-allow">while</span>
+                        <span class="chip chip-allow">for</span>
+                        <span class="chip chip-allow">asignación</span>
+                        <span class="chip chip-allow">op. aritméticos</span>
+                        <span class="chip chip-allow">op. lógicos</span>
+                        <span class="chip chip-allow">op. de comparación</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <div class="card-hotel h-100">
+                    <h6 class="mb-3" style="font-family:var(--serif); color:var(--red); font-weight:700;">
+                        <i class="bi bi-x-circle me-2"></i>No deben usar
+                    </h6>
+                    <div>
+                        <span class="chip chip-deny">funciones propias</span>
+                        <span class="chip chip-deny">listas</span>
+                        <span class="chip chip-deny">tuplas</span>
+                        <span class="chip chip-deny">diccionarios</span>
+                        <span class="chip chip-deny">sets</span>
+                        <span class="chip chip-deny">colecciones</span>
+                        <span class="chip chip-deny">POO / clases</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modelado sin colecciones -->
+        <div class="warn-box">
+            <strong><i class="bi bi-exclamation-circle-fill me-2"></i>Sin colecciones: variables separadas</strong><br>
+            Como no pueden usar listas ni diccionarios, deben manejar la información con variables individuales:
+            datos del pasajero 1, datos del pasajero 2, estado de la habitación, pasajero que opera el menú,
+            y pasajero que tiene la reserva (si existe).
+        </div>
+    </section>
+
+    <!-- ENTREGABLE -->
+    <section class="mb-5 fade-up">
+        <div class="sec-title">
+            <div class="sec-title-icon"><i class="bi bi-send"></i></div>
+            Entregable
+            <div class="sec-title-line"></div>
+        </div>
+        <div class="card-hotel">
+            <div class="row align-items-center g-3">
+                <div class="col-auto">
+                    <div style="font-size:3rem; color:var(--gold); opacity:.7;"><i class="bi bi-file-earmark-code-fill"></i></div>
+                </div>
+                <div class="col">
+                    <ul class="mb-0" style="font-size:.92rem; padding-left:1.1rem; line-height:1.9;">
+                        <li>Archivo <strong><code>.py</code></strong> con la solución completa.</li>
+                        <li>Código que se ejecute sin errores desde consola.</li>
+                        <li>Cumplimiento del enunciado y respeto por las restricciones dadas.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CRITERIOS DE EVALUACIÓN -->
+    <section class="mb-2 fade-up">
+        <div class="sec-title">
+            <div class="sec-title-icon"><i class="bi bi-clipboard-check"></i></div>
+            Criterios de Evaluación
+            <div class="sec-title-line"></div>
+        </div>
+        <div class="card-hotel p-0">
+            <table class="eval-table">
+                <thead>
+                <tr>
+                    <th>Criterio</th>
+                    <th style="text-align:right;">Relevancia</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><i class="bi bi-check2 me-2" style="color:var(--gold);"></i>Correcta inicialización de los 2 pasajeros</td>
+                    <td class="weight">Medio</td>
+                </tr>
+                <tr>
+                    <td><i class="bi bi-check2 me-2" style="color:var(--gold);"></i>Manejo correcto de una sola habitación con sus estados</td>
+                    <td class="weight">Alto</td>
+                </tr>
+                <tr>
+                    <td><i class="bi bi-check2 me-2" style="color:var(--gold);"></i>Validación de reserva exclusiva (un solo dueño)</td>
+                    <td class="weight">Alto</td>
+                </tr>
+                <tr>
+                    <td><i class="bi bi-check2 me-2" style="color:var(--gold);"></i>Cambio correcto del pasajero que opera el menú</td>
+                    <td class="weight">Medio</td>
+                </tr>
+                <tr>
+                    <td><i class="bi bi-check2 me-2" style="color:var(--gold);"></i>Claridad y orden de los mensajes al usuario</td>
+                    <td class="weight">Medio</td>
+                </tr>
+                <tr>
+                    <td><i class="bi bi-check2 me-2" style="color:var(--gold);"></i>Uso correcto de estructuras básicas</td>
+                    <td class="weight">Alto</td>
+                </tr>
+                <tr>
+                    <td><i class="bi bi-check2 me-2" style="color:var(--gold);"></i>Respeto por la restricción de no usar funciones ni colecciones</td>
+                    <td class="weight">Alto</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</main>
+
+<!-- ══════════════════ FOOTER ═════════════════ -->
+<footer>
+    <div class="container">
+        <strong>Escuela de Ingeniería en Informática y Telecomunicaciones</strong>
+        <div class="footer-divider"></div>
+        Fundamentos de Programación &nbsp;·&nbsp; FPY-1101 &nbsp;|&nbsp; Taller de Fundamentos de Programación
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+            if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+        });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicios Python – Ciclos, Strings y Excepciones</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --verde: #1a9e6e;
+            --verde-claro: #d0f0e4;
+            --verde-oscuro: #0c5e40;
+            --rojo: #c0392b;
+            --rojo-claro: #fdecea;
+            --amarillo: #e6a817;
+            --amarillo-claro: #fef4d8;
+            --gris-bg: #f5f4f0;
+            --gris-card: #ffffff;
+            --gris-borde: #dedad2;
+            --gris-texto: #3a3835;
+            --gris-muted: #7a7773;
+            --codigo-bg: #1e1e2e;
+            --codigo-text: #cdd6f4;
+            --acento: #2563eb;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Syne', sans-serif;
+            background: var(--gris-bg);
+            color: var(--gris-texto);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+        .site-header {
+            background: var(--verde-oscuro);
+            color: white;
+            padding: 2.5rem 0 2rem;
+            border-bottom: 4px solid var(--verde);
+            position: relative;
+            overflow: hidden;
+        }
+        .site-header::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -60px;
+            width: 220px; height: 220px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.04);
+        }
+        .site-header::after {
+            content: '';
+            position: absolute;
+            bottom: -60px; left: 30px;
+            width: 140px; height: 140px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.03);
+        }
+        .header-badge {
+            background: var(--verde);
+            color: white;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.72rem;
+            padding: 4px 12px;
+            border-radius: 100px;
+            display: inline-block;
+            margin-bottom: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .site-header h1 {
+            font-size: 2.1rem;
+            font-weight: 800;
+            margin: 0 0 0.4rem;
+            line-height: 1.1;
+        }
+        .site-header p {
+            font-size: 0.95rem;
+            opacity: 0.75;
+            margin: 0;
+            font-weight: 400;
+        }
+        .header-tags {
+            display: flex;
+            gap: 8px;
+            margin-top: 1.2rem;
+            flex-wrap: wrap;
+        }
+        .header-tag {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            padding: 3px 10px;
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 100px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* INDICADORES */
+        .indicadores {
+            background: white;
+            border-bottom: 1px solid var(--gris-borde);
+        }
+        .ind-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 1rem 0;
+        }
+        .ind-num {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--verde);
+            font-family: 'Space Mono', monospace;
+            line-height: 1;
+        }
+        .ind-label {
+            font-size: 0.78rem;
+            color: var(--gris-muted);
+            line-height: 1.3;
+            font-weight: 400;
+        }
+        .ind-sep {
+            width: 1px;
+            background: var(--gris-borde);
+            height: 32px;
+            align-self: center;
+        }
+
+        /* CARDS DE EJERCICIO */
+        .ejercicio-card {
+            background: var(--gris-card);
+            border: 1px solid var(--gris-borde);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 2.2rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        }
+        .ejercicio-header {
+            padding: 1.4rem 1.8rem 1.2rem;
+            border-bottom: 1px solid var(--gris-borde);
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        .ejercicio-num {
+            background: var(--verde-oscuro);
+            color: white;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 100px;
+            white-space: nowrap;
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+        .ejercicio-titulo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin: 0 0 0.3rem;
+            color: var(--gris-texto);
+            line-height: 1.3;
+        }
+        .ejercicio-puntaje {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.72rem;
+            color: var(--verde);
+            font-weight: 400;
+        }
+
+        .ejercicio-body {
+            padding: 1.6rem 1.8rem;
+        }
+        .enunciado {
+            font-size: 0.95rem;
+            line-height: 1.75;
+            color: var(--gris-texto);
+            margin-bottom: 1.4rem;
+        }
+
+        /* TAGS DE CONCEPTOS */
+        .concepto-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 1.4rem;
+        }
+        .concepto-tag {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            padding: 3px 10px;
+            border-radius: 100px;
+            border: 1px solid;
+            text-transform: lowercase;
+        }
+        .tag-ciclo { border-color: #2563eb33; background: #eff6ff; color: #1d4ed8; }
+        .tag-string { border-color: #7c3aed33; background: #f5f3ff; color: #6d28d9; }
+        .tag-excepcion { border-color: #dc262633; background: #fef2f2; color: #b91c1c; }
+        .tag-input { border-color: #0f766e33; background: #f0fdfa; color: #0f766e; }
+
+        /* SECCIONES PLEGABLES */
+        .seccion-plegable {
+            border: 1px solid var(--gris-borde);
+            border-radius: 10px;
+            margin-bottom: 0.8rem;
+            overflow: hidden;
+        }
+        .seccion-btn {
+            width: 100%;
+            background: var(--gris-bg);
+            border: none;
+            padding: 0.75rem 1.1rem;
+            text-align: left;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--gris-texto);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            transition: background 0.15s;
+        }
+        .seccion-btn:hover { background: #eeede8; }
+        .seccion-btn .arrow {
+            font-size: 0.7rem;
+            color: var(--gris-muted);
+            transition: transform 0.2s;
+            display: inline-block;
+        }
+        .seccion-btn.open .arrow { transform: rotate(180deg); }
+        .seccion-contenido {
+            display: none;
+            border-top: 1px solid var(--gris-borde);
+            padding: 1rem 1.1rem;
+            font-size: 0.875rem;
+            line-height: 1.7;
+            background: white;
+        }
+        .seccion-contenido.visible { display: block; }
+
+        /* CAJA DE EJEMPLO */
+        .ejemplo-wrapper {
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--gris-borde);
+            margin: 0;
+        }
+        .ejemplo-header {
+            background: #2a2a3e;
+            padding: 6px 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dot-r { background: #ff5f57; }
+        .dot-y { background: #ffbd2e; }
+        .dot-g { background: #28c840; }
+        .ejemplo-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.45);
+            margin-left: auto;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        .ejemplo-code {
+            background: var(--codigo-bg);
+            color: var(--codigo-text);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.78rem;
+            line-height: 1.8;
+            padding: 1rem 1.2rem;
+            margin: 0;
+            white-space: pre;
+            overflow-x: auto;
+            tab-size: 4;
+        }
+        .input-bold { color: #a6e3a1; font-weight: 700; }
+        .output-normal { color: #cdd6f4; }
+        .output-error { color: #f38ba8; }
+        .output-info { color: #89dceb; }
+
+        /* REQUERIMIENTOS */
+        .req-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .req-list li {
+            padding: 0.4rem 0;
+            padding-left: 1.4rem;
+            position: relative;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            border-bottom: 1px solid var(--gris-bg);
+        }
+        .req-list li:last-child { border-bottom: none; }
+        .req-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--verde);
+            font-weight: 700;
+        }
+
+        /* ALERTA IMPORTANTE */
+        .alerta-importante {
+            background: var(--amarillo-claro);
+            border: 1px solid #f5d68a;
+            border-left: 4px solid var(--amarillo);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.84rem;
+            color: #7a5800;
+            margin-top: 1rem;
+            line-height: 1.6;
+        }
+        .alerta-importante strong { color: #5a3f00; }
+
+        /* SEPARADOR ENTRE EJERCICIOS */
+        .seccion-sep {
+            text-align: center;
+            margin: 0.5rem 0 2rem;
+            position: relative;
+        }
+        .seccion-sep::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0; right: 0;
+            height: 1px;
+            background: var(--gris-borde);
+        }
+        .seccion-sep span {
+            position: relative;
+            background: var(--gris-bg);
+            padding: 0 1rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--gris-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* FOOTER */
+        .site-footer {
+            background: var(--verde-oscuro);
+            color: rgba(255,255,255,0.6);
+            padding: 1.5rem 0;
+            font-size: 0.8rem;
+            text-align: center;
+            font-family: 'Space Mono', monospace;
+            margin-top: 3rem;
+        }
+
+        /* PILL NÚMERO REQUERIMIENTO */
+        .req-icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--verde-claro);
+            color: var(--verde-oscuro);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-align: center;
+            line-height: 20px;
+            margin-right: 6px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 576px) {
+            .site-header h1 { font-size: 1.5rem; }
+            .ejercicio-body { padding: 1.2rem; }
+            .ejercicio-header { padding: 1rem 1.2rem; }
+            .ejemplo-code { font-size: 0.7rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+    <div class="container">
+        <span class="header-badge">Python · FPY-1101</span>
+        <h1>Ejercicios de Programación</h1>
+        <p>Ciclos · Strings · Manejo de excepciones</p>
+        <div class="header-tags">
+            <span class="header-tag">while / for</span>
+            <span class="header-tag">try / except</span>
+            <span class="header-tag">int() / float()</span>
+            <span class="header-tag">str · upper · count</span>
+        </div>
+    </div>
+</header>
+
+<!-- INDICADORES -->
+<div class="indicadores">
+    <div class="container">
+        <div class="d-flex align-items-center gap-4 flex-wrap">
+            <div class="ind-item">
+                <span class="ind-num">02</span>
+                <span class="ind-label">ejercicios<br>propuestos</span>
+            </div>
+            <div class="ind-sep d-none d-sm-block"></div>
+            <div class="ind-item">
+                <span class="ind-num">6p</span>
+                <span class="ind-label">por<br>ejercicio</span>
+            </div>
+            <div class="ind-sep d-none d-sm-block"></div>
+            <div class="ind-item">
+                <span class="ind-num">3</span>
+                <span class="ind-label">conceptos<br>integrados</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CONTENIDO PRINCIPAL -->
+<main class="container py-4 py-md-5">
+
+    <p class="text-muted mb-4" style="font-size:0.9rem;">
+        En los ejemplos de ejecución, el texto en <strong style="color:#1a9e6e;">verde</strong> representa datos ingresados por teclado.
+        Lee el enunciado completo antes de comenzar a codificar.
+    </p>
+
+    <!-- ══════════════════════════════════
+         EJERCICIO 1
+    ══════════════════════════════════ -->
+    <div class="ejercicio-card">
+        <div class="ejercicio-header">
+            <span class="ejercicio-num">Ejercicio 01</span>
+            <div>
+                <p class="ejercicio-titulo">Validador de contraseñas</p>
+                <span class="ejercicio-puntaje">3 puntos</span>
+            </div>
+        </div>
+
+        <div class="ejercicio-body">
+
+            <div class="concepto-tags">
+                <span class="concepto-tag tag-ciclo">ciclo while</span>
+                <span class="concepto-tag tag-string">strings / métodos</span>
+                <span class="concepto-tag tag-excepcion">try / except</span>
+                <span class="concepto-tag tag-input">input()</span>
+            </div>
+
+            <div class="enunciado">
+                <p>
+                    Una empresa de desarrollo web necesita un programa que evalúe la solidez de las contraseñas ingresadas por sus usuarios.
+                    El programa debe comenzar pidiendo al usuario que indique cuántas contraseñas desea verificar. Este número debe ser un entero positivo; si se ingresa cualquier otro valor (texto, decimal, etc.) se debe mostrar el mensaje <code>"Debe ingresar un número entero positivo."</code> y repetir la solicitud.
+                </p>
+                <p>
+                    Luego, para cada contraseña, el programa debe verificar si cumple <em>todas</em> las siguientes condiciones:
+                </p>
+            </div>
+
+            <!-- Requisitos colapsables -->
+            <div class="seccion-plegable mb-3">
+                <button class="seccion-btn open" onclick="toggle(this)">
+                    📋 Condiciones de validación <span class="arrow">▾</span>
+                </button>
+                <div class="seccion-contenido visible">
+                    <ul class="req-list">
+                        <li>Tiene al menos 8 caracteres de largo.</li>
+                        <li>Contiene al menos una letra mayúscula (usa el método <code>.upper()</code> o recorre la cadena).</li>
+                        <li>Contiene al menos un dígito numérico.</li>
+                        <li>No contiene espacios en blanco.</li>
+                    </ul>
+                    <p class="mt-2 mb-0" style="font-size:0.82rem; color:var(--gris-muted);">
+                        Si la contraseña cumple todas las condiciones → <code>"Contraseña segura."</code><br>
+                        Si no cumple alguna → <code>"Contraseña débil."</code> e indica cuál condición falla (solo la primera que encuentres).
+                    </p>
+                </div>
+            </div>
+
+            <div class="seccion-plegable mb-3">
+                <button class="seccion-btn" onclick="toggle(this)">
+                    📊 Resumen al finalizar <span class="arrow">▾</span>
+                </button>
+                <div class="seccion-contenido">
+                    <ul class="req-list">
+                        <li>Mostrar cuántas contraseñas resultaron seguras.</li>
+                        <li>Mostrar cuántas resultaron débiles.</li>
+                        <li>Mostrar la contraseña más larga que fue ingresada (independientemente de si es segura o no).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="seccion-plegable mb-4">
+                <button class="seccion-btn" onclick="toggle(this)">
+                    💻 Ejemplo de ejecución <span class="arrow">▾</span>
+                </button>
+                <div class="seccion-contenido" style="padding:0;">
+                    <div class="ejemplo-wrapper" style="border:none; border-radius:0;">
+                        <div class="ejemplo-header">
+                            <span class="dot dot-r"></span>
+                            <span class="dot dot-y"></span>
+                            <span class="dot dot-g"></span>
+                            <span class="ejemplo-label">terminal</span>
+                        </div>
+                        <pre class="ejemplo-code">¿Cuántas contraseñas desea verificar? <span class="input-bold">dos</span>
+<span class="output-error">Debe ingresar un número entero positivo.</span>
+¿Cuántas contraseñas desea verificar? <span class="input-bold">3.5</span>
+<span class="output-error">Debe ingresar un número entero positivo.</span>
+¿Cuántas contraseñas desea verificar? <span class="input-bold">3</span>
+
+Ingrese contraseña 1: <span class="input-bold">hola</span>
+<span class="output-error">Contraseña débil. Motivo: largo insuficiente (mínimo 8 caracteres).</span>
+
+Ingrese contraseña 2: <span class="input-bold">MiClave123</span>
+<span class="output-info">Contraseña segura.</span>
+
+Ingrese contraseña 3: <span class="input-bold">sinmayuscula8</span>
+<span class="output-error">Contraseña débil. Motivo: no contiene mayúsculas.</span>
+
+--- Resumen ---
+Contraseñas seguras  : 1
+Contraseñas débiles  : 2
+Contraseña más larga : sinmayuscula8</pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alerta-importante">
+                <strong>⚠ Importante:</strong> el ingreso del número inicial y de cada contraseña debe estar protegido con manejo de excepciones (<code>try / except</code>). Si el usuario ingresa un tipo de dato inválido para el número inicial, el programa debe repetir la solicitud hasta obtener un entero positivo.
+            </div>
+
+        </div>
+    </div>
+
+    <div class="seccion-sep">
+        <span>siguiente ejercicio</span>
+    </div>
+
+    <!-- ══════════════════════════════════
+         EJERCICIO 2
+    ══════════════════════════════════ -->
+    <div class="ejercicio-card">
+        <div class="ejercicio-header">
+            <span class="ejercicio-num">Ejercicio 02</span>
+            <div>
+                <p class="ejercicio-titulo">Sistema de caja de farmacia</p>
+                <span class="ejercicio-puntaje">3 puntos</span>
+            </div>
+        </div>
+
+        <div class="ejercicio-body">
+
+            <div class="concepto-tags">
+                <span class="concepto-tag tag-ciclo">ciclo while</span>
+                <span class="concepto-tag tag-excepcion">try / except</span>
+                <span class="concepto-tag tag-input">int() / float()</span>
+                <span class="concepto-tag tag-string">strings</span>
+            </div>
+
+            <div class="enunciado">
+                <p>
+                    Una farmacia necesita un programa de caja simple para registrar ventas durante un turno. El programa debe mostrar el siguiente menú en bucle hasta que el cajero decida cerrar el turno:
+                </p>
+            </div>
+
+            <!-- Menú -->
+            <div class="seccion-plegable mb-3">
+                <button class="seccion-btn open" onclick="toggle(this)">
+                    🖥 Menú del sistema <span class="arrow">▾</span>
+                </button>
+                <div class="seccion-contenido">
+                    <div class="ejemplo-wrapper">
+                        <div class="ejemplo-header">
+                            <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+                            <span class="ejemplo-label">menú</span>
+                        </div>
+                        <pre class="ejemplo-code"><span class="output-info">*** SISTEMA DE CAJA - FARMACIA ***</span>
+1. Registrar venta.
+2. Ver total acumulado.
+3. Ver cantidad de ventas.
+4. Cerrar turno.</pre>
+                    </div>
+                    <ul class="req-list mt-3">
+                        <li>
+                            <strong>Opción 1 – Registrar venta:</strong> pide el nombre del producto (no puede estar vacío ni ser solo espacios) y su precio (número real mayor a 0). Ambos datos deben validarse con <code>try/except</code>. Si el precio no es un número o es ≤ 0, debe mostrar el mensaje correspondiente y volver a pedir el dato. Si todo es correcto muestra: <code>"Venta registrada: [nombre] - $[precio]"</code>.
+                        </li>
+                        <li>
+                            <strong>Opción 2 – Ver total acumulado:</strong> muestra la suma de todos los precios registrados. Si no hay ventas, muestra <code>"No se han registrado ventas aún."</code>.
+                        </li>
+                        <li>
+                            <strong>Opción 3 – Ver cantidad de ventas:</strong> muestra cuántas ventas se han registrado. Si no hay ventas, muestra <code>"No se han registrado ventas aún."</code>.
+                        </li>
+                        <li>
+                            <strong>Opción 4 – Cerrar turno:</strong> muestra el total recaudado y la cantidad de ventas, luego termina con <code>"Turno cerrado. Hasta pronto."</code>.
+                        </li>
+                        <li>
+                            <strong>Opción inválida:</strong> cualquier otro ingreso muestra <code>"Opción no válida. Intente nuevamente."</code> y repite el menú.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="seccion-plegable mb-4">
+                <button class="seccion-btn" onclick="toggle(this)">
+                    💻 Ejemplo de ejecución <span class="arrow">▾</span>
+                </button>
+                <div class="seccion-contenido" style="padding:0;">
+                    <div class="ejemplo-wrapper" style="border:none; border-radius:0;">
+                        <div class="ejemplo-header">
+                            <span class="dot dot-r"></span>
+                            <span class="dot dot-y"></span>
+                            <span class="dot dot-g"></span>
+                            <span class="ejemplo-label">terminal</span>
+                        </div>
+                        <pre class="ejemplo-code"><span class="output-info">*** SISTEMA DE CAJA - FARMACIA ***</span>
+1. Registrar venta.
+2. Ver total acumulado.
+3. Ver cantidad de ventas.
+4. Cerrar turno.
+Elija opción: <span class="input-bold">2</span>
+No se han registrado ventas aún.
+
+<span class="output-info">*** SISTEMA DE CAJA - FARMACIA ***</span>
+1. Registrar venta.
+2. Ver total acumulado.
+3. Ver cantidad de ventas.
+4. Cerrar turno.
+Elija opción: <span class="input-bold">1</span>
+
+Ingrese nombre del producto: <span class="input-bold">Paracetamol 500mg</span>
+Ingrese precio: <span class="input-bold">abc</span>
+<span class="output-error">Debe ingresar un precio válido (número mayor a 0).</span>
+Ingrese precio: <span class="input-bold">-200</span>
+<span class="output-error">Debe ingresar un precio válido (número mayor a 0).</span>
+Ingrese precio: <span class="input-bold">1490</span>
+<span class="output-info">Venta registrada: Paracetamol 500mg - $1490.0</span>
+
+<span class="output-info">*** SISTEMA DE CAJA - FARMACIA ***</span>
+1. Registrar venta.
+2. Ver total acumulado.
+3. Ver cantidad de ventas.
+4. Cerrar turno.
+Elija opción: <span class="input-bold">1</span>
+
+Ingrese nombre del producto: <span class="input-bold">   </span>
+<span class="output-error">El nombre del producto no puede estar vacío.</span>
+Ingrese nombre del producto: <span class="input-bold">Ibuprofeno 400mg</span>
+Ingrese precio: <span class="input-bold">990</span>
+<span class="output-info">Venta registrada: Ibuprofeno 400mg - $990.0</span>
+
+<span class="output-info">*** SISTEMA DE CAJA - FARMACIA ***</span>
+1. Registrar venta.
+2. Ver total acumulado.
+3. Ver cantidad de ventas.
+4. Cerrar turno.
+Elija opción: <span class="input-bold">3</span>
+Cantidad de ventas: 2
+
+<span class="output-info">*** SISTEMA DE CAJA - FARMACIA ***</span>
+1. Registrar venta.
+2. Ver total acumulado.
+3. Ver cantidad de ventas.
+4. Cerrar turno.
+Elija opción: <span class="input-bold">7</span>
+<span class="output-error">Opción no válida. Intente nuevamente.</span>
+
+<span class="output-info">*** SISTEMA DE CAJA - FARMACIA ***</span>
+1. Registrar venta.
+2. Ver total acumulado.
+3. Ver cantidad de ventas.
+4. Cerrar turno.
+Elija opción: <span class="input-bold">4</span>
+
+--- Resumen del turno ---
+Total recaudado : $2480.0
+Ventas realizadas: 2
+<span class="output-info">Turno cerrado. Hasta pronto.</span></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alerta-importante">
+                <strong>⚠ Importante:</strong> el ingreso del precio y de la opción del menú deben estar protegidos con <code>try / except</code>. Para el nombre del producto usa el método <code>.strip()</code> para detectar cadenas vacías o solo con espacios.
+            </div>
+
+        </div>
+    </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+    <div class="container">
+        Fundamentos de Programación · FPY-1101 &nbsp;|&nbsp; Escuela de Ingeniería en Informática y Telecomunicaciones
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function toggle(btn) {
+        const contenido = btn.nextElementSibling;
+        const estaAbierto = contenido.classList.contains('visible');
+        contenido.classList.toggle('visible', !estaAbierto);
+        btn.classList.toggle('open', !estaAbierto);
+    }
+</script>
+
+</body>
+</html>
