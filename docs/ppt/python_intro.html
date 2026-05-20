@@ -1,0 +1,1668 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Introducción a Python · FPY-1101</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════
+   DARK (default)
+══════════════════════════════════════════════ */
+:root {
+  --bg:        #0b0f0a;
+  --surface:   #131a10;
+  --surface2:  #1c2618;
+  --border:    #2a3a24;
+  --py-green:  #4ade80;
+  --py-yellow: #facc15;
+  --accent:    #4ade80;
+  --accent2:   #facc15;
+  --accent3:   #38bdf8;
+  --accent4:   #fb923c;
+  --accent5:   #f87171;
+  --text:      #ecfdf0;
+  --text-muted:#7aa87a;
+  --code-bg:   #090d08;
+}
+
+/* LIGHT */
+html[data-theme="light"] {
+  --bg:        #f0faf0;
+  --surface:   #ffffff;
+  --surface2:  #e8f5e8;
+  --border:    #c4e0c4;
+  --accent:    #16a34a;
+  --accent2:   #ca8a04;
+  --accent3:   #0284c7;
+  --accent4:   #ea580c;
+  --accent5:   #dc2626;
+  --text:      #0f1f0f;
+  --text-muted:#4a7a4a;
+  --code-bg:   #f0faf0;
+}
+html[data-theme="light"] .kw  { color: #15803d; }
+html[data-theme="light"] .fn  { color: #1d4ed8; }
+html[data-theme="light"] .str { color: #7c3aed; }
+html[data-theme="light"] .num { color: #b45309; }
+html[data-theme="light"] .cmt { color: #6b7280; }
+html[data-theme="light"] .var { color: #9a3412; }
+html[data-theme="light"] .blt { color: #0369a1; }
+html[data-theme="light"] .dec { color: #6d28d9; }
+
+/* HIGH CONTRAST */
+html[data-theme="hc"] {
+  --bg:        #000;
+  --surface:   #080808;
+  --surface2:  #111;
+  --border:    #ffffff;
+  --accent:    #00ff88;
+  --accent2:   #ffff00;
+  --accent3:   #00ccff;
+  --accent4:   #ff8800;
+  --accent5:   #ff4444;
+  --text:      #ffffff;
+  --text-muted:#cccccc;
+  --code-bg:   #000;
+}
+html[data-theme="hc"] pre  { border-width: 2px; }
+html[data-theme="hc"] .card { border-width: 2px; }
+
+/* ── BASE ── */
+html { font-size: 20px; transition: font-size .2s ease; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+  user-select: none;
+  transition: background .3s, color .3s;
+}
+
+/* ── SLIDE ENGINE ── */
+.slide { display:none; width:100%; height:100vh; position:relative; overflow:hidden; }
+.slide.active { display:flex; flex-direction:column; animation: fadeIn .3s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+/* ── TOPBAR ── */
+.topbar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.55em 1.75em;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink:0;
+}
+.topbar .course { font-weight:700; color:var(--accent); letter-spacing:.5px; text-transform:uppercase; font-size:.65rem; }
+.slide-counter { font-family:'Fira Code',monospace; font-size:.75rem; color:var(--text-muted); }
+
+/* ── PROGRESS ── */
+.progress-bar { position:fixed; top:0; left:0; height:3px; background:linear-gradient(90deg, var(--py-green), var(--py-yellow)); transition:width .4s ease; z-index:200; }
+
+/* ── SLIDE BODY ── */
+.slide-body {
+  flex:1; display:flex; flex-direction:column;
+  justify-content:center; align-items:center;
+  padding:24px 56px 90px;
+  position:relative; gap:14px;
+}
+.slide-body.scrollable { justify-content:flex-start; padding-top:20px; overflow-y:auto; }
+
+/* ── SECTION TAG ── */
+.section-tag {
+  display:inline-block; font-size:.65rem; font-weight:800; letter-spacing:2.5px;
+  text-transform:uppercase; color:var(--accent);
+  background:rgba(74,222,128,.08); border:1px solid rgba(74,222,128,.25);
+  border-radius:4px; padding:4px 12px;
+}
+
+/* ── TITLES ── */
+h2.title {
+  font-family:'Playfair Display', serif;
+  font-size:clamp(1.7rem,3.8vw,3rem);
+  font-weight:900; line-height:1.05; margin-bottom:4px;
+}
+h2.title span { color:var(--accent); }
+h2.title .y { color:var(--accent2); }
+
+.slide-title {
+  font-family:'Playfair Display', serif;
+  font-size:clamp(2.4rem,5.5vw,4.5rem);
+  font-weight:900; line-height:.95; text-align:center; letter-spacing:-.5px;
+}
+.lead { font-size:clamp(.8rem,1.3vw,1.05rem); color:var(--text-muted); max-width:840px; line-height:1.75; }
+
+/* ── HERO BG ── */
+.hero-bg {
+  position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse at 15% 55%, rgba(74,222,128,.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 20%, rgba(250,204,21,.05) 0%, transparent 48%),
+    radial-gradient(ellipse at 55% 85%, rgba(56,189,248,.04) 0%, transparent 45%);
+}
+.hero-grid {
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size:44px 44px; opacity:.25;
+}
+
+/* ── PYTHON LOGO WATERMARK ── */
+.py-watermark {
+  position:absolute; right:48px; top:50%; transform:translateY(-50%);
+  opacity:.04; pointer-events:none;
+  font-family:'Fira Code',monospace; font-size:14rem; font-weight:700;
+  color:var(--py-green); line-height:1; user-select:none;
+}
+
+/* ── CODE ── */
+pre {
+  background:var(--code-bg); border:1px solid var(--border);
+  border-radius:10px; padding:1em 1.25em;
+  font-family:'Fira Code',monospace;
+  font-size:clamp(.68rem,1vw,.87rem);
+  line-height:1.8; overflow-x:auto;
+  max-width:960px; width:100%;
+  position:relative;
+}
+.kw  { color:#4ade80; font-weight:700; }
+.fn  { color:#60a5fa; }
+.str { color:#a78bfa; }
+.num { color:#facc15; }
+.cmt { color:#4a6645; font-style:italic; }
+.var { color:#fb923c; }
+.blt { color:#38bdf8; }   /* builtins: print, input, int, str */
+.dec { color:#c084fc; }   /* decorators / special */
+.op  { color:#4ade80; }
+
+/* code filename tab */
+pre .code-tab {
+  display:block; font-size:.6rem; color:var(--text-muted); letter-spacing:1px;
+  text-transform:uppercase; margin-bottom:.5em; padding-bottom:.5em;
+  border-bottom:1px solid var(--border);
+}
+
+/* ── CARDS ── */
+.cards { display:grid; gap:14px; width:100%; max-width:960px; }
+.cards.col2 { grid-template-columns:1fr 1fr; }
+.cards.col3 { grid-template-columns:1fr 1fr 1fr; }
+.card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding:1.1em 1.4em;
+  transition:border-color .2s, transform .2s;
+}
+.card:hover { border-color:var(--accent); transform:translateY(-2px); }
+.card .icon { font-size:1.6rem; margin-bottom:8px; }
+.card h3 { font-size:.9rem; font-weight:700; margin-bottom:5px; }
+.card p { font-size:.78rem; color:var(--text-muted); line-height:1.6; }
+.card.green  { border-color:var(--accent);  background:rgba(74,222,128,.04); }
+.card.yellow { border-color:var(--accent2); background:rgba(250,204,21,.04); }
+.card.blue   { border-color:var(--accent3); background:rgba(56,189,248,.04); }
+.card.orange { border-color:var(--accent4); background:rgba(251,146,60,.04); }
+.card.red    { border-color:var(--accent5); background:rgba(248,113,113,.04); }
+
+/* ── SPLIT ── */
+.split { display:grid; grid-template-columns:1fr 1fr; gap:24px; width:100%; max-width:980px; align-items:start; }
+.split.lw  { grid-template-columns:1.35fr 1fr; }
+.split.rw  { grid-template-columns:1fr 1.35fr; }
+
+/* ── HIGHLIGHT BOX ── */
+.hbox {
+  background:rgba(74,222,128,.05); border-left:4px solid var(--accent);
+  border-radius:0 8px 8px 0; padding:.85em 1.1em;
+  font-size:.8rem; line-height:1.65; max-width:960px; width:100%;
+}
+.hbox.y  { border-left-color:var(--accent2); background:rgba(250,204,21,.05); }
+.hbox.b  { border-left-color:var(--accent3); background:rgba(56,189,248,.05); }
+.hbox.o  { border-left-color:var(--accent4); background:rgba(251,146,60,.05); }
+.hbox.r  { border-left-color:var(--accent5); background:rgba(248,113,113,.05); }
+
+/* ── TABLE ── */
+table.t { width:100%; border-collapse:collapse; font-size:.78rem; max-width:900px; }
+table.t th { background:var(--surface2); color:var(--accent); padding:.55em .9em; text-align:left; font-size:.65rem; letter-spacing:1px; text-transform:uppercase; }
+table.t td { padding:.5em .9em; border-bottom:1px solid var(--border); font-family:'Fira Code',monospace; }
+table.t tr:last-child td { border-bottom:none; }
+table.t tr:hover td { background:var(--surface); }
+table.t td.desc { font-family:'Outfit',sans-serif; }
+
+/* ── BADGE ── */
+.badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:.65rem; font-weight:700; letter-spacing:.5px; }
+.bg  { background:rgba(74,222,128,.12); color:var(--accent);  border:1px solid rgba(74,222,128,.3); }
+.by  { background:rgba(250,204,21,.12); color:var(--accent2); border:1px solid rgba(250,204,21,.3); }
+.bb  { background:rgba(56,189,248,.12); color:var(--accent3); border:1px solid rgba(56,189,248,.3); }
+.bo  { background:rgba(251,146,60,.12); color:var(--accent4); border:1px solid rgba(251,146,60,.3); }
+.br  { background:rgba(248,113,113,.12); color:var(--accent5); border:1px solid rgba(248,113,113,.3); }
+
+/* ── STEPS ── */
+.steps { display:flex; flex-direction:column; gap:9px; max-width:840px; width:100%; }
+.step { display:flex; align-items:flex-start; gap:14px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:.8em 1.1em; }
+.step-num { width:1.6rem; height:1.6rem; border-radius:50%; background:var(--accent); color:#000; font-weight:900; font-size:.75rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.step h4 { font-size:.85rem; font-weight:700; margin-bottom:2px; }
+.step p  { font-size:.73rem; color:var(--text-muted); line-height:1.5; }
+
+/* ── LIST ── */
+ul.fl { list-style:none; padding:0; display:flex; flex-direction:column; gap:7px; }
+ul.fl li { display:flex; align-items:flex-start; gap:9px; font-size:.8rem; line-height:1.5; }
+ul.fl li::before { content:'▸'; color:var(--accent); flex-shrink:0; margin-top:1px; }
+
+/* ── TIME BADGE ── */
+.time-badge { display:inline-flex; align-items:center; gap:6px; background:var(--surface2); border:1px solid var(--border); border-radius:20px; padding:4px 14px; font-size:.72rem; color:var(--text-muted); }
+
+/* ── SCORE BANNER ── */
+.score-banner {
+  display:flex; align-items:center; gap:14px;
+  background:rgba(250,204,21,.07); border:1.5px solid rgba(250,204,21,.35);
+  border-radius:12px; padding:10px 18px;
+  max-width:900px; width:100%;
+}
+.score-banner .trophy { font-size:1.6rem; flex-shrink:0; }
+.score-banner .rule   { font-size:.76rem; line-height:1.6; }
+.score-banner .rule strong { color:var(--accent2); }
+
+/* ── AGENDA GRID ── */
+.agenda-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; max-width:900px; width:100%; }
+.agenda-item { display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:.7em 1em; }
+.agenda-num  { font-family:'Fira Code',monospace; font-size:.65rem; color:var(--accent); font-weight:700; }
+.agenda-text { font-size:.78rem; font-weight:600; }
+.agenda-time { font-size:.65rem; color:var(--text-muted); margin-left:auto; white-space:nowrap; }
+
+/* ── COMPARISON TABLE (PSeInt vs Python) ── */
+.vs-table { display:grid; grid-template-columns:1fr auto 1fr; gap:0; max-width:880px; width:100%; border-radius:12px; overflow:hidden; border:1px solid var(--border); }
+.vs-header { background:var(--surface2); padding:.6em 1em; font-size:.7rem; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; text-align:center; }
+.vs-header.left  { color:#60a5fa; border-right:1px solid var(--border); }
+.vs-header.mid   { color:var(--text-muted); background:var(--bg); font-size:.6rem; width:40px; }
+.vs-header.right { color:var(--accent); border-left:1px solid var(--border); }
+.vs-row  { display:contents; }
+.vs-cell { padding:.5em .9em; font-family:'Fira Code',monospace; font-size:.73rem; border-top:1px solid var(--border); background:var(--surface); line-height:1.6; }
+.vs-mid  { display:flex; align-items:center; justify-content:center; background:var(--bg); border-top:1px solid var(--border); font-size:.65rem; color:var(--text-muted); }
+.vs-cell.left  { border-right:1px solid var(--border); color:#60a5fa; }
+.vs-cell.right { border-left:1px solid var(--border); color:var(--accent); }
+
+/* ── TRUTH TABLE ── */
+.truth-table { border-collapse:collapse; font-family:'Fira Code',monospace; font-size:.78rem; max-width:600px; width:100%; }
+.truth-table th { background:var(--surface2); color:var(--accent); padding:.5em .9em; border:1px solid var(--border); text-align:center; }
+.truth-table td { padding:.45em .9em; border:1px solid var(--border); text-align:center; }
+.truth-table .t { color:var(--accent);  font-weight:700; }
+.truth-table .f { color:var(--accent5); font-weight:700; }
+
+/* ── NAV ── */
+.nav {
+  position:fixed; bottom:22px; left:50%; transform:translateX(-50%);
+  display:flex; gap:10px; align-items:center;
+  background:var(--surface); border:1px solid var(--border);
+  padding:9px 18px; border-radius:50px; z-index:100;
+  box-shadow:0 8px 32px rgba(0,0,0,.5);
+}
+.nav button { background:none; border:none; color:var(--text); cursor:pointer; font-size:1.05rem; padding:3px 9px; border-radius:7px; transition:background .2s, color .2s; }
+.nav button:hover { background:var(--surface2); color:var(--accent); }
+.nav button:disabled { opacity:.3; cursor:default; }
+.nav-dots { display:flex; gap:5px; }
+.dot { width:6px; height:6px; border-radius:50%; background:var(--border); cursor:pointer; transition:all .2s; }
+.dot.active { background:var(--accent); width:18px; border-radius:3px; }
+.dot.quiz-dot { background:rgba(250,204,21,.45); border-radius:3px; width:8px; height:8px; }
+.dot.quiz-dot.active { background:var(--accent2); width:18px; }
+
+/* ── KB HINT ── */
+.kb-hint { position:fixed; bottom:72px; right:20px; font-size:.65rem; color:var(--text-muted); background:var(--surface); border:1px solid var(--border); padding:3px 9px; border-radius:6px; }
+
+/* ══ ACCESSIBILITY PANEL ══ */
+.a11y-panel { position:fixed; top:40px; right:14px; z-index:300; display:flex; flex-direction:column; gap:5px; align-items:flex-end; }
+.a11y-toggle-btn { background:var(--surface); border:1px solid var(--border); color:var(--text); cursor:pointer; width:2.2rem; height:2.2rem; border-radius:9px; font-size:1rem; display:flex; align-items:center; justify-content:center; transition:border-color .2s, transform .15s; box-shadow:0 2px 10px rgba(0,0,0,.3); }
+.a11y-toggle-btn:hover { border-color:var(--accent); transform:scale(1.08); }
+.a11y-box { background:var(--surface); border:1px solid var(--border); border-radius:13px; padding:.8rem .9rem; min-width:205px; box-shadow:0 8px 28px rgba(0,0,0,.4); display:none; flex-direction:column; gap:.8rem; }
+.a11y-box.open { display:flex; animation:popIn .2s ease; }
+@keyframes popIn { from { opacity:0; transform:translateY(-5px) scale(.97); } to { opacity:1; transform:none; } }
+.a11y-lbl { font-size:.58rem; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-muted); margin-bottom:3px; }
+.theme-row { display:flex; gap:5px; }
+.theme-btn { flex:1; padding:.45rem .2rem; border-radius:7px; cursor:pointer; border:2px solid var(--border); background:var(--surface2); color:var(--text); font-size:.65rem; font-weight:700; display:flex; flex-direction:column; align-items:center; gap:3px; transition:border-color .2s, transform .15s; font-family:'Outfit',sans-serif; }
+.theme-btn:hover { transform:translateY(-1px); }
+.theme-btn .ti { font-size:.95rem; }
+.theme-btn.active { border-color:var(--accent); background:rgba(74,222,128,.08); color:var(--accent); }
+html[data-theme="hc"] .theme-btn.active { border-color:#00ff88; color:#00ff88; background:rgba(0,255,136,.1); }
+
+  /* ── Scrollable code block ── */
+  pre::-webkit-scrollbar { width: 6px; height: 6px; }
+  pre::-webkit-scrollbar-track { background: var(--surface2); border-radius: 3px; }
+  pre::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
+  pre::-webkit-scrollbar-thumb:hover { background: var(--py-yellow); }
+.fs-row { display:flex; align-items:center; gap:8px; }
+.fs-lbl { font-size:.7rem; color:var(--text-muted); width:2.3rem; text-align:center; font-family:'Fira Code',monospace; font-weight:700; }
+.fs-btn { width:1.75rem; height:1.75rem; border-radius:7px; border:1px solid var(--border); background:var(--surface2); color:var(--text); cursor:pointer; font-size:.95rem; font-weight:700; display:flex; align-items:center; justify-content:center; transition:border-color .15s; flex-shrink:0; }
+.fs-btn:hover { border-color:var(--accent); color:var(--accent); }
+.fs-btn:disabled { opacity:.3; cursor:default; }
+.fs-track { flex:1; height:4px; background:var(--border); border-radius:2px; cursor:pointer; }
+.fs-fill  { height:100%; background:var(--accent); border-radius:2px; transition:width .2s; }
+.a11y-div { height:1px; background:var(--border); }
+
+/* ══ QUIZ SLIDES ══ */
+.slide.quiz-slide .slide-body { gap:0; padding:18px 48px 90px; justify-content:center; }
+.quiz-header { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+.quiz-num-badge { background:var(--accent2); color:#000; font-family:'Playfair Display',serif; font-weight:900; font-size:1.35rem; padding:3px 14px; border-radius:7px; flex-shrink:0; }
+.quiz-label { font-size:.65rem; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:var(--accent2); background:rgba(250,204,21,.09); border:1px solid rgba(250,204,21,.3); border-radius:4px; padding:4px 11px; }
+.quiz-pts { margin-left:auto; display:inline-flex; align-items:center; gap:5px; background:rgba(74,222,128,.1); border:1px solid rgba(74,222,128,.3); border-radius:20px; padding:3px 13px; font-size:.72rem; font-weight:700; color:var(--accent); font-family:'Fira Code',monospace; }
+.quiz-q-box { background:var(--surface); border:2px solid var(--accent2); border-radius:13px; padding:20px 24px; max-width:860px; width:100%; margin-bottom:16px; }
+.q-text { font-size:clamp(.9rem,1.5vw,1.1rem); font-weight:700; line-height:1.5; margin-bottom:15px; }
+.quiz-options { display:flex; flex-direction:column; gap:9px; }
+.quiz-option { display:flex; align-items:center; gap:12px; background:var(--surface2); border:1px solid var(--border); border-radius:9px; padding:.65em 1.1em; font-size:.82rem; }
+.quiz-option .ol { width:1.5rem; height:1.5rem; border-radius:50%; background:var(--border); color:var(--text); font-weight:800; font-size:.72rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-family:'Fira Code',monospace; }
+.quiz-option.correct-answer { border-color:var(--accent)!important; background:rgba(74,222,128,.07)!important; }
+.quiz-option.correct-answer .ol { background:var(--accent)!important; color:#000!important; }
+.quiz-answer-wrap { max-width:860px; width:100%; }
+.reveal-btn { display:flex; align-items:center; gap:9px; background:none; border:2px dashed var(--border); color:var(--text-muted); border-radius:9px; padding:10px 20px; font-size:.82rem; font-weight:700; cursor:pointer; width:100%; justify-content:center; transition:border-color .25s, color .25s, background .25s; font-family:'Outfit',sans-serif; }
+.reveal-btn:hover { border-color:var(--accent); color:var(--accent); background:rgba(74,222,128,.04); }
+.answer-box { display:none; background:rgba(74,222,128,.06); border:2px solid var(--accent); border-radius:0 0 11px 11px; padding:14px 20px; margin-top:-2px; animation:slideDown .3s ease; }
+.answer-box.visible { display:block; }
+@keyframes slideDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }
+.correct-tag { font-size:.65rem; font-weight:900; letter-spacing:2px; text-transform:uppercase; color:var(--accent); display:flex; align-items:center; gap:5px; margin-bottom:7px; }
+.correct-tag::before { content:'✓'; font-size:.95rem; }
+.ans-content { font-size:.82rem; line-height:1.65; }
+.ans-hl { display:inline-block; background:rgba(74,222,128,.16); border-radius:5px; padding:1px 9px; font-weight:700; color:var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress"></div>
+
+<!-- ══════════════════════════════════ SLIDE 1 – PORTADA -->
+<div class="slide active" id="s1">
+  <div class="topbar">
+    <span class="course">Escuela de Ingeniería en Informática y Telecomunicaciones</span>
+    <span class="slide-counter">01 / 35</span>
+  </div>
+  <div class="hero-grid"></div>
+  <div class="hero-bg"></div>
+  <div class="py-watermark">{ }</div>
+
+  <div class="slide-body" style="z-index:1; justify-content:space-between; padding:26px 72px 90px; gap:0;">
+
+    <!-- TOP -->
+    <div style="text-align:center; width:100%;">
+      <div style="display:inline-flex; align-items:center; gap:13px; margin-bottom:16px;">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0; opacity:.9;">
+          <polygon points="24,3 45,13 45,28 24,45 3,28 3,13" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+          <polygon points="24,9 39,17 39,27 24,39 9,27 9,17" fill="none" stroke="var(--accent2)" stroke-width="1" opacity=".5"/>
+          <text x="24" y="29" text-anchor="middle" font-family="'Playfair Display',serif" font-size="12" fill="var(--accent)" font-weight="900">EIT</text>
+        </svg>
+        <div style="text-align:left;">
+          <div style="font-size:.6rem; font-weight:800; letter-spacing:2.5px; text-transform:uppercase; color:var(--text-muted); margin-bottom:2px;">Escuela de</div>
+          <div style="font-size:.88rem; font-weight:700; color:var(--text); line-height:1.2;">Ingeniería en Informática y Telecomunicaciones</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
+        <div style="height:1px; flex:1; max-width:100px; background:linear-gradient(to right, transparent, var(--border));"></div>
+        <span style="font-size:.63rem; font-weight:700; letter-spacing:1.8px; text-transform:uppercase; color:var(--text-muted);">Ingeniería en Informática &nbsp;·&nbsp; Analista en Programación</span>
+        <div style="height:1px; flex:1; max-width:100px; background:linear-gradient(to left, transparent, var(--border));"></div>
+      </div>
+    </div>
+
+    <!-- CENTER -->
+    <div style="text-align:center; width:100%; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;">
+      <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(74,222,128,.07); border:1px solid rgba(74,222,128,.22); border-radius:6px; padding:4px 16px;">
+        <span style="font-family:'Fira Code',monospace; font-size:.68rem; color:var(--accent); font-weight:700; letter-spacing:2px;">FPY-1101</span>
+        <span style="width:1px; height:11px; background:var(--border); display:inline-block;"></span>
+        <span style="font-size:.68rem; color:var(--text-muted); font-weight:600;">Fundamentos de Programación</span>
+      </div>
+      <div style="font-size:.68rem; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:var(--text-muted);">Taller de Fundamentos de Programación</div>
+
+      <!-- Python snake logo inline -->
+      <div style="display:flex; align-items:center; gap:18px; margin:6px 0;">
+        <svg width="54" height="54" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+          <path d="M24.05 1.75C13.2 1.75 13.87 6.6 13.87 6.6l.01 5.04h10.4v1.51H9.1S2.35 12.4 2.35 23.36c0 10.97 6.08 10.58 6.08 10.58H12V28.7s-.22-6.08 5.98-6.08h10.3s5.78.09 5.78-5.6V7.42S34.9 1.75 24.05 1.75zm-5.74 3.32c1.04 0 1.88.84 1.88 1.88s-.84 1.88-1.88 1.88-1.88-.84-1.88-1.88.84-1.88 1.88-1.88z" fill="var(--accent3)"/>
+          <path d="M24.27 46.25c10.86 0 10.18-4.86 10.18-4.86l-.01-5.04H24.04v-1.51H39.2s6.76.75 6.76-10.21c0-10.97-6.08-10.58-6.08-10.58H36.3v5.24s.22 6.08-5.98 6.08H20.02s-5.78-.09-5.78 5.6v9.6s-.87 5.68 10 5.68zm5.74-3.32c-1.04 0-1.88-.84-1.88-1.88s.84-1.88 1.88-1.88 1.88.84 1.88 1.88-.84 1.88-1.88 1.88z" fill="var(--accent2)"/>
+        </svg>
+        <div class="slide-title" style="font-size:clamp(2.6rem,5.5vw,4.6rem); letter-spacing:-.5px; text-align:left;">
+          Introducción<br>a <span style="color:var(--accent);">Python</span>
+        </div>
+      </div>
+
+      <p style="font-size:.82rem; color:var(--text-muted); max-width:560px; line-height:1.7; margin-top:2px;">
+        De PSeInt a Python: similitudes, diferencias, tipos, estructuras de control y buenas prácticas para tu primera evaluación
+      </p>
+      <div style="display:flex; gap:9px; flex-wrap:wrap; justify-content:center; margin-top:4px;">
+        <div class="time-badge"><span>📐</span> Unidad 2</div>
+        <div class="time-badge"><span>⏱</span> 45 – 50 min</div>
+        <div class="time-badge"><span>⚡</span> Primera evaluación Python</div>
+      </div>
+    </div>
+
+    <!-- BOTTOM: docente -->
+    <div style="width:100%; text-align:center;">
+      <div style="height:1px; background:linear-gradient(to right, transparent, var(--border) 30%, var(--border) 70%, transparent); margin-bottom:13px;"></div>
+      <div style="display:inline-flex; align-items:center; gap:24px; flex-wrap:wrap; justify-content:center;">
+        <div style="text-align:left;">
+          <div style="font-size:.57rem; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted); margin-bottom:2px;">Docente</div>
+          <div style="font-size:.85rem; font-weight:700; color:var(--text);">Prof. Carlos Martínez Sánchez</div>
+        </div>
+        <div style="width:1px; height:30px; background:var(--border);"></div>
+        <div style="text-align:left;">
+          <div style="font-size:.57rem; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted); margin-bottom:2px;">Asignatura</div>
+          <div style="font-size:.85rem; font-weight:600; color:var(--text-muted);">Fundamentos de Programación &nbsp;<span style="font-family:'Fira Code',monospace; color:var(--accent); font-size:.73rem;">FPY-1101</span></div>
+        </div>
+        <div style="width:1px; height:30px; background:var(--border);"></div>
+        <div style="text-align:left;">
+          <div style="font-size:.57rem; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted); margin-bottom:2px;">Periodo</div>
+          <div style="font-size:.85rem; font-weight:600; color:var(--text-muted);" id="coverYear">Primer Año · 2026</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 2 – AGENDA -->
+<div class="slide" id="s2">
+  <div class="topbar"><span class="course">FPY-1101 · Prof. Carlos Martínez Sánchez</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Contenidos</div>
+    <h2 class="title">¿Qué vamos a <span>ver hoy</span>?</h2>
+    <p class="lead" style="margin-bottom:16px;">Transición PSeInt → Python, con enfoque en tu primera evaluación</p>
+    <div class="agenda-grid">
+      <div class="agenda-item"><span class="agenda-num">01</span><span class="agenda-text">PSeInt vs Python — similitudes y diferencias</span><span class="agenda-time">6 min</span></div>
+      <div class="agenda-item"><span class="agenda-num">02</span><span class="agenda-text">Tipado dinámico y tipos de datos</span><span class="agenda-time">5 min</span></div>
+      <div class="agenda-item"><span class="agenda-num">03</span><span class="agenda-text">Operadores aritméticos, lógicos y comparación</span><span class="agenda-time">5 min</span></div>
+      <div class="agenda-item"><span class="agenda-num">04</span><span class="agenda-text">Tabla de verdad</span><span class="agenda-time">3 min</span></div>
+      <div class="agenda-item"><span class="agenda-num">05</span><span class="agenda-text">input() y print() — con y sin formato</span><span class="agenda-time">5 min</span></div>
+      <div class="agenda-item"><span class="agenda-num">06</span><span class="agenda-text">Conversión de tipos: int(), str(), float()</span><span class="agenda-time">4 min</span></div>
+      <div class="agenda-item"><span class="agenda-num">07</span><span class="agenda-text">if / elif / else</span><span class="agenda-time">4 min</span></div>
+      <div class="agenda-item"><span class="agenda-num">08</span><span class="agenda-text">while y for</span><span class="agenda-time">4 min</span></div>
+      <div class="agenda-item"><span class="agenda-num">09</span><span class="agenda-text">Validación de entradas</span><span class="agenda-time">5 min</span></div>
+      <div class="agenda-item"><span class="agenda-num">10</span><span class="agenda-text">Menú con loop principal + salida</span><span class="agenda-time">5 min</span></div>
+    </div>
+    <div class="score-banner">
+      <span class="trophy">🏆</span>
+      <div class="rule"><strong>¡Puntos extra!</strong> Cada pregunta relámpago correcta vale <strong>+1.5 décimas</strong>. Máximo <strong>3 décimas por clase</strong>. ¡Cualquiera puede ser preguntado!</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 3 – PSEINT VS PYTHON: SIMILITUDES -->
+<div class="slide" id="s3">
+  <div class="topbar"><span class="course">PSeInt → Python</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Transición</div>
+    <h2 class="title">Lo que <span>ya sabés</span> sigue funcionando</h2>
+    <p class="lead" style="margin-bottom:14px;">Los conceptos de PSeInt se mapean directamente a Python. El <em>qué</em> no cambia, solo el <em>cómo se escribe</em>.</p>
+    <div class="vs-table">
+      <div class="vs-header left">PSeInt</div>
+      <div class="vs-header mid">≡</div>
+      <div class="vs-header right">Python</div>
+
+      <div class="vs-cell left">Algoritmo Nombre<br>FinAlgoritmo</div>
+      <div class="vs-mid">→</div>
+      <div class="vs-cell right"><span class="cmt"># sin estructura obligatoria</span><br><span class="cmt"># código directo</span></div>
+
+      <div class="vs-cell left"><span class="kw">Definir</span> x <span class="kw">Como</span> Entero</div>
+      <div class="vs-mid">→</div>
+      <div class="vs-cell right">x = 0 &nbsp;<span class="cmt"># sin declaración previa</span></div>
+
+      <div class="vs-cell left">x <span class="op">&lt;-</span> 5</div>
+      <div class="vs-mid">→</div>
+      <div class="vs-cell right">x = 5</div>
+
+      <div class="vs-cell left"><span class="blt">Leer</span> x</div>
+      <div class="vs-mid">→</div>
+      <div class="vs-cell right">x = <span class="blt">input</span>(<span class="str">"..."</span>)</div>
+
+      <div class="vs-cell left"><span class="blt">Escribir</span> <span class="str">"Hola"</span>, x</div>
+      <div class="vs-mid">→</div>
+      <div class="vs-cell right"><span class="blt">print</span>(<span class="str">"Hola"</span>, x)</div>
+
+      <div class="vs-cell left"><span class="kw">Si</span> … <span class="kw">Entonces</span> / <span class="kw">SiNo</span> / <span class="kw">FinSi</span></div>
+      <div class="vs-mid">→</div>
+      <div class="vs-cell right"><span class="kw">if</span> … : / <span class="kw">elif</span> / <span class="kw">else</span>:</div>
+
+      <div class="vs-cell left"><span class="kw">Mientras</span> … <span class="kw">Hacer</span> / <span class="kw">FinMientras</span></div>
+      <div class="vs-mid">→</div>
+      <div class="vs-cell right"><span class="kw">while</span> …:</div>
+
+      <div class="vs-cell left"><span class="kw">Para</span> i &lt;- 1 <span class="kw">Hasta</span> n <span class="kw">Hacer</span></div>
+      <div class="vs-mid">→</div>
+      <div class="vs-cell right"><span class="kw">for</span> i <span class="kw">in</span> <span class="blt">range</span>(1, n+1):</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 4 – DIFERENCIAS CLAVE -->
+<div class="slide" id="s4">
+  <div class="topbar"><span class="course">PSeInt → Python</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Diferencias</div>
+    <h2 class="title">Las grandes <span class="y">diferencias</span></h2>
+    <div class="cards col2" style="max-width:880px;">
+      <div class="card green">
+        <div class="icon">📐</div>
+        <h3>Indentación obligatoria</h3>
+        <p>En PSeInt usás <code style="color:var(--accent);">FinSi</code>, <code style="color:var(--accent);">FinMientras</code> para cerrar bloques. En Python los bloques se definen con <strong>4 espacios de indentación</strong>. No hay palabras de cierre.</p>
+      </div>
+      <div class="card yellow">
+        <div class="icon">🔣</div>
+        <h3>Sin operador ←</h3>
+        <p>La asignación en Python usa <code style="color:var(--accent2);">=</code> (no <code>&lt;-</code>). La comparación de igualdad usa <code style="color:var(--accent2);">==</code> (doble igual).</p>
+      </div>
+      <div class="card blue">
+        <div class="icon">🔤</div>
+        <h3>input() siempre retorna texto</h3>
+        <p>En PSeInt <code style="color:var(--accent3);">Leer</code> respeta el tipo de la variable. En Python <code style="color:var(--accent3);">input()</code> siempre devuelve <strong>cadena</strong>, sin importar lo que el usuario escriba.</p>
+      </div>
+      <div class="card orange">
+        <div class="icon">💬</div>
+        <h3>Comentarios con #</h3>
+        <p>En PSeInt se usa <code>//</code>. En Python el comentario de línea es con <code style="color:var(--accent4);">#</code>. Los bloques de comentario usan <code style="color:var(--accent4);">"""texto"""</code>.</p>
+      </div>
+    </div>
+    <div class="hbox y" style="max-width:880px;">
+      ⚠️ <strong>Regla de oro:</strong> en Python el error más común al venir de PSeInt es olvidar el <code style="color:var(--accent2);">:</code> al final del <code>if</code>, <code>while</code>, <code>for</code>, y olvidar indentar el bloque siguiente.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ QUIZ 1 – PSEINT VS PYTHON -->
+<div class="slide quiz-slide" id="sq1">
+  <div class="topbar"><span class="course">⚡ Pregunta Relámpago</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="quiz-header">
+      <span class="quiz-num-badge">Q1</span>
+      <span class="quiz-label">Tema: PSeInt vs Python · Diferencias</span>
+      <span class="quiz-pts">+1.5 décimas</span>
+    </div>
+    <div class="quiz-q-box">
+      <p class="q-text">¿Cuál de las siguientes afirmaciones describe una diferencia correcta entre PSeInt y Python?</p>
+      <div class="quiz-options">
+        <div class="quiz-option"><span class="ol">A</span> En Python los bloques se cierran con <code>FinSi</code>, igual que en PSeInt</div>
+        <div class="quiz-option"><span class="ol">B</span> En Python el operador de asignación es <code>&lt;-</code> y el de comparación es <code>=</code></div>
+        <div class="quiz-option correct-reveal"><span class="ol">C</span> En Python los bloques se definen con indentación de 4 espacios, sin palabras de cierre</div>
+        <div class="quiz-option"><span class="ol">D</span> Python declara el tipo de cada variable antes de usarla, igual que PSeInt con <code>Definir</code></div>
+      </div>
+    </div>
+    <div class="quiz-answer-wrap">
+      <button class="reveal-btn" onclick="revealAnswer(this)"><span>👁</span> Mostrar respuesta correcta</button>
+      <div class="answer-box">
+        <div class="correct-tag">Respuesta correcta: opción C</div>
+        <div class="ans-content">En Python la <span class="ans-hl">indentación de 4 espacios</span> reemplaza a <code>FinSi</code>, <code>FinMientras</code>, etc. No existen palabras de cierre. Además la asignación usa <code>=</code> (no <code>&lt;-</code>) y la comparación usa <code>==</code>. Y Python tiene <strong>tipado dinámico</strong>: no se declara el tipo, la variable toma el tipo del valor asignado.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 5 – TIPADO DINÁMICO -->
+<div class="slide" id="s5">
+  <div class="topbar"><span class="course">Python · Tipos</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Tipado</div>
+    <h2 class="title">Python no es <span class="y">tipado</span> — ¿qué significa?</h2>
+    <div class="split lw" style="max-width:920px; gap:20px; align-items:start;">
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div class="hbox" style="margin:0;">
+          En PSeInt debías <strong>declarar</strong> el tipo de cada variable antes de usarla (<code>Definir x Como Entero</code>). Python es de <strong>tipado dinámico</strong>: la variable toma el tipo del valor que se le asigna, y ese tipo puede cambiar durante la ejecución.
+        </div>
+        <div class="hbox r" style="margin:0;">
+          🚨 <strong>Peligro:</strong> el tipo puede cambiar en tiempo de ejecución sin advertencia, lo que puede causar errores inesperados. Por eso es crítico <strong>convertir explícitamente</strong> con <code style="color:var(--accent5);">int()</code>, <code style="color:var(--accent5);">float()</code>, <code style="color:var(--accent5);">str()</code>.
+        </div>
+        <table class="t" style="max-width:100%;">
+          <tr><th>Tipo Python</th><th>Equivalente PSeInt</th><th>Ejemplo</th></tr>
+          <tr><td><span class="badge bb">int</span></td><td class="desc">Entero</td><td>x = 42</td></tr>
+          <tr><td><span class="badge bg">float</span></td><td class="desc">Real</td><td>p = 3.14</td></tr>
+          <tr><td><span class="badge bo">str</span></td><td class="desc">Cadena</td><td>n = "Ana"</td></tr>
+          <tr><td><span class="badge by">bool</span></td><td class="desc">Lógico</td><td>ok = True</td></tr>
+        </table>
+      </div>
+      <div>
+        <pre><span class="code-tab">tipado_dinamico.py</span><span class="var">x</span> = <span class="num">10</span>          <span class="cmt"># x es int</span>
+<span class="blt">print</span>(<span class="blt">type</span>(<span class="var">x</span>))  <span class="cmt"># &lt;class 'int'&gt;</span>
+
+<span class="var">x</span> = <span class="str">"hola"</span>      <span class="cmt"># ahora x es str !</span>
+<span class="blt">print</span>(<span class="blt">type</span>(<span class="var">x</span>))  <span class="cmt"># &lt;class 'str'&gt;</span>
+
+<span class="cmt"># ⚠️ esto NO suma, concatena:</span>
+<span class="var">edad</span> = <span class="blt">input</span>(<span class="str">"Edad: "</span>)
+<span class="blt">print</span>(<span class="var">edad</span> + <span class="num">1</span>)  <span class="cmt"># ❌ TypeError!</span>
+
+<span class="cmt"># ✅ correcto:</span>
+<span class="var">edad</span> = <span class="blt">int</span>(<span class="blt">input</span>(<span class="str">"Edad: "</span>))
+<span class="blt">print</span>(<span class="var">edad</span> + <span class="num">1</span>)  <span class="cmt"># ✓ funciona</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 6 – OPERADORES -->
+<div class="slide" id="s6">
+  <div class="topbar"><span class="course">Python · Operadores</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Expresiones</div>
+    <h2 class="title">Operadores <span>Aritméticos</span></h2>
+    <div class="split" style="max-width:900px; gap:20px; align-items:start;">
+      <table class="t">
+        <tr><th>Op.</th><th>Significado</th><th>Ejemplo</th><th>Resultado</th></tr>
+        <tr><td>+</td><td class="desc">Suma</td><td>7 + 3</td><td style="color:var(--num);">10</td></tr>
+        <tr><td>-</td><td class="desc">Resta</td><td>7 - 3</td><td style="color:var(--num);">4</td></tr>
+        <tr><td>*</td><td class="desc">Multiplicación</td><td>7 * 3</td><td style="color:var(--num);">21</td></tr>
+        <tr><td>/</td><td class="desc">División real</td><td>7 / 2</td><td style="color:var(--num);">3.5</td></tr>
+        <tr><td>//</td><td class="desc">División entera</td><td>7 // 2</td><td style="color:var(--num);">3</td></tr>
+        <tr><td>%</td><td class="desc">Módulo (resto)</td><td>7 % 3</td><td style="color:var(--num);">1</td></tr>
+        <tr><td>**</td><td class="desc">Potencia</td><td>2 ** 8</td><td style="color:var(--num);">256</td></tr>
+      </table>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="hbox y">
+          🔎 <strong>Ojo con <code>//</code> vs <code>/</code>:</strong><br>
+          <code>7 / 2</code> → <span style="color:var(--num);">3.5</span> (float)<br>
+          <code>7 // 2</code> → <span style="color:var(--num);">3</span> (int, trunca)
+        </div>
+        <pre style="font-size:.72rem;"><span class="code-tab">operadores.py</span><span class="var">a</span>, <span class="var">b</span> = <span class="num">10</span>, <span class="num">3</span>
+
+<span class="blt">print</span>(<span class="var">a</span> + <span class="var">b</span>)    <span class="cmt"># 13</span>
+<span class="blt">print</span>(<span class="var">a</span> / <span class="var">b</span>)    <span class="cmt"># 3.333...</span>
+<span class="blt">print</span>(<span class="var">a</span> // <span class="var">b</span>)   <span class="cmt"># 3</span>
+<span class="blt">print</span>(<span class="var">a</span> % <span class="var">b</span>)    <span class="cmt"># 1</span>
+<span class="blt">print</span>(<span class="var">a</span> ** <span class="num">2</span>)   <span class="cmt"># 100</span>
+<span class="cmt"># par/impar:</span>
+<span class="blt">print</span>(<span class="var">a</span> % <span class="num">2</span> == <span class="num">0</span>) <span class="cmt"># True → par</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 7 – COMPARACIÓN Y LÓGICOS -->
+<div class="slide" id="s7">
+  <div class="topbar"><span class="course">Python · Operadores</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Lógica</div>
+    <h2 class="title">Comparación y <span>Operadores Lógicos</span></h2>
+    <div class="split" style="max-width:920px; gap:20px; align-items:start;">
+      <div>
+        <p style="font-size:.7rem; color:var(--text-muted); font-weight:800; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">🔵 Relacionales</p>
+        <table class="t" style="margin-bottom:14px;">
+          <tr><th>Python</th><th>PSeInt</th><th>Significado</th></tr>
+          <tr><td>==</td><td>=</td><td class="desc">Igual a</td></tr>
+          <tr><td>!=</td><td>&lt;&gt;</td><td class="desc">Distinto de</td></tr>
+          <tr><td>&gt;</td><td>&gt;</td><td class="desc">Mayor que</td></tr>
+          <tr><td>&lt;</td><td>&lt;</td><td class="desc">Menor que</td></tr>
+          <tr><td>&gt;=</td><td>&gt;=</td><td class="desc">Mayor o igual</td></tr>
+          <tr><td>&lt;=</td><td>&lt;=</td><td class="desc">Menor o igual</td></tr>
+        </table>
+        <p style="font-size:.7rem; color:var(--text-muted); font-weight:800; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">🟣 Lógicos</p>
+        <table class="t">
+          <tr><th>Python</th><th>PSeInt</th><th>Significado</th></tr>
+          <tr><td><span class="kw">and</span></td><td>Y</td><td class="desc">Ambas verdaderas</td></tr>
+          <tr><td><span class="kw">or</span></td><td>O</td><td class="desc">Al menos una verdadera</td></tr>
+          <tr><td><span class="kw">not</span></td><td>NO</td><td class="desc">Invierte el valor</td></tr>
+        </table>
+      </div>
+      <div>
+        <pre style="font-size:.72rem;"><span class="code-tab">logicos.py</span><span class="var">edad</span> = <span class="num">20</span>
+<span class="var">tiene_dni</span> = <span class="kw">True</span>
+
+<span class="cmt"># and: ambas deben ser True</span>
+<span class="kw">if</span> <span class="var">edad</span> >= <span class="num">18</span> <span class="kw">and</span> <span class="var">tiene_dni</span>:
+    <span class="blt">print</span>(<span class="str">"Puede votar"</span>)
+
+<span class="cmt"># or: basta una True</span>
+<span class="var">dia</span> = <span class="str">"sabado"</span>
+<span class="kw">if</span> <span class="var">dia</span> == <span class="str">"sabado"</span> <span class="kw">or</span> <span class="var">dia</span> == <span class="str">"domingo"</span>:
+    <span class="blt">print</span>(<span class="str">"Fin de semana"</span>)
+
+<span class="cmt"># not: invierte</span>
+<span class="var">aprobado</span> = <span class="kw">False</span>
+<span class="kw">if</span> <span class="kw">not</span> <span class="var">aprobado</span>:
+    <span class="blt">print</span>(<span class="str">"Debe rendir de nuevo"</span>)
+
+<span class="cmt"># ⚠️ = asigna, == compara</span>
+<span class="var">x</span> = <span class="num">5</span>          <span class="cmt"># asignación</span>
+<span class="blt">print</span>(<span class="var">x</span> == <span class="num">5</span>)  <span class="cmt"># True</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 8 – TABLA DE VERDAD -->
+<div class="slide" id="s8">
+  <div class="topbar"><span class="course">Python · Lógica</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Fundamento</div>
+    <h2 class="title">Tabla de <span>Verdad</span></h2>
+    <div class="split" style="max-width:900px; gap:24px; align-items:start;">
+      <div>
+        <p style="font-size:.72rem; color:var(--text-muted); font-weight:800; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">AND — ambas deben ser True</p>
+        <table class="truth-table" style="margin-bottom:16px;">
+          <tr><th>A</th><th>B</th><th>A and B</th></tr>
+          <tr><td class="t">True</td><td class="t">True</td><td class="t">True</td></tr>
+          <tr><td class="t">True</td><td class="f">False</td><td class="f">False</td></tr>
+          <tr><td class="f">False</td><td class="t">True</td><td class="f">False</td></tr>
+          <tr><td class="f">False</td><td class="f">False</td><td class="f">False</td></tr>
+        </table>
+        <p style="font-size:.72rem; color:var(--text-muted); font-weight:800; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">NOT — invierte</p>
+        <table class="truth-table">
+          <tr><th>A</th><th>not A</th></tr>
+          <tr><td class="t">True</td><td class="f">False</td></tr>
+          <tr><td class="f">False</td><td class="t">True</td></tr>
+        </table>
+      </div>
+      <div>
+        <p style="font-size:.72rem; color:var(--text-muted); font-weight:800; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">OR — basta una True</p>
+        <table class="truth-table" style="margin-bottom:16px;">
+          <tr><th>A</th><th>B</th><th>A or B</th></tr>
+          <tr><td class="t">True</td><td class="t">True</td><td class="t">True</td></tr>
+          <tr><td class="t">True</td><td class="f">False</td><td class="t">True</td></tr>
+          <tr><td class="f">False</td><td class="t">True</td><td class="t">True</td></tr>
+          <tr><td class="f">False</td><td class="f">False</td><td class="f">False</td></tr>
+        </table>
+        <div class="hbox" style="margin:0; font-size:.75rem;">
+          💡 En Python <code>True</code> y <code>False</code> empiezan con <strong>mayúscula</strong>.<br>
+          <code>true</code> o <code>false</code> en minúscula → ❌ NameError
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ QUIZ 2 – TIPADO Y OPERADORES -->
+<div class="slide quiz-slide" id="sq2">
+  <div class="topbar"><span class="course">⚡ Pregunta Relámpago</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="quiz-header">
+      <span class="quiz-num-badge">Q2</span>
+      <span class="quiz-label">Tema: Tipado · Operadores · Tabla de verdad</span>
+      <span class="quiz-pts">+1.5 décimas</span>
+    </div>
+    <div class="quiz-q-box">
+      <p class="q-text">¿Cuál es el resultado de ejecutar este código?<br><code style="font-family:'Fira Code'; font-size:.85rem; color:var(--accent2);">print(10 % 3 == 1 and not False)</code></p>
+      <div class="quiz-options">
+        <div class="quiz-option"><span class="ol">A</span> False</div>
+        <div class="quiz-option correct-reveal"><span class="ol">B</span> True</div>
+        <div class="quiz-option"><span class="ol">C</span> 1</div>
+        <div class="quiz-option"><span class="ol">D</span> Error de sintaxis</div>
+      </div>
+    </div>
+    <div class="quiz-answer-wrap">
+      <button class="reveal-btn" onclick="revealAnswer(this)"><span>👁</span> Mostrar respuesta correcta</button>
+      <div class="answer-box">
+        <div class="correct-tag">Respuesta correcta: opción B — True</div>
+        <div class="ans-content">Paso a paso: <span class="ans-hl">10 % 3</span> = 1 → <code>1 == 1</code> = <strong>True</strong>. Luego <span class="ans-hl">not False</span> = <strong>True</strong>. Finalmente <code>True and True</code> = <strong>True</strong>. Python evalúa en orden: primero <code>%</code>, luego <code>==</code>, luego <code>not</code>, luego <code>and</code>.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 9 – INPUT Y PRINT -->
+<div class="slide" id="s9">
+  <div class="topbar"><span class="course">Python · E/S</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Entrada y Salida</div>
+    <h2 class="title"><span>input()</span> y <span>print()</span></h2>
+    <div class="split lw" style="max-width:940px; gap:20px; align-items:start;">
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="card blue">
+          <h3>📥 input() — siempre retorna str</h3>
+          <p style="margin-bottom:8px;">Detiene el programa y espera que el usuario escriba algo. <strong>Siempre devuelve texto</strong>, sin importar si el usuario escribe números. El parámetro entre paréntesis es el mensaje que se muestra al usuario.</p>
+          <pre style="background:transparent; border:none; padding:4px 0 0; font-size:.74rem;"><span class="var">nombre</span> = <span class="blt">input</span>(<span class="str">"Tu nombre: "</span>)
+<span class="var">edad</span>   = <span class="blt">int</span>(<span class="blt">input</span>(<span class="str">"Tu edad: "</span>))
+<span class="var">nota</span>   = <span class="blt">float</span>(<span class="blt">input</span>(<span class="str">"Tu nota: "</span>))</pre>
+        </div>
+        <div class="card green">
+          <h3>📤 print() — múltiples formas</h3>
+          <p style="margin-bottom:8px;">Muestra información en pantalla. Acepta múltiples argumentos separados por coma, e imprime un salto de línea al final por defecto. Se puede cambiar con <code>end=</code> y el separador con <code>sep=</code>.</p>
+          <pre style="background:transparent; border:none; padding:4px 0 0; font-size:.73rem;"><span class="cmt"># concatenación con coma</span>
+<span class="blt">print</span>(<span class="str">"Hola"</span>, <span class="var">nombre</span>)
+
+<span class="cmt"># f-string (más limpio)</span>
+<span class="blt">print</span>(<span class="str">f"Hola, <span style="color:var(--accent4);">{nombre}</span>!"</span>)
+<span class="blt">print</span>(<span class="str">f"Tenés <span style="color:var(--accent4);">{edad}</span> años"</span>)
+
+<span class="cmt"># format()</span>
+<span class="blt">print</span>(<span class="str">"Nota: {:.2f}"</span>.<span class="fn">format</span>(<span class="var">nota</span>))
+
+<span class="cmt"># sin salto de línea</span>
+<span class="blt">print</span>(<span class="str">"cargando..."</span>, end=<span class="str">""</span>)</pre>
+        </div>
+      </div>
+      <div>
+        <pre style="font-size:.72rem;"><span class="code-tab">entrada_salida.py</span><span class="var">nombre</span> = <span class="blt">input</span>(<span class="str">"Nombre: "</span>)
+<span class="var">edad</span>   = <span class="blt">int</span>(<span class="blt">input</span>(<span class="str">"Edad:   "</span>))
+<span class="var">nota</span>   = <span class="blt">float</span>(<span class="blt">input</span>(<span class="str">"Nota:   "</span>))
+
+<span class="cmt"># Salida simple</span>
+<span class="blt">print</span>(<span class="str">"Alumno:"</span>, <span class="var">nombre</span>)
+
+<span class="cmt"># F-string con formato</span>
+<span class="blt">print</span>(<span class="str">f"<span style="color:var(--accent4);">{nombre}</span> tiene <span style="color:var(--accent4);">{edad}</span> años"</span>)
+
+<span class="cmt"># Nota con 2 decimales</span>
+<span class="blt">print</span>(<span class="str">f"Nota: <span style="color:var(--accent4);">{nota:.2f}</span>"</span>)
+
+<span class="cmt"># Separador personalizado</span>
+<span class="blt">print</span>(<span class="str">"A"</span>, <span class="str">"B"</span>, <span class="str">"C"</span>, sep=<span class="str">"-"</span>)
+<span class="cmt"># → A-B-C</span></pre>
+        <div class="hbox" style="margin-top:10px; font-size:.74rem;">
+          ✨ Los <strong>f-strings</strong> (f"…{variable}…") son la forma más moderna y legible de formatear texto en Python 3.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 10 – CONVERSIÓN DE TIPOS -->
+<div class="slide" id="s10">
+  <div class="topbar"><span class="course">Python · Tipos</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Conversión</div>
+    <h2 class="title">int() · float() · <span>str()</span></h2>
+    <div class="split" style="max-width:920px; gap:20px; align-items:start;">
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="cards col3" style="max-width:100%;">
+          <div class="card blue">
+            <h3 style="font-family:'Fira Code'; font-size:1rem; color:var(--accent3);">int()</h3>
+            <p>Convierte a número entero. Descarta decimales, no redondea.</p>
+          </div>
+          <div class="card green">
+            <h3 style="font-family:'Fira Code'; font-size:1rem; color:var(--accent);">float()</h3>
+            <p>Convierte a número decimal. Acepta enteros o cadenas numéricas.</p>
+          </div>
+          <div class="card orange">
+            <h3 style="font-family:'Fira Code'; font-size:1rem; color:var(--accent4);">str()</h3>
+            <p>Convierte cualquier valor a texto. Necesario para concatenar con +.</p>
+          </div>
+        </div>
+        <div class="hbox r" style="margin:0; font-size:.76rem;">
+          🚨 <strong>ValueError:</strong> si el texto no representa un número válido, <code>int("hola")</code> lanza error. Por eso validamos antes de convertir.
+        </div>
+        <div class="hbox" style="margin:0; font-size:.76rem;">
+          💡 <code>int(3.9)</code> → <span style="color:var(--num);">3</span> — ¡No redondea! Trunca hacia abajo. Para redondear usá <code>round(3.9)</code> → <span style="color:var(--num);">4</span>
+        </div>
+      </div>
+      <div>
+        <pre style="font-size:.72rem;"><span class="code-tab">conversiones.py</span><span class="cmt"># str → int</span>
+<span class="var">edad</span> = <span class="blt">int</span>(<span class="str">"25"</span>)       <span class="cmt"># ✓ 25</span>
+<span class="var">x</span>    = <span class="blt">int</span>(<span class="str">"hola"</span>)     <span class="cmt"># ❌ ValueError</span>
+<span class="var">y</span>    = <span class="blt">int</span>(<span class="num">3.9</span>)       <span class="cmt"># ✓ 3 (trunca)</span>
+
+<span class="cmt"># str → float</span>
+<span class="var">nota</span> = <span class="blt">float</span>(<span class="str">"9.5"</span>)   <span class="cmt"># ✓ 9.5</span>
+<span class="var">p</span>    = <span class="blt">float</span>(<span class="str">"3,14"</span>)  <span class="cmt"># ❌ ValueError (coma!)</span>
+
+<span class="cmt"># int/float → str</span>
+<span class="var">s</span> = <span class="blt">str</span>(<span class="num">42</span>)            <span class="cmt"># "42"</span>
+<span class="var">msg</span> = <span class="str">"Edad: "</span> + <span class="blt">str</span>(<span class="var">edad</span>)  <span class="cmt"># "Edad: 25"</span>
+
+<span class="cmt"># mejor con f-string:</span>
+<span class="var">msg</span> = <span class="str">f"Edad: <span style="color:var(--accent4);">{edad}</span>"</span>    <span class="cmt"># ✓ más limpio</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 11 – IF / ELIF / ELSE -->
+<div class="slide" id="s11">
+  <div class="topbar"><span class="course">Python · Control de Flujo</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Decisión</div>
+    <h2 class="title">if / <span>elif</span> / else</h2>
+    <div class="split lw" style="max-width:940px; gap:20px; align-items:start;">
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="hbox" style="margin:0; font-size:.78rem;">
+          <strong>elif</strong> = "else if" = es el equivalente al <code>SiNo Si</code> anidado de PSeInt. Permite encadenar múltiples condiciones de forma limpia, sin el caos del anidamiento.
+        </div>
+        <pre style="font-size:.72rem;"><span class="code-tab">estructura.py</span><span class="kw">if</span> condicion1:
+    <span class="cmt"># bloque 1</span>
+<span class="kw">elif</span> condicion2:
+    <span class="cmt"># bloque 2</span>
+<span class="kw">elif</span> condicion3:
+    <span class="cmt"># bloque 3</span>
+<span class="kw">else</span>:
+    <span class="cmt"># si ninguna aplica</span></pre>
+        <div class="hbox y" style="margin:0; font-size:.76rem;">
+          ⚠️ <strong>Indentación obligatoria:</strong> el bloque de cada rama debe tener exactamente <strong>4 espacios</strong> (o 1 tab consistente). Sin indentación → SyntaxError o lógica incorrecta.
+        </div>
+      </div>
+      <div>
+        <pre style="font-size:.71rem;"><span class="code-tab">calificacion.py</span><span class="var">nota</span> = <span class="blt">float</span>(<span class="blt">input</span>(<span class="str">"Nota (0-10): "</span>))
+
+<span class="kw">if</span> <span class="var">nota</span> >= <span class="num">9</span>:
+    <span class="blt">print</span>(<span class="str">"Sobresaliente"</span>)
+<span class="kw">elif</span> <span class="var">nota</span> >= <span class="num">7</span>:
+    <span class="blt">print</span>(<span class="str">"Bueno"</span>)
+<span class="kw">elif</span> <span class="var">nota</span> >= <span class="num">6</span>:
+    <span class="blt">print</span>(<span class="str">"Aprobado"</span>)
+<span class="kw">else</span>:
+    <span class="blt">print</span>(<span class="str">"Reprobado"</span>)
+
+<span class="cmt"># Con operador lógico:</span>
+<span class="kw">if</span> <span class="var">nota</span> >= <span class="num">6</span> <span class="kw">and</span> <span class="var">nota</span> <= <span class="num">10</span>:
+    <span class="blt">print</span>(<span class="str">"Rango válido y aprobado"</span>)
+
+<span class="cmt"># Equivalente más pythonico:</span>
+<span class="kw">if</span> <span class="num">6</span> <= <span class="var">nota</span> <= <span class="num">10</span>:
+    <span class="blt">print</span>(<span class="str">"Rango válido y aprobado"</span>)</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ QUIZ 3 – INPUT / CONVERSIONES / IF -->
+<div class="slide quiz-slide" id="sq3">
+  <div class="topbar"><span class="course">⚡ Pregunta Relámpago</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="quiz-header">
+      <span class="quiz-num-badge">Q3</span>
+      <span class="quiz-label">Tema: input() · Conversiones · if/elif/else</span>
+      <span class="quiz-pts">+1.5 décimas</span>
+    </div>
+    <div class="quiz-q-box">
+      <p class="q-text">Un alumno escribe el siguiente código. ¿Qué imprime si el usuario ingresa <code style="color:var(--accent2);">8.5</code>?</p>
+      <pre style="background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:.7em 1em; font-size:.78rem; margin-bottom:0; width:100%;">nota = <span class="blt">float</span>(<span class="blt">input</span>(<span class="str">"Nota: "</span>))
+<span class="kw">if</span> nota >= <span class="num">9</span>:
+    <span class="blt">print</span>(<span class="str">"Sobresaliente"</span>)
+<span class="kw">elif</span> nota >= <span class="num">7</span>:
+    <span class="blt">print</span>(<span class="str">"Bueno"</span>)
+<span class="kw">elif</span> nota >= <span class="num">6</span>:
+    <span class="blt">print</span>(<span class="str">"Aprobado"</span>)
+<span class="kw">else</span>:
+    <span class="blt">print</span>(<span class="str">"Reprobado"</span>)</pre>
+      <div class="quiz-options" style="margin-top:12px;">
+        <div class="quiz-option"><span class="ol">A</span> Sobresaliente</div>
+        <div class="quiz-option correct-reveal"><span class="ol">B</span> Bueno</div>
+        <div class="quiz-option"><span class="ol">C</span> Aprobado</div>
+        <div class="quiz-option"><span class="ol">D</span> Reprobado</div>
+      </div>
+    </div>
+    <div class="quiz-answer-wrap">
+      <button class="reveal-btn" onclick="revealAnswer(this)"><span>👁</span> Mostrar respuesta correcta</button>
+      <div class="answer-box">
+        <div class="correct-tag">Respuesta correcta: opción B — "Bueno"</div>
+        <div class="ans-content">8.5 <strong>no</strong> cumple <code>nota >= 9</code> (primer elif, False). Sí cumple <span class="ans-hl">nota >= 7</span> (8.5 ≥ 7 = True) → imprime <strong>"Bueno"</strong> y no evalúa los elif siguientes. El <code>if/elif</code> se detiene en el primer caso verdadero.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 12 – WHILE -->
+<div class="slide" id="s12">
+  <div class="topbar"><span class="course">Python · Bucles</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Repetición</div>
+    <h2 class="title">Bucle <span>while</span></h2>
+    <div class="split" style="max-width:940px; gap:20px; align-items:start;">
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="hbox" style="margin:0; font-size:.78rem;">
+          Equivalente al <code>Mientras … Hacer</code> de PSeInt. Repite mientras la condición sea <strong>True</strong>. La condición se evalúa <em>antes</em> de entrar al bloque.
+        </div>
+        <pre style="font-size:.72rem;"><span class="code-tab">estructura.py</span><span class="kw">while</span> condicion:
+    <span class="cmt"># bloque que se repite</span>
+    <span class="cmt"># debe haber algo que</span>
+    <span class="cmt"># haga la condición False</span></pre>
+        <div class="hbox r" style="margin:0; font-size:.76rem;">
+          🚨 Si nada dentro del bucle cambia la condición → <strong>bucle infinito</strong>. Detenerlo con <kbd>Ctrl+C</kbd>.
+        </div>
+        <div class="hbox" style="margin:0; font-size:.76rem;">
+          💡 <code>while True:</code> crea un bucle infinito intencional. Se sale con <code style="color:var(--accent);">break</code>.
+        </div>
+      </div>
+      <div>
+        <pre style="font-size:.71rem;"><span class="code-tab">while_ejemplo.py</span><span class="cmt"># Tabla del 5</span>
+<span class="var">i</span> = <span class="num">1</span>
+<span class="kw">while</span> <span class="var">i</span> <= <span class="num">10</span>:
+    <span class="blt">print</span>(<span class="str">f"5 x <span style="color:var(--accent4);">{i}</span> = <span style="color:var(--accent4);">{5*i}</span>"</span>)
+    <span class="var">i</span> += <span class="num">1</span>   <span class="cmt"># i = i + 1</span>
+
+<span class="cmt"># Acumulador</span>
+<span class="var">suma</span> = <span class="num">0</span>
+<span class="var">n</span>    = <span class="num">1</span>
+<span class="kw">while</span> <span class="var">n</span> <= <span class="num">100</span>:
+    <span class="var">suma</span> += <span class="var">n</span>  <span class="cmt"># suma = suma + n</span>
+    <span class="var">n</span>    += <span class="num">1</span>
+<span class="blt">print</span>(<span class="str">f"Suma 1-100: <span style="color:var(--accent4);">{suma}</span>"</span>)   <span class="cmt"># 5050</span>
+
+<span class="cmt"># while True + break</span>
+<span class="kw">while</span> <span class="kw">True</span>:
+    <span class="var">resp</span> = <span class="blt">input</span>(<span class="str">"¿Salir? (s/n): "</span>)
+    <span class="kw">if</span> <span class="var">resp</span> == <span class="str">"s"</span>:
+        <span class="kw">break</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 13 – FOR -->
+<div class="slide" id="s13">
+  <div class="topbar"><span class="course">Python · Bucles</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Repetición</div>
+    <h2 class="title">Bucle <span>for</span> y <span>range()</span></h2>
+    <div class="split" style="max-width:940px; gap:20px; align-items:start;">
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="hbox" style="margin:0; font-size:.78rem;">
+          Equivalente al <code>Para … Hasta</code> de PSeInt. <code>range()</code> genera la secuencia de números.
+        </div>
+        <table class="t" style="max-width:100%;">
+          <tr><th>Uso de range()</th><th>Genera</th></tr>
+          <tr><td>range(5)</td><td>0, 1, 2, 3, 4</td></tr>
+          <tr><td>range(1, 6)</td><td>1, 2, 3, 4, 5</td></tr>
+          <tr><td>range(1, 11, 2)</td><td>1, 3, 5, 7, 9</td></tr>
+          <tr><td>range(10, 0, -1)</td><td>10, 9, 8 … 1</td></tr>
+        </table>
+        <div class="hbox y" style="margin:0; font-size:.76rem;">
+          ⚠️ <code>range(1, n)</code> llega hasta <strong>n-1</strong>. Para incluir n: <code>range(1, n+1)</code>
+        </div>
+      </div>
+      <div>
+        <pre style="font-size:.71rem;"><span class="code-tab">for_range.py</span><span class="cmt"># Para i ← 1 Hasta 5 Hacer</span>
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="blt">range</span>(<span class="num">1</span>, <span class="num">6</span>):
+    <span class="blt">print</span>(<span class="var">i</span>)           <span class="cmt"># 1 2 3 4 5</span>
+
+<span class="cmt"># Suma de N números</span>
+<span class="var">n</span>    = <span class="blt">int</span>(<span class="blt">input</span>(<span class="str">"N: "</span>))
+<span class="var">suma</span> = <span class="num">0</span>
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="blt">range</span>(<span class="num">1</span>, <span class="var">n</span> + <span class="num">1</span>):
+    <span class="var">suma</span> += <span class="var">i</span>
+<span class="blt">print</span>(<span class="str">f"Suma: <span style="color:var(--accent4);">{suma}</span>"</span>)
+
+<span class="cmt"># Cuenta regresiva</span>
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="blt">range</span>(<span class="num">10</span>, <span class="num">0</span>, -<span class="num">1</span>):
+    <span class="blt">print</span>(<span class="var">i</span>, end=<span class="str">" "</span>)
+<span class="cmt"># 10 9 8 7 6 5 4 3 2 1</span>
+
+<span class="cmt"># Pares del 2 al 20</span>
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="blt">range</span>(<span class="num">2</span>, <span class="num">21</span>, <span class="num">2</span>):
+    <span class="blt">print</span>(<span class="var">i</span>, end=<span class="str">" "</span>)</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ QUIZ 4 – WHILE / FOR -->
+<div class="slide quiz-slide" id="sq4">
+  <div class="topbar"><span class="course">⚡ Pregunta Relámpago</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="quiz-header">
+      <span class="quiz-num-badge">Q4</span>
+      <span class="quiz-label">Tema: while · for · range()</span>
+      <span class="quiz-pts">+1.5 décimas</span>
+    </div>
+    <div class="quiz-q-box">
+      <p class="q-text">¿Cuántas veces se imprime <code style="color:var(--accent2);">"hola"</code> al ejecutar este código?<br><code style="font-family:'Fira Code'; font-size:.85rem; color:var(--accent2);">for i in range(2, 10, 3): print("hola")</code></p>
+      <div class="quiz-options">
+        <div class="quiz-option"><span class="ol">A</span> 8 veces</div>
+        <div class="quiz-option"><span class="ol">B</span> 2 veces</div>
+        <div class="quiz-option correct-reveal"><span class="ol">C</span> 3 veces</div>
+        <div class="quiz-option"><span class="ol">D</span> 4 veces</div>
+      </div>
+    </div>
+    <div class="quiz-answer-wrap">
+      <button class="reveal-btn" onclick="revealAnswer(this)"><span>👁</span> Mostrar respuesta correcta</button>
+      <div class="answer-box">
+        <div class="correct-tag">Respuesta correcta: opción C — 3 veces</div>
+        <div class="ans-content"><span class="ans-hl">range(2, 10, 3)</span> genera los valores: <strong>2, 5, 8</strong> (empieza en 2, salta de 3 en 3, se detiene antes de llegar a 10). El valor 11 quedaría fuera. Son 3 valores → el cuerpo del for se ejecuta <strong>3 veces</strong>.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 14 – VALIDACIÓN NUMÉRICA -->
+<div class="slide" id="s14">
+  <div class="topbar"><span class="course">Python · Validación</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Robustez</div>
+    <h2 class="title">Validar que el dato sea un <span>número</span></h2>
+    <div class="split lw" style="max-width:940px; gap:20px; align-items:start;">
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="hbox" style="margin:0; font-size:.78rem;">
+          Como <code>input()</code> siempre retorna <strong>str</strong>, antes de convertir con <code>int()</code> debemos verificar que el texto efectivamente representa un número. Para eso usamos el método <code style="color:var(--accent);">.isdigit()</code> del string.
+        </div>
+        <div class="card blue" style="padding:.9em 1.1em;">
+          <h3 style="margin-bottom:6px;">📌 str.isdigit()</h3>
+          <p>Retorna <code>True</code> si <strong>todos</strong> los caracteres del string son dígitos (0-9). Retorna <code>False</code> si hay letras, espacios, puntos o signos.</p>
+          <pre style="background:transparent; border:none; padding:6px 0 0; font-size:.74rem;"><span class="str">"25"</span>.<span class="fn">isdigit</span>()    <span class="cmt"># True  ✓</span>
+<span class="str">"hola"</span>.<span class="fn">isdigit</span>()  <span class="cmt"># False ✗</span>
+<span class="str">"3.5"</span>.<span class="fn">isdigit</span>()   <span class="cmt"># False ✗ (tiene punto)</span>
+<span class="str">"-5"</span>.<span class="fn">isdigit</span>()    <span class="cmt"># False ✗ (tiene signo)</span>
+<span class="str">"007"</span>.<span class="fn">isdigit</span>()   <span class="cmt"># True  ✓</span></pre>
+        </div>
+        <div class="steps" style="margin:0;">
+          <div class="step"><div class="step-num">1</div><div><h4>Leer con input() → str</h4><p>El texto queda guardado como string</p></div></div>
+          <div class="step"><div class="step-num">2</div><div><h4>Verificar con .isdigit()</h4><p>Si es False → avisar y repetir</p></div></div>
+          <div class="step"><div class="step-num">3</div><div><h4>Convertir con int()</h4><p>Recién acá, porque ya sabemos que es número</p></div></div>
+          <div class="step"><div class="step-num">4</div><div><h4>Verificar regla de negocio</h4><p>Rango válido, positivo, etc.</p></div></div>
+        </div>
+      </div>
+      <div>
+        <pre style="font-size:.7rem;"><span class="code-tab">validar_numero.py</span><span class="cmt"># Pedir edad válida (0-120)</span>
+<span class="kw">while</span> <span class="kw">True</span>:
+    <span class="var">texto</span> = <span class="blt">input</span>(<span class="str">"Edad (0-120): "</span>)
+    <span class="kw">if</span> <span class="kw">not</span> <span class="var">texto</span>.<span class="fn">isdigit</span>():
+        <span class="blt">print</span>(<span class="str">"⚠ Ingresá solo números enteros"</span>)
+    <span class="kw">else</span>:
+        <span class="var">edad</span> = <span class="blt">int</span>(<span class="var">texto</span>)
+        <span class="kw">if</span> <span class="num">0</span> <= <span class="var">edad</span> <= <span class="num">120</span>:
+            <span class="kw">break</span>
+        <span class="kw">else</span>:
+            <span class="blt">print</span>(<span class="str">"⚠ Debe estar entre 0 y 120"</span>)
+
+<span class="blt">print</span>(<span class="str">f"Edad registrada: <span style="color:var(--accent4);">{edad}</span>"</span>)
+
+<span class="cmt"># ─── Validar clave de 4 dígitos ──────────</span>
+<span class="kw">while</span> <span class="kw">True</span>:
+    <span class="var">texto</span> = <span class="blt">input</span>(<span class="str">"Clave (4 dígitos): "</span>)
+    <span class="kw">if</span> <span class="kw">not</span> <span class="var">texto</span>.<span class="fn">isdigit</span>():
+        <span class="blt">print</span>(<span class="str">"⚠ Solo números, sin letras ni espacios"</span>)
+    <span class="kw">elif</span> <span class="blt">len</span>(<span class="var">texto</span>) != <span class="num">4</span>:
+        <span class="blt">print</span>(<span class="str">"⚠ Debe tener exactamente 4 dígitos"</span>)
+    <span class="kw">else</span>:
+        <span class="var">clave</span> = <span class="blt">int</span>(<span class="var">texto</span>)
+        <span class="kw">break</span>
+
+<span class="blt">print</span>(<span class="str">f"Clave aceptada: <span style="color:var(--accent4);">{clave}</span>"</span>)</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 15 – VALIDACIÓN REGLA DE NEGOCIO -->
+<div class="slide" id="s15">
+  <div class="topbar"><span class="course">Python · Validación</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Reglas de Negocio</div>
+    <h2 class="title">Validaciones según <span>regla de negocio</span></h2>
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; width:100%; max-width:980px; align-items:start;">
+
+      <!-- COLUMNA 1: cadenas y opciones -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="hbox y" style="margin:0; font-size:.74rem;">
+          Una <strong>regla de negocio</strong> es una condición específica del problema: nota entre 1 y 7, porcentaje entre 0 y 100, opción de menú, etc.
+        </div>
+        <pre style="font-size:.67rem;"><span class="code-tab">cadenas.py</span><span class="cmt"># Validar que no esté vacío</span>
+<span class="kw">while</span> <span class="kw">True</span>:
+    <span class="var">nombre</span> = <span class="blt">input</span>(<span class="str">"Nombre: "</span>).<span class="fn">strip</span>()
+    <span class="kw">if</span> <span class="var">nombre</span> != <span class="str">""</span>:
+        <span class="kw">break</span>
+    <span class="blt">print</span>(<span class="str">"⚠ No puede estar vacío"</span>)
+
+<span class="cmt"># Validar opción de menú</span>
+<span class="var">opciones</span> = [<span class="str">"1"</span>, <span class="str">"2"</span>, <span class="str">"3"</span>]
+<span class="kw">while</span> <span class="kw">True</span>:
+    <span class="var">op</span> = <span class="blt">input</span>(<span class="str">"Opción (1-3): "</span>)
+    <span class="kw">if</span> <span class="var">op</span> <span class="kw">in</span> <span class="var">opciones</span>:
+        <span class="kw">break</span>
+    <span class="blt">print</span>(<span class="str">"⚠ Solo 1, 2 o 3"</span>)</pre>
+      </div>
+
+      <!-- COLUMNA 2: validar entero con isdigit -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="hbox" style="margin:0; font-size:.74rem;">
+          Para <strong>enteros</strong>: <code>.isdigit()</code> verifica que todos los caracteres son dígitos, luego se convierte y se valida el rango.
+        </div>
+        <pre style="font-size:.67rem;"><span class="code-tab">val_entero.py</span><span class="cmt"># Nota entera (1-7)</span>
+<span class="kw">while</span> <span class="kw">True</span>:
+    <span class="var">texto</span> = <span class="blt">input</span>(<span class="str">"Nota (1-7): "</span>)
+    <span class="kw">if</span> <span class="kw">not</span> <span class="var">texto</span>.<span class="fn">isdigit</span>():
+        <span class="blt">print</span>(<span class="str">"⚠ Solo números enteros"</span>)
+    <span class="kw">else</span>:
+        <span class="var">nota</span> = <span class="blt">int</span>(<span class="var">texto</span>)
+        <span class="kw">if</span> <span class="num">1</span> <= <span class="var">nota</span> <= <span class="num">7</span>:
+            <span class="kw">break</span>
+        <span class="kw">else</span>:
+            <span class="blt">print</span>(<span class="str">"⚠ Debe estar entre 1 y 7"</span>)
+
+<span class="cmt"># Porcentaje entero (0-100)</span>
+<span class="kw">while</span> <span class="kw">True</span>:
+    <span class="var">texto</span> = <span class="blt">input</span>(<span class="str">"Porcentaje (0-100): "</span>)
+    <span class="kw">if</span> <span class="kw">not</span> <span class="var">texto</span>.<span class="fn">isdigit</span>():
+        <span class="blt">print</span>(<span class="str">"⚠ Solo números enteros"</span>)
+    <span class="kw">else</span>:
+        <span class="var">pct</span> = <span class="blt">int</span>(<span class="var">texto</span>)
+        <span class="kw">if</span> <span class="num">0</span> <= <span class="var">pct</span> <= <span class="num">100</span>:
+            <span class="kw">break</span>
+        <span class="kw">else</span>:
+            <span class="blt">print</span>(<span class="str">"⚠ Debe estar entre 0 y 100"</span>)</pre>
+      </div>
+
+      <!-- COLUMNA 3: validar float con replace+isdigit -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="hbox o" style="margin:0; font-size:.74rem;">
+          Para <strong>decimales</strong>: <code>.isdigit()</code> falla con <code>"3.5"</code> porque el punto no es dígito. Truco: quitar <strong>un</strong> punto y luego verificar.
+        </div>
+        <pre style="font-size:.67rem;"><span class="code-tab">val_float.py</span><span class="cmt"># El truco: replace + isdigit</span>
+<span class="str">"3.5"</span>.<span class="fn">replace</span>(<span class="str">"."</span>,<span class="str">""</span>,<span class="num">1</span>).<span class="fn">isdigit</span>()
+<span class="cmt"># → "35"   → True  ✓</span>
+<span class="str">"3.5.1"</span>.<span class="fn">replace</span>(<span class="str">"."</span>,<span class="str">""</span>,<span class="num">1</span>).<span class="fn">isdigit</span>()
+<span class="cmt"># → "35.1" → False ✗</span>
+<span class="str">"hola"</span>.<span class="fn">replace</span>(<span class="str">"."</span>,<span class="str">""</span>,<span class="num">1</span>).<span class="fn">isdigit</span>()
+<span class="cmt"># → "hola" → False ✗</span>
+
+<span class="cmt"># Nota decimal (1.0 - 7.0)</span>
+<span class="kw">while</span> <span class="kw">True</span>:
+    <span class="var">texto</span> = <span class="blt">input</span>(<span class="str">"Nota (1.0-7.0): "</span>)
+    <span class="kw">if</span> <span class="var">texto</span>.<span class="fn">replace</span>(<span class="str">"."</span>,<span class="str">""</span>,<span class="num">1</span>).<span class="fn">isdigit</span>():
+        <span class="var">nota</span> = <span class="blt">float</span>(<span class="var">texto</span>)
+        <span class="kw">if</span> <span class="num">1.0</span> <= <span class="var">nota</span> <= <span class="num">7.0</span>:
+            <span class="kw">break</span>
+        <span class="blt">print</span>(<span class="str">"⚠ Fuera de rango"</span>)
+    <span class="kw">else</span>:
+        <span class="blt">print</span>(<span class="str">"⚠ Decimal inválido"</span>)</pre>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 16 – MENÚ CON LOOP -->
+<div class="slide" id="s16">
+  <div class="topbar"><span class="course">Python · Patrones</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Patrón Avanzado</div>
+    <h2 class="title">Menú con <span>loop principal</span> + salida</h2>
+    <div class="split rw" style="max-width:960px; gap:20px; align-items:start;">
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="hbox" style="margin:0; font-size:.77rem;">
+          El patrón más común en programas de consola: un <code>while True</code> externo que muestra el menú, ejecuta la opción elegida, y solo sale cuando el usuario elige "Salir". <strong>Toda la lógica del programa vive dentro de este loop</strong>.
+        </div>
+        <div class="steps" style="margin:0;">
+          <div class="step"><div class="step-num">1</div><div><h4>while True:</h4><p>Loop infinito intencional</p></div></div>
+          <div class="step"><div class="step-num">2</div><div><h4>Mostrar menú</h4><p>print() de todas las opciones</p></div></div>
+          <div class="step"><div class="step-num">3</div><div><h4>Leer y validar opción</h4><p>.isdigit() + verificar rango</p></div></div>
+          <div class="step"><div class="step-num">4</div><div><h4>if/elif para cada caso</h4><p>Ejecutar la funcionalidad</p></div></div>
+          <div class="step"><div class="step-num">5</div><div><h4>break en opción salir</h4><p>Rompe el while True</p></div></div>
+        </div>
+      </div>
+      <div style="min-width:0;">
+        <pre style="font-size:.68rem; max-height:calc(100vh - 260px); overflow-y:auto; scrollbar-width:thin; scrollbar-color:var(--accent) var(--surface2);"><span class="code-tab">menu_principal.py</span><span class="kw">while</span> <span class="kw">True</span>:
+    <span class="cmt"># ── Mostrar menú ──────────────</span>
+    <span class="blt">print</span>(<span class="str">"\n=== MENÚ PRINCIPAL ==="</span>)
+    <span class="blt">print</span>(<span class="str">"1. Saludar"</span>)
+    <span class="blt">print</span>(<span class="str">"2. Calcular promedio"</span>)
+    <span class="blt">print</span>(<span class="str">"3. Verificar mayoría de edad"</span>)
+    <span class="blt">print</span>(<span class="str">"0. Salir"</span>)
+
+    <span class="cmt"># ── Leer y validar opción ─────</span>
+    <span class="var">texto</span> = <span class="blt">input</span>(<span class="str">"Opción: "</span>)
+    <span class="kw">if</span> <span class="kw">not</span> <span class="var">texto</span>.<span class="fn">isdigit</span>():
+        <span class="blt">print</span>(<span class="str">"⚠ Solo números"</span>)
+        <span class="kw">continue</span>   <span class="cmt"># vuelve al inicio del while</span>
+    <span class="var">op</span> = <span class="blt">int</span>(<span class="var">texto</span>)
+
+    <span class="cmt"># ── Ejecutar opción ───────────</span>
+    <span class="kw">if</span> <span class="var">op</span> == <span class="num">1</span>:
+        <span class="var">nombre</span> = <span class="blt">input</span>(<span class="str">"Tu nombre: "</span>)
+        <span class="blt">print</span>(<span class="str">f"¡Hola, <span style="color:var(--accent4);">{nombre}</span>!"</span>)
+
+    <span class="kw">elif</span> <span class="var">op</span> == <span class="num">2</span>:
+        <span class="var">a</span> = <span class="blt">int</span>(<span class="blt">input</span>(<span class="str">"Nota 1: "</span>))
+        <span class="var">b</span> = <span class="blt">int</span>(<span class="blt">input</span>(<span class="str">"Nota 2: "</span>))
+        <span class="blt">print</span>(<span class="str">f"Promedio: <span style="color:var(--accent4);">{(a+b)/2:.1f}</span>"</span>)
+
+    <span class="kw">elif</span> <span class="var">op</span> == <span class="num">3</span>:
+        <span class="var">texto</span> = <span class="blt">input</span>(<span class="str">"Edad: "</span>)
+        <span class="kw">if</span> <span class="var">texto</span>.<span class="fn">isdigit</span>():
+            <span class="var">edad</span> = <span class="blt">int</span>(<span class="var">texto</span>)
+            <span class="blt">print</span>(<span class="str">"Mayor"</span> <span class="kw">if</span> <span class="var">edad</span> >= <span class="num">18</span> <span class="kw">else</span> <span class="str">"Menor"</span>)
+
+    <span class="kw">elif</span> <span class="var">op</span> == <span class="num">0</span>:
+        <span class="blt">print</span>(<span class="str">"¡Hasta luego!"</span>)
+        <span class="kw">break</span>      <span class="cmt"># ← sale del while True</span>
+
+    <span class="kw">else</span>:
+        <span class="blt">print</span>(<span class="str">"⚠ Opción no válida (0-3)"</span>)</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 17 – EJERCICIO INTEGRADOR -->
+<div class="slide" id="s17">
+  <div class="topbar"><span class="course">Python · Práctica</span><span class="slide-counter"></span></div>
+  <div class="slide-body scrollable" style="padding-bottom:90px;">
+    <div class="section-tag" style="margin-top:16px;">Ejercicio Integrador</div>
+    <h2 class="title" style="text-align:center; margin-bottom:10px;">Todo junto: <span>programa completo</span></h2>
+    <div class="hbox y" style="max-width:900px; margin-bottom:10px; font-size:.76rem;">
+      🎯 <strong>Enunciado:</strong> Programa con menú que: (1) pide N notas validadas (1.0-7.0), calcula promedio e indica si aprueba. (2) calcula factorial de un número positivo. (0) sale.
+    </div>
+    <pre style="max-width:900px; font-size:.67rem;"><span class="code-tab">integrador.py</span><span class="kw">while</span> <span class="kw">True</span>:
+    <span class="blt">print</span>(<span class="str">"\n══ MENÚ ══"</span>)
+    <span class="blt">print</span>(<span class="str">"1. Calcular promedio de notas"</span>)
+    <span class="blt">print</span>(<span class="str">"2. Calcular factorial"</span>)
+    <span class="blt">print</span>(<span class="str">"0. Salir"</span>)
+
+    <span class="cmt"># Validar opción del menú</span>
+    <span class="var">texto</span> = <span class="blt">input</span>(<span class="str">"Opción: "</span>)
+    <span class="kw">if</span> <span class="kw">not</span> <span class="var">texto</span>.<span class="fn">isdigit</span>():
+        <span class="blt">print</span>(<span class="str">"⚠ Solo números"</span>)
+        <span class="kw">continue</span>
+    <span class="var">op</span> = <span class="blt">int</span>(<span class="var">texto</span>)
+
+    <span class="kw">if</span> <span class="var">op</span> == <span class="num">1</span>:
+        <span class="cmt"># Pedir N válido</span>
+        <span class="kw">while</span> <span class="kw">True</span>:
+            <span class="var">txt</span> = <span class="blt">input</span>(<span class="str">"¿Cuántas notas? "</span>)
+            <span class="kw">if</span> <span class="var">txt</span>.<span class="fn">isdigit</span>() <span class="kw">and</span> <span class="blt">int</span>(<span class="var">txt</span>) > <span class="num">0</span>:
+                <span class="var">n</span> = <span class="blt">int</span>(<span class="var">txt</span>)
+                <span class="kw">break</span>
+            <span class="blt">print</span>(<span class="str">"⚠ Ingresá un entero mayor a 0"</span>)
+
+        <span class="var">suma</span> = <span class="num">0</span>
+        <span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="blt">range</span>(<span class="num">1</span>, <span class="var">n</span> + <span class="num">1</span>):
+            <span class="kw">while</span> <span class="kw">True</span>:    <span class="cmt"># validar cada nota</span>
+                <span class="var">txt</span> = <span class="blt">input</span>(<span class="str">f"Nota <span style="color:var(--accent4);">{i}</span> (1-7): "</span>)
+                <span class="kw">if</span> <span class="var">txt</span>.<span class="fn">isdigit</span>():
+                    <span class="var">nota</span> = <span class="blt">int</span>(<span class="var">txt</span>)
+                    <span class="kw">if</span> <span class="num">1</span> <= <span class="var">nota</span> <= <span class="num">7</span>:
+                        <span class="kw">break</span>
+                    <span class="blt">print</span>(<span class="str">"⚠ Debe estar entre 1 y 7"</span>)
+                <span class="kw">else</span>:
+                    <span class="blt">print</span>(<span class="str">"⚠ Solo números enteros"</span>)
+            <span class="var">suma</span> += <span class="var">nota</span>
+
+        <span class="var">prom</span> = <span class="var">suma</span> / <span class="var">n</span>
+        <span class="var">estado</span> = <span class="str">"✅ Aprobado"</span> <span class="kw">if</span> <span class="var">prom</span> >= <span class="num">4</span> <span class="kw">else</span> <span class="str">"❌ Reprobado"</span>
+        <span class="blt">print</span>(<span class="str">f"Promedio: <span style="color:var(--accent4);">{prom:.1f}</span> → <span style="color:var(--accent4);">{estado}</span>"</span>)
+
+    <span class="kw">elif</span> <span class="var">op</span> == <span class="num">2</span>:
+        <span class="kw">while</span> <span class="kw">True</span>:
+            <span class="var">txt</span> = <span class="blt">input</span>(<span class="str">"Número (≥ 0): "</span>)
+            <span class="kw">if</span> <span class="var">txt</span>.<span class="fn">isdigit</span>():
+                <span class="var">num</span> = <span class="blt">int</span>(<span class="var">txt</span>)
+                <span class="kw">break</span>
+            <span class="blt">print</span>(<span class="str">"⚠ Solo enteros positivos"</span>)
+
+        <span class="var">fact</span> = <span class="num">1</span>
+        <span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="blt">range</span>(<span class="num">1</span>, <span class="var">num</span> + <span class="num">1</span>):
+            <span class="var">fact</span> *= <span class="var">i</span>
+        <span class="blt">print</span>(<span class="str">f"<span style="color:var(--accent4);">{num}</span>! = <span style="color:var(--accent4);">{fact}</span>"</span>)
+
+    <span class="kw">elif</span> <span class="var">op</span> == <span class="num">0</span>:
+        <span class="blt">print</span>(<span class="str">"¡Hasta luego! 🐍"</span>); <span class="kw">break</span>
+    <span class="kw">else</span>:
+        <span class="blt">print</span>(<span class="str">"⚠ Opción inválida"</span>)</pre>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ QUIZ 5 – VALIDACIÓN / TRY-EXCEPT -->
+<div class="slide quiz-slide" id="sq5">
+  <div class="topbar"><span class="course">⚡ Pregunta Relámpago</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="quiz-header">
+      <span class="quiz-num-badge">Q5</span>
+      <span class="quiz-label">Tema: Validación · .isdigit() · Menú</span>
+      <span class="quiz-pts">+1.5 décimas</span>
+    </div>
+    <div class="quiz-q-box">
+      <p class="q-text">¿Cuál de los siguientes fragmentos valida <strong>correctamente</strong> que el usuario ingresó un número entero positivo antes de convertirlo?</p>
+      <div class="quiz-options">
+        <div class="quiz-option"><span class="ol">A</span>
+          <code style="font-size:.75rem; color:var(--text-muted);">n = int(input("N: ")) &nbsp;&nbsp;if n > 0: break</code>
+        </div>
+        <div class="quiz-option correct-reveal"><span class="ol">B</span>
+          <code style="font-size:.75rem; color:var(--text-muted);">txt = input("N: ") &nbsp;&nbsp;if txt.isdigit() and int(txt) > 0: n = int(txt); break</code>
+        </div>
+        <div class="quiz-option"><span class="ol">C</span>
+          <code style="font-size:.75rem; color:var(--text-muted);">n = input("N: ") &nbsp;&nbsp;if n.isdigit(): break</code>
+        </div>
+        <div class="quiz-option"><span class="ol">D</span>
+          <code style="font-size:.75rem; color:var(--text-muted);">if input("N: ") > 0: break</code>
+        </div>
+      </div>
+    </div>
+    <div class="quiz-answer-wrap">
+      <button class="reveal-btn" onclick="revealAnswer(this)"><span>👁</span> Mostrar respuesta correcta</button>
+      <div class="answer-box">
+        <div class="correct-tag">Respuesta correcta: opción B</div>
+        <div class="ans-content">
+          La opción B hace las dos comprobaciones necesarias: <span class="ans-hl">.isdigit()</span> verifica que el string solo tiene dígitos (evita letras y símbolos), y luego <code>int(txt) &gt; 0</code> verifica la regla de negocio (positivo). Solo después convierte con <code>int()</code>. La opción A convierte sin verificar el tipo primero. La C no verifica el rango. La D compara un string con un número, lo que da error.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 18 – ALCANCE DE LA EVALUACIÓN -->
+<div class="slide" id="s18b">
+  <div class="topbar"><span class="course">Python · Evaluación</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">¿Qué entra en la evaluación?</div>
+    <h2 class="title">Alcance del <span>temario</span></h2>
+    <div class="split" style="max-width:940px; gap:20px; align-items:start;">
+
+      <!-- Lo que SÍ entra -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-size:.68rem; font-weight:900; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:2px;">✅ Entra en la evaluación</div>
+        <div class="card green" style="padding:.9em 1.2em;">
+          <ul class="fl" style="gap:9px;">
+            <li>Variables, tipos básicos: <code>int</code>, <code>float</code>, <code>str</code>, <code>bool</code></li>
+            <li>Conversión explícita: <code>int()</code>, <code>float()</code>, <code>str()</code></li>
+            <li>Operadores aritméticos, de comparación y lógicos</li>
+            <li>Entrada y salida: <code>input()</code>, <code>print()</code>, f-strings</li>
+            <li>Estructuras de decisión: <code>if</code>, <code>elif</code>, <code>else</code></li>
+            <li>Bucles: <code>while</code>, <code>for</code>, <code>range()</code></li>
+            <li>Validación de entrada numérica con <code>.isdigit()</code> + <code>if/else</code></li>
+            <li>Validaciones según regla de negocio (rango, positivo, etc.)</li>
+            <li>Menú principal con <code>while True</code>, <code>break</code>, <code>continue</code></li>
+            <li>Contadores y acumuladores</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Lo que NO entra -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-size:.68rem; font-weight:900; letter-spacing:2px; text-transform:uppercase; color:var(--accent5); margin-bottom:2px;">🚫 NO entra — aún no se ha visto</div>
+        <div class="card red" style="padding:.9em 1.2em; margin-bottom:10px;">
+          <ul class="fl" style="gap:10px;">
+            <li style="font-size:.85rem; font-weight:600;">
+              <div><strong style="color:var(--accent5);">Colecciones</strong><br>
+              <span style="font-size:.75rem; color:var(--text-muted);">listas <code>[]</code>, tuplas <code>()</code>, diccionarios <code>{}</code>, conjuntos <code>set()</code></span></div>
+            </li>
+            <li style="font-size:.85rem; font-weight:600;">
+              <div><strong style="color:var(--accent5);">Funciones propias</strong><br>
+              <span style="font-size:.75rem; color:var(--text-muted);"><code>def nombre():</code>, parámetros, <code>return</code></span></div>
+            </li>
+            <li style="font-size:.85rem; font-weight:600;">
+              <div><strong style="color:var(--accent5);">Manejo de excepciones en profundidad</strong><br>
+              <span style="font-size:.75rem; color:var(--text-muted);"><code>try/except/else/finally</code>, excepciones personalizadas, jerarquía de errores</span></div>
+            </li>
+          </ul>
+        </div>
+        <div class="hbox y" style="margin:0; font-size:.76rem;">
+          ⚠️ Para validar que un dato es numérico usamos <code>.isdigit()</code> — que es un método de string — no <code>try/except</code>. Las excepciones como concepto <strong>no</strong> entran en esta evaluación.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 18 – RESUMEN VISUAL -->
+<div class="slide" id="s18">
+  <div class="topbar"><span class="course">Python · Resumen</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Repaso</div>
+    <h2 class="title">Lo que <span>aprendimos</span> hoy</h2>
+    <div class="cards col3" style="max-width:920px; margin-top:8px;">
+      <div class="card green"><div class="icon">🔀</div><h3>Transición PSeInt→Python</h3><p>Mismos conceptos, diferente sintaxis. Indentación reemplaza FinSi/FinMientras.</p></div>
+      <div class="card yellow"><div class="icon">🔣</div><h3>Tipado dinámico</h3><p>Sin declarar tipos. Pero input() siempre es str — convertir con int()/float().</p></div>
+      <div class="card blue"><div class="icon">⚙️</div><h3>Operadores</h3><p>+, -, *, /, //, %, **. Comparación: ==, !=, >, <. Lógicos: and, or, not.</p></div>
+      <div class="card orange"><div class="icon">📤</div><h3>print() e input()</h3><p>F-strings para formato limpio. sep= y end= para controlar salida.</p></div>
+      <div class="card red"><div class="icon">🛡️</div><h3>Validación</h3><p>try/except ValueError + while True + break. Robusto ante entradas incorrectas.</p></div>
+      <div class="card green" style="border-color:var(--accent2); background:rgba(250,204,21,.04);"><div class="icon">📋</div><h3>Menú principal</h3><p>while True → mostrar → leer → if/elif → break en salida.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 19 – CIERRE -->
+<div class="slide" id="s19">
+  <div class="topbar"><span class="course">FPY-1101 · Prof. Carlos Martínez Sánchez</span><span class="slide-counter"></span></div>
+  <div class="hero-grid"></div>
+  <div class="hero-bg"></div>
+  <div class="py-watermark" style="opacity:.03;">🐍</div>
+  <div class="slide-body" style="z-index:1;">
+    <div style="text-align:center; max-width:680px;">
+      <div class="section-tag">¡Eso es todo!</div>
+      <div class="slide-title" style="font-size:clamp(2.4rem,6vw,4.8rem); margin:16px 0;">
+        ¡A programar<br>en <span style="color:var(--accent);">Python</span>! 🐍
+      </div>
+      <p style="font-size:.85rem; color:var(--text-muted); line-height:1.75; margin-bottom:20px;">
+        Ya tienen todo lo que necesitan para su primera evaluación. Practiquen validaciones, el menú con loop principal y la conversión de tipos. La programación se aprende <strong>haciendo</strong>.
+      </p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:20px;">
+        <div class="badge bg">🐍 python.org</div>
+        <div class="badge by">📘 Practiquen a diario</div>
+        <div class="badge bb">❓ Pregunten sin miedo</div>
+        <div class="badge bo">⚠️ Recuerden el int(input())</div>
+      </div>
+      <div class="time-badge" style="justify-content:center;">
+        <span>👏</span> Fin de la clase · Prof. Carlos Martínez Sánchez
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ ACCESSIBILITY PANEL -->
+<div class="a11y-panel" id="a11yPanel">
+  <button class="a11y-toggle-btn" id="a11yToggle" title="Accesibilidad" aria-label="Opciones de accesibilidad">♿</button>
+  <div class="a11y-box" id="a11yBox">
+    <div>
+      <div class="a11y-lbl">🎨 Tema</div>
+      <div class="theme-row">
+        <button class="theme-btn" id="btn-dark"  onclick="setTheme('dark')"><span class="ti">🌙</span>Oscuro</button>
+        <button class="theme-btn" id="btn-light" onclick="setTheme('light')"><span class="ti">☀️</span>Claro</button>
+        <button class="theme-btn" id="btn-hc"    onclick="setTheme('hc')"><span class="ti">⚡</span>A.Cont.</button>
+      </div>
+    </div>
+    <div class="a11y-div"></div>
+    <div>
+      <div class="a11y-lbl">🔠 Tamaño de texto</div>
+      <div class="fs-row">
+        <button class="fs-btn" id="fsDown" onclick="changeFontSize(-1)">−</button>
+        <div class="fs-track" onclick="trackClick(event)"><div class="fs-fill" id="fsFill"></div></div>
+        <button class="fs-btn" id="fsUp"   onclick="changeFontSize(1)">+</button>
+        <span class="fs-lbl" id="fsLabel">100%</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ NAV -->
+<div class="nav">
+  <button id="prevBtn" onclick="changeSlide(-1)" disabled>◀</button>
+  <div class="nav-dots" id="dots"></div>
+  <button id="nextBtn" onclick="changeSlide(1)">▶</button>
+</div>
+<div class="kb-hint">← → navegar &nbsp;|&nbsp; Ctrl +/− texto</div>
+
+<script>
+/* ══ SLIDE ENGINE ══ */
+const slides = Array.from(document.querySelectorAll('.slide'));
+const TOTAL  = slides.length;
+let current  = 0;
+
+const progress      = document.getElementById('progress');
+const prevBtn       = document.getElementById('prevBtn');
+const nextBtn       = document.getElementById('nextBtn');
+const dotsContainer = document.getElementById('dots');
+
+slides.forEach((s, i) => {
+  const d = document.createElement('div');
+  const isQuiz = s.classList.contains('quiz-slide');
+  d.className = 'dot' + (i === 0 ? ' active' : '') + (isQuiz ? ' quiz-dot' : '');
+  d.title = isQuiz ? '⚡ Pregunta' : 'Slide ' + (i + 1);
+  d.onclick = () => goTo(i);
+  dotsContainer.appendChild(d);
+
+  const c = s.querySelector('.slide-counter');
+  if (c) c.textContent = String(i + 1).padStart(2, '0') + ' / ' + String(TOTAL).padStart(2, '0');
+});
+
+function goTo(n) {
+  slides[current].classList.remove('active');
+  dotsContainer.children[current].classList.remove('active');
+  current = n;
+  slides[current].classList.add('active');
+  dotsContainer.children[current].classList.add('active');
+  prevBtn.disabled = current === 0;
+  nextBtn.disabled = current === TOTAL - 1;
+  progress.style.width = ((current + 1) / TOTAL * 100) + '%';
+}
+function changeSlide(dir) { const n = current + dir; if (n >= 0 && n < TOTAL) goTo(n); }
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changeSlide(1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   changeSlide(-1);
+});
+progress.style.width = (1 / TOTAL * 100) + '%';
+
+/* ══ QUIZ ══ */
+function revealAnswer(btn) {
+  const wrap    = btn.closest('.quiz-answer-wrap');
+  const ansBox  = wrap.querySelector('.answer-box');
+  const correct = btn.closest('.slide-body').querySelector('.correct-reveal');
+  ansBox.classList.add('visible');
+  if (correct) correct.classList.add('correct-answer');
+  btn.innerHTML = '<span style="display:inline-block;transform:rotate(180deg);">👁</span> Ocultar respuesta';
+  btn.style.cssText = 'border-color:var(--accent);color:var(--accent);background:rgba(74,222,128,.05);';
+  btn.onclick = () => hideAnswer(btn);
+}
+function hideAnswer(btn) {
+  const wrap    = btn.closest('.quiz-answer-wrap');
+  const ansBox  = wrap.querySelector('.answer-box');
+  const correct = btn.closest('.slide-body').querySelector('.correct-reveal');
+  ansBox.classList.remove('visible');
+  if (correct) correct.classList.remove('correct-answer');
+  btn.innerHTML = '<span>👁</span> Mostrar respuesta correcta';
+  btn.style.cssText = '';
+  btn.onclick = () => revealAnswer(btn);
+}
+
+/* ══ ACCESSIBILITY ══ */
+// Panel toggle
+document.getElementById('a11yToggle').addEventListener('click', e => {
+  e.stopPropagation();
+  document.getElementById('a11yBox').classList.toggle('open');
+});
+document.addEventListener('click', e => {
+  if (!document.getElementById('a11yPanel').contains(e.target))
+    document.getElementById('a11yBox').classList.remove('open');
+});
+
+// Theme
+let currentTheme = localStorage.getItem('py-theme') || 'dark';
+function setTheme(t) {
+  currentTheme = t;
+  if (t === 'dark') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('py-theme', t);
+  ['dark','light','hc'].forEach(x => document.getElementById('btn-' + x).classList.toggle('active', x === t));
+}
+
+// Font size
+const FS_SIZES  = [13, 15, 17, 20, 23, 27];
+const FS_LABELS = ['65%','75%','85%','100%','115%','135%'];
+let fsIdx = parseInt(localStorage.getItem('py-fs') || '3');
+function applyFontSize() {
+  document.documentElement.style.fontSize = FS_SIZES[fsIdx] + 'px';
+  document.getElementById('fsLabel').textContent = FS_LABELS[fsIdx];
+  document.getElementById('fsDown').disabled = fsIdx === 0;
+  document.getElementById('fsUp').disabled   = fsIdx === FS_SIZES.length - 1;
+  document.getElementById('fsFill').style.width = (fsIdx / (FS_SIZES.length - 1) * 100) + '%';
+  localStorage.setItem('py-fs', fsIdx);
+}
+function changeFontSize(dir) {
+  const n = fsIdx + dir;
+  if (n >= 0 && n < FS_SIZES.length) { fsIdx = n; applyFontSize(); }
+}
+function trackClick(e) {
+  const r = e.currentTarget.getBoundingClientRect();
+  fsIdx = Math.round((e.clientX - r.left) / r.width * (FS_SIZES.length - 1));
+  fsIdx = Math.max(0, Math.min(FS_SIZES.length - 1, fsIdx));
+  applyFontSize();
+}
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && (e.key === '=' || e.key === '+')) { e.preventDefault(); changeFontSize(1); }
+  if (e.ctrlKey && e.key === '-')                    { e.preventDefault(); changeFontSize(-1); }
+});
+
+// Auto year
+const cy = document.getElementById('coverYear');
+if (cy) cy.textContent = 'Primer Año · ' + new Date().getFullYear();
+
+// Init
+setTheme(currentTheme);
+applyFontSize();
+</script>
+</body>
+</html>

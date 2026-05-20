@@ -303,6 +303,7 @@
       border-radius: 999px;
       color: var(--ink);
       background: #f8fafc;
+      cursor: pointer;
       font-family: var(--mono);
       font-size: .72rem;
       font-weight: 700;
@@ -325,6 +326,100 @@
     .nav-pills .nav-link.active {
       background: var(--dark);
       color: #fff;
+    }
+
+    .ppt-card {
+      height: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+      box-shadow: 0 16px 44px rgba(16, 24, 40, .08);
+    }
+
+    .ppt-preview {
+      min-height: 150px;
+      padding: 1rem;
+      color: #fff;
+      background:
+        radial-gradient(circle at 85% 20%, rgba(255, 255, 255, .24), transparent 28%),
+        linear-gradient(135deg, #111827, #2563eb);
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .ppt-preview.teal {
+      background:
+        radial-gradient(circle at 85% 20%, rgba(255, 255, 255, .24), transparent 28%),
+        linear-gradient(135deg, #0f172a, #0f766e);
+    }
+
+    .ppt-preview.green {
+      background:
+        radial-gradient(circle at 85% 20%, rgba(255, 255, 255, .24), transparent 28%),
+        linear-gradient(135deg, #102014, #15803d);
+    }
+
+    .ppt-preview span {
+      font-family: var(--mono);
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .ppt-body {
+      padding: 1.15rem;
+    }
+
+    .ppt-body h3 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-bottom: .45rem;
+    }
+
+    .ppt-body p {
+      color: #667085;
+      min-height: 54px;
+      margin-bottom: 1rem;
+    }
+
+    .ppt-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .ppt-fullscreen {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      display: none;
+      flex-direction: column;
+      background: #020617;
+    }
+
+    .ppt-fullscreen.active { display: flex; }
+
+    .ppt-fullscreen-bar {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: .55rem .85rem;
+      color: #fff;
+      background: #111827;
+      border-bottom: 1px solid rgba(255, 255, 255, .12);
+      font-family: var(--mono);
+      font-size: .78rem;
+    }
+
+    .ppt-frame {
+      width: 100%;
+      flex: 1;
+      border: 0;
+      background: #000;
     }
 
     .path {
@@ -383,6 +478,7 @@
         <div class="navbar-nav ms-auto">
           <a class="nav-link" href="#actividades">Actividades</a>
           <a class="nav-link" href="#material">Lecciones y extras</a>
+          <a class="nav-link" href="#ppt">PPT</a>
           <a class="nav-link" href="#ruta">Ruta</a>
         </div>
       </div>
@@ -678,6 +774,63 @@
       </div>
     </section>
 
+    <section id="ppt" class="py-5">
+      <div class="container">
+        <h2 class="section-title">PPT del curso</h2>
+        <p class="section-copy">Presentaciones HTML listas para proyectar en clases. Puedes abrirlas en una pestaña nueva o activar el modo pantalla completa.</p>
+
+        <div class="row g-4">
+          <div class="col-md-6 col-xl-4 resource-item">
+            <article class="ppt-card">
+              <div class="ppt-preview teal"><span>Clase inicial</span></div>
+              <div class="ppt-body">
+                <h3>Algoritmos, diagramas y PSeInt</h3>
+                <p>Conceptos base para pasar desde lógica visual y pseudocódigo hacia programación.</p>
+                <div class="ppt-actions">
+                  <a class="mini-link" href="ppt/algoritmos_pseint.html" target="_blank" rel="noopener">Abrir</a>
+                  <button class="mini-link border-0" type="button" data-ppt="ppt/algoritmos_pseint.html" data-title="Algoritmos, diagramas y PSeInt">
+                    <i class="bi bi-fullscreen me-1"></i>Pantalla completa
+                  </button>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-md-6 col-xl-4 resource-item">
+            <article class="ppt-card">
+              <div class="ppt-preview green"><span>Python</span></div>
+              <div class="ppt-body">
+                <h3>Introducción a Python</h3>
+                <p>Primer recorrido por sintaxis, variables, entrada, salida y mentalidad de trabajo.</p>
+                <div class="ppt-actions">
+                  <a class="mini-link" href="ppt/python_intro.html" target="_blank" rel="noopener">Abrir</a>
+                  <button class="mini-link border-0" type="button" data-ppt="ppt/python_intro.html" data-title="Introducción a Python">
+                    <i class="bi bi-fullscreen me-1"></i>Pantalla completa
+                  </button>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-md-6 col-xl-4 resource-item">
+            <article class="ppt-card">
+              <div class="ppt-preview"><span>Continuación</span></div>
+              <div class="ppt-body">
+                <h3>Seguimos con Python</h3>
+                <p>Material para profundizar con más estructuras, ejemplos y práctica guiada.</p>
+                <div class="ppt-actions">
+                  <a class="mini-link" href="ppt/seguimos_python.html" target="_blank" rel="noopener">Abrir</a>
+                  <button class="mini-link border-0" type="button" data-ppt="ppt/seguimos_python.html" data-title="Seguimos con Python">
+                    <i class="bi bi-fullscreen me-1"></i>Pantalla completa
+                  </button>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section id="ruta" class="path">
       <div class="container">
         <h2 class="section-title">Ruta sugerida</h2>
@@ -715,6 +868,16 @@
     </section>
   </main>
 
+  <div class="ppt-fullscreen" id="pptViewer" aria-hidden="true">
+    <div class="ppt-fullscreen-bar">
+      <span id="pptViewerTitle">Presentación</span>
+      <button class="btn btn-sm btn-light" type="button" id="closePptViewer">
+        <i class="bi bi-fullscreen-exit me-1"></i>Salir
+      </button>
+    </div>
+    <iframe class="ppt-frame" id="pptFrame" title="Presentación en pantalla completa" allowfullscreen></iframe>
+  </div>
+
   <footer>
     <div class="container d-flex flex-wrap justify-content-between gap-2">
       <span>FPY-1101 · Fundamentos de Programación</span>
@@ -725,7 +888,46 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
   <script>
+    const pptViewer = document.getElementById("pptViewer");
+    const pptFrame = document.getElementById("pptFrame");
+    const pptViewerTitle = document.getElementById("pptViewerTitle");
+    const closePptViewer = document.getElementById("closePptViewer");
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function openPptViewer(src, title) {
+      pptFrame.setAttribute("src", src);
+      pptViewerTitle.textContent = title;
+      pptViewer.classList.add("active");
+      pptViewer.setAttribute("aria-hidden", "false");
+
+      if (pptViewer.requestFullscreen) {
+        pptViewer.requestFullscreen().catch(() => {});
+      }
+    }
+
+    function closePpt() {
+      pptViewer.classList.remove("active");
+      pptViewer.setAttribute("aria-hidden", "true");
+      pptFrame.removeAttribute("src");
+
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    document.querySelectorAll("[data-ppt]").forEach((button) => {
+      button.addEventListener("click", () => {
+        openPptViewer(button.dataset.ppt, button.dataset.title);
+      });
+    });
+
+    closePptViewer.addEventListener("click", closePpt);
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && pptViewer.classList.contains("active")) {
+        closePpt();
+      }
+    });
 
     if (!reduceMotion && window.anime) {
       anime({
