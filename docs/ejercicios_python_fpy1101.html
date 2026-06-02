@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ejercicios Python — FPY-1101</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --bg2: #13161e;
+      --bg3: #1a1e28;
+      --border: rgba(255,255,255,0.07);
+      --border2: rgba(255,255,255,0.13);
+      --text: #e8eaf0;
+      --muted: #8890a4;
+      --accent: #5b8bff;
+      --accent2: #a78bfa;
+      --green: #34d399;
+      --amber: #fbbf24;
+      --coral: #fb7185;
+      --teal: #2dd4bf;
+
+      --n1: #34d399;
+      --n2: #60a5fa;
+      --n3: #fbbf24;
+      --n4: #f97316;
+      --n5: #f43f5e;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Sora', sans-serif;
+      font-size: 15px;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    .site-header {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 0 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+    .site-header h1 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: .03em;
+      color: var(--text);
+    }
+    .site-header .subtitle {
+      font-size: .75rem;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 2px;
+    }
+    .badge-count {
+      background: rgba(91,139,255,.15);
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .7rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(91,139,255,.3);
+    }
+
+    /* ── FILTERS ── */
+    .filter-bar {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: .85rem 0;
+    }
+    .filter-group { display: flex; gap: .4rem; flex-wrap: wrap; align-items: center; }
+    .filter-label { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-right: .3rem; white-space: nowrap; }
+
+    .btn-filter {
+      border: 1px solid var(--border2);
+      background: transparent;
+      color: var(--muted);
+      font-size: .72rem;
+      font-family: 'Sora', sans-serif;
+      padding: 4px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all .15s ease;
+      white-space: nowrap;
+    }
+    .btn-filter:hover { border-color: rgba(255,255,255,.25); color: var(--text); }
+    .btn-filter.active { color: #fff; border-color: transparent; }
+
+    .btn-filter[data-val="all"].active { background: rgba(255,255,255,.12); color: var(--text); }
+    .btn-filter[data-val="1"].active  { background: var(--n1); color: #022c22; }
+    .btn-filter[data-val="2"].active  { background: var(--n2); color: #0d1f3c; }
+    .btn-filter[data-val="3"].active  { background: var(--n3); color: #2d1d00; }
+    .btn-filter[data-val="4"].active  { background: var(--n4); color: #2d0d00; }
+    .btn-filter[data-val="5"].active  { background: var(--n5); color: #2d0010; }
+
+    .btn-topic {
+      border: 1px solid var(--border2);
+      background: transparent;
+      color: var(--muted);
+      font-size: .68rem;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 3px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all .15s ease;
+    }
+    .btn-topic:hover { border-color: rgba(255,255,255,.25); color: var(--text); }
+    .btn-topic.active { background: rgba(167,139,250,.15); border-color: rgba(167,139,250,.4); color: var(--accent2); }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+      padding: .5rem 0;
+      font-size: .75rem;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    #visible-count { color: var(--accent); font-weight: 600; }
+
+    /* ── EXERCISE CARD ── */
+    .ex-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1rem;
+      padding: 1.25rem 0 3rem;
+    }
+
+    .ex-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: border-color .2s ease, transform .2s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .ex-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+    .ex-card.hidden { display: none; }
+
+    .ex-header {
+      padding: .75rem 1rem .6rem;
+      display: flex;
+      align-items: flex-start;
+      gap: .75rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .ex-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .65rem;
+      color: var(--muted);
+      min-width: 28px;
+      padding-top: 2px;
+    }
+    .ex-title {
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.4;
+      flex: 1;
+    }
+
+    .level-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+    .lvl-1 { background: var(--n1); box-shadow: 0 0 6px var(--n1); }
+    .lvl-2 { background: var(--n2); box-shadow: 0 0 6px var(--n2); }
+    .lvl-3 { background: var(--n3); box-shadow: 0 0 6px var(--n3); }
+    .lvl-4 { background: var(--n4); box-shadow: 0 0 6px var(--n4); }
+    .lvl-5 { background: var(--n5); box-shadow: 0 0 6px var(--n5); }
+
+    .ex-body {
+      padding: .85rem 1rem;
+      flex: 1;
+    }
+    .ex-enunciado {
+      font-size: .8rem;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .topic-tags { display: flex; flex-wrap: wrap; gap: .3rem; padding: 0 1rem .75rem; }
+    .topic-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .62rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(167,139,250,.1);
+      color: var(--accent2);
+      border: 1px solid rgba(167,139,250,.2);
+    }
+
+    .ex-footer {
+      border-top: 1px solid var(--border);
+      padding: .6rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .level-badge {
+      font-size: .65rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      padding: 2px 9px;
+      border-radius: 20px;
+    }
+    .level-badge.lvl-1 { background: rgba(52,211,153,.15); color: var(--n1); border: 1px solid rgba(52,211,153,.3); box-shadow: none; }
+    .level-badge.lvl-2 { background: rgba(96,165,250,.15); color: var(--n2); border: 1px solid rgba(96,165,250,.3); box-shadow: none; }
+    .level-badge.lvl-3 { background: rgba(251,191,36,.12); color: var(--n3); border: 1px solid rgba(251,191,36,.3); box-shadow: none; }
+    .level-badge.lvl-4 { background: rgba(249,115,22,.12); color: var(--n4); border: 1px solid rgba(249,115,22,.3); box-shadow: none; }
+    .level-badge.lvl-5 { background: rgba(244,63,94,.12); color: var(--n5); border: 1px solid rgba(244,63,94,.3); box-shadow: none; }
+
+    .btn-hint {
+      font-size: .7rem;
+      font-family: 'Sora', sans-serif;
+      background: transparent;
+      border: 1px solid var(--border2);
+      color: var(--muted);
+      padding: 3px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .btn-hint:hover { background: rgba(255,255,255,.05); color: var(--text); border-color: rgba(255,255,255,.2); }
+    .btn-hint.shown { background: rgba(91,139,255,.1); border-color: rgba(91,139,255,.3); color: var(--accent); }
+
+    .hint-box {
+      display: none;
+      padding: .7rem 1rem;
+      background: rgba(91,139,255,.06);
+      border-top: 1px solid rgba(91,139,255,.15);
+      font-size: .78rem;
+      color: #b0bbdd;
+      line-height: 1.55;
+    }
+    .hint-box.visible { display: block; }
+    .hint-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .6rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-bottom: .35rem;
+    }
+
+    /* ── NO RESULTS ── */
+    #no-results {
+      display: none;
+      text-align: center;
+      padding: 4rem 1rem;
+      color: var(--muted);
+    }
+    #no-results h3 { font-size: 1rem; font-weight: 400; margin-bottom: .5rem; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 576px) {
+      .ex-grid { grid-template-columns: 1fr; }
+      .filter-group { gap: .3rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header class="site-header">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <div>
+        <h1>🐍 Ejercicios Python</h1>
+        <div class="subtitle">FPY-1101 · Fundamentos de Programación · 50 ejercicios</div>
+      </div>
+      <div class="d-flex gap-2 align-items-center">
+        <span class="badge-count" id="header-count">50 ejercicios</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ══ FILTERS ══ -->
+<div class="filter-bar">
+  <div class="container">
+    <div class="d-flex flex-column gap-2">
+      <!-- Nivel -->
+      <div class="filter-group">
+        <span class="filter-label">Nivel</span>
+        <button class="btn-filter active" data-group="level" data-val="all">Todos</button>
+        <button class="btn-filter" data-group="level" data-val="1">⬤ 1 Básico</button>
+        <button class="btn-filter" data-group="level" data-val="2">⬤ 2 Fácil</button>
+        <button class="btn-filter" data-group="level" data-val="3">⬤ 3 Medio</button>
+        <button class="btn-filter" data-group="level" data-val="4">⬤ 4 Avanzado</button>
+        <button class="btn-filter" data-group="level" data-val="5">⬤ 5 Experto</button>
+      </div>
+      <!-- Tema -->
+      <div class="filter-group">
+        <span class="filter-label">Tema</span>
+        <button class="btn-topic active" data-topic="all">todos</button>
+        <button class="btn-topic" data-topic="input/print">input/print</button>
+        <button class="btn-topic" data-topic="tipos">tipos</button>
+        <button class="btn-topic" data-topic="if/else">if/else</button>
+        <button class="btn-topic" data-topic="while">while</button>
+        <button class="btn-topic" data-topic="for">for</button>
+        <button class="btn-topic" data-topic="listas">listas</button>
+        <button class="btn-topic" data-topic="diccionarios">diccionarios</button>
+        <button class="btn-topic" data-topic="try/except">try/except</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ STATS ══ -->
+<div class="stats-bar">
+  <div class="container">
+    Mostrando <span id="visible-count">50</span> de 50 ejercicios
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<main class="container">
+  <div class="ex-grid" id="grid"></div>
+  <div id="no-results">
+    <h3>Sin resultados para este filtro</h3>
+    <p style="font-size:.8rem">Prueba con otro nivel o tema</p>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const EXERCISES = [
+    // ── NIVEL 1 (4 ejercicios) ──
+    {
+      id: 1, level: 1,
+      title: "Hola, mundo personalizado",
+      topics: ["input/print"],
+      enunciado: "Pide al usuario su nombre y salúdalo por pantalla con un mensaje como: <em>¡Hola, Ana!</em>",
+      hint: "Usa <code>input()</code> para leer el nombre. Luego usa <code>print()</code> o <code>print(f'...')</code> para mostrar el saludo con el nombre incluido."
+    },
+    {
+      id: 2, level: 1,
+      title: "Suma de dos números",
+      topics: ["input/print", "tipos"],
+      enunciado: "Lee dos números enteros desde el teclado y muestra su suma en pantalla.",
+      hint: "Recuerda que <code>input()</code> siempre devuelve texto. Debes convertir cada valor con <code>int()</code> antes de sumarlos."
+    },
+    {
+      id: 3, level: 1,
+      title: "Área de un rectángulo",
+      topics: ["input/print", "tipos"],
+      enunciado: "Solicita la base y la altura de un rectángulo (números con decimales) y calcula su área. Muestra el resultado con 2 decimales.",
+      hint: "Convierte los valores con <code>float()</code>. Para mostrar 2 decimales usa un f-string con formato: <code>{resultado:.2f}</code>."
+    },
+    {
+      id: 4, level: 1,
+      title: "Valor absoluto",
+      topics: ["input/print", "tipos"],
+      enunciado: "Pide un número al usuario (puede ser negativo) y muestra su valor absoluto.",
+      hint: "Convierte la entrada con <code>int()</code> o <code>float()</code>. Luego aplica la función <code>abs()</code> al número y muestra el resultado."
+    },
+
+    // ── NIVEL 2 (6 ejercicios) ──
+    {
+      id: 5, level: 2,
+      title: "Temperatura Celsius a Fahrenheit",
+      topics: ["input/print", "tipos"],
+      enunciado: "Lee una temperatura en Celsius y conviértela a Fahrenheit. Fórmula: <em>F = C × 9/5 + 32</em>. Muestra el resultado con 1 decimal.",
+      hint: "Usa <code>float()</code> para la entrada. Aplica la fórmula con operadores aritméticos. Formatea la salida con <code>:.1f</code> dentro del f-string."
+    },
+    {
+      id: 6, level: 2,
+      title: "¿Es par o impar?",
+      topics: ["if/else"],
+      enunciado: "Solicita un número entero e indica si es par o impar.",
+      hint: "El operador módulo <code>%</code> devuelve el resto de la división. Si <code>numero % 2 == 0</code>, el número es par. Usa <code>if/else</code> para decidir qué imprimir."
+    },
+    {
+      id: 7, level: 2,
+      title: "Mayor de dos números",
+      topics: ["if/else"],
+      enunciado: "Lee dos números e indica cuál es el mayor. Si son iguales, indícalo también.",
+      hint: "Compara con <code>></code> y <code>==</code>. Necesitas tres ramas: primer número mayor, segundo número mayor, o iguales. Usa <code>if</code>, <code>elif</code> y <code>else</code>."
+    },
+    {
+      id: 8, level: 2,
+      title: "Contador del 1 al N",
+      topics: ["for"],
+      enunciado: "Pide un número N positivo e imprime todos los números del 1 hasta N, uno por línea.",
+      hint: "Usa <code>for i in range(1, N+1)</code>. Recuerda que el segundo argumento de <code>range</code> es exclusivo, por eso se suma 1."
+    },
+    {
+      id: 9, level: 2,
+      title: "Suma de 1 a N con while",
+      topics: ["while"],
+      enunciado: "Lee un entero N y calcula la suma de todos los números desde 1 hasta N usando un bucle <code>while</code>.",
+      hint: "Declara un acumulador en 0 antes del bucle. En cada iteración súmale el valor de la variable contadora y luego increméntala. El bucle se repite mientras la variable sea ≤ N."
+    },
+    {
+      id: 10, level: 2,
+      title: "Tabla de multiplicar",
+      topics: ["for"],
+      enunciado: "Solicita un número y muestra su tabla de multiplicar del 1 al 10.",
+      hint: "Usa <code>for i in range(1, 11)</code> y dentro del bucle calcula <code>numero * i</code>. Un f-string con tabulación (<code>\\t</code>) hará la salida más legible."
+    },
+
+    // ── NIVEL 3 (18 ejercicios) ──
+    {
+      id: 11, level: 3,
+      title: "Validar entrada numérica",
+      topics: ["try/except"],
+      enunciado: "Solicita un número entero al usuario. Si ingresa algo que no es número, muestra un mensaje de error en lugar de que el programa falle.",
+      hint: "Usa un bloque <code>try</code> para intentar la conversión con <code>int()</code>. En el <code>except ValueError</code> captura el error y muestra el aviso al usuario."
+    },
+    {
+      id: 12, level: 3,
+      title: "Calificación con nota",
+      topics: ["if/else"],
+      enunciado: "Lee una nota de 1 a 7. Muestra: Reprobado (< 4), Suficiente (4.0–4.9), Bueno (5.0–5.9) o Excelente (6.0–7.0).",
+      hint: "Convierte la entrada a <code>float()</code>. Usa <code>if/elif/elif/else</code> con los rangos. Recuerda que las comparaciones flotantes usan <code>>=</code> y <code><</code>."
+    },
+    {
+      id: 13, level: 3,
+      title: "Factorial con while",
+      topics: ["while"],
+      enunciado: "Lee un entero N ≥ 0 y calcula su factorial (N!) usando un bucle <code>while</code>. El factorial de 0 es 1.",
+      hint: "Inicializa el resultado en 1. Multiplica en cada iteración por el contador (desde N hasta 1, decrementando). Maneja el caso especial N = 0 antes del bucle."
+    },
+    {
+      id: 14, level: 3,
+      title: "Número primo",
+      topics: ["for", "if/else"],
+      enunciado: "Determina si un número entero positivo ingresado por el usuario es primo o no.",
+      hint: "Un primo solo es divisible por 1 y por sí mismo. Usa un <code>for</code> desde 2 hasta <code>numero - 1</code> y comprueba si alguno divide exactamente con <code>%</code>. Usa una variable bandera o <code>break</code>."
+    },
+    {
+      id: 15, level: 3,
+      title: "Suma de lista ingresada",
+      topics: ["listas", "for"],
+      enunciado: "Pide al usuario que ingrese 5 números separados por espacios. Almacénalos en una lista y muestra la suma y el promedio.",
+      hint: "Usa <code>input().split()</code> para separar los valores. Luego convierte cada uno con un bucle <code>for</code> o <code>list comprehension</code>. Suma con <code>sum()</code> y divide por el largo con <code>len()</code>."
+    },
+    {
+      id: 16, level: 3,
+      title: "Máximo de una lista",
+      topics: ["listas", "for"],
+      enunciado: "Lee N números del usuario uno por uno (pide N primero) y muestra el valor máximo SIN usar la función <code>max()</code>.",
+      hint: "Inicializa una variable <code>maximo</code> con el primer elemento. Recorre la lista con <code>for</code> y actualiza <code>maximo</code> cada vez que encuentres un número mayor."
+    },
+    {
+      id: 17, level: 3,
+      title: "FizzBuzz",
+      topics: ["for", "if/else"],
+      enunciado: "Imprime los números del 1 al 30. Pero: si el número es múltiplo de 3 imprime <em>Fizz</em>, si es múltiplo de 5 imprime <em>Buzz</em>, y si es múltiplo de ambos imprime <em>FizzBuzz</em>.",
+      hint: "Revisa primero el caso múltiplo de ambos (15). Usa <code>elif</code> para los otros casos. El orden importa: coloca el <code>elif n % 15</code> primero (o usa <code>and</code>)."
+    },
+    {
+      id: 18, level: 3,
+      title: "Contar vocales",
+      topics: ["for", "listas"],
+      enunciado: "Lee una palabra o frase y cuenta cuántas vocales tiene (mayúsculas y minúsculas cuentan igual).",
+      hint: "Define una lista o string con las vocales: <code>'aeiouáéíóúAEIOUÁÉÍÓÚ'</code>. Recorre cada carácter con <code>for</code> y verifica si está <code>in</code> las vocales. Usa un acumulador."
+    },
+    {
+      id: 19, level: 3,
+      title: "Diccionario de contactos simple",
+      topics: ["diccionarios", "input/print"],
+      enunciado: "Crea un diccionario con al menos 3 contactos (nombre → teléfono). Pide un nombre al usuario y muestra su número, o indica que no existe.",
+      hint: "Usa un diccionario literal para los datos. Comprueba si la clave existe con <code>in</code> o usa el método <code>.get()</code> que devuelve <code>None</code> si no existe."
+    },
+    {
+      id: 20, level: 3,
+      title: "Inversión de lista",
+      topics: ["listas", "for"],
+      enunciado: "Pide al usuario 5 palabras, guárdalas en una lista y muéstralas en orden inverso SIN usar <code>reverse()</code> ni <code>[::-1]</code>.",
+      hint: "Itera desde el último índice hasta el primero. Recuerda que el último índice es <code>len(lista) - 1</code>. Usa <code>range(len(lista) - 1, -1, -1)</code> con paso -1."
+    },
+    {
+      id: 21, level: 3,
+      title: "Adivina el número",
+      topics: ["while", "if/else"],
+      enunciado: "El programa tiene un número secreto (fíjalo tú en el código, ej: 42). El usuario intenta adivinarlo; dile si su intento es mayor, menor o correcto, hasta que lo logre.",
+      hint: "Usa un bucle <code>while True</code>. Compara el intento con el secreto. Usa <code>break</code> para salir cuando adivinen. Puedes contar los intentos con un acumulador."
+    },
+    {
+      id: 22, level: 3,
+      title: "Calculadora básica",
+      topics: ["if/else", "try/except"],
+      enunciado: "Pide dos números y un operador (+, -, *, /). Realiza la operación y muestra el resultado. Maneja la división entre cero.",
+      hint: "Usa <code>if/elif/else</code> para elegir la operación según el operador ingresado. Para la división, verifica si el segundo número es 0 antes de dividir (o captura <code>ZeroDivisionError</code> con <code>except</code>)."
+    },
+    {
+      id: 23, level: 3,
+      title: "Promedio de notas con for",
+      topics: ["listas", "for"],
+      enunciado: "Pide al usuario que ingrese notas (de 1.0 a 7.0) una por una. Cuando ingrese 0, termina y muestra el promedio y si aprobó o reprobó (nota mínima 4.0).",
+      hint: "Guarda las notas en una lista. Usa un <code>while</code> para seguir leyendo hasta que ingrese 0. Al final calcula el promedio con <code>sum()</code> y <code>len()</code>."
+    },
+    {
+      id: 24, level: 3,
+      title: "Frecuencia de caracteres",
+      topics: ["diccionarios", "for"],
+      enunciado: "Lee una palabra e indica cuántas veces aparece cada letra, usando un diccionario.",
+      hint: "Recorre cada carácter con <code>for</code>. Si el carácter ya es clave en el diccionario, incrementa su valor; si no, agrégalo con valor 1. El método <code>.get(clave, 0)</code> es muy útil aquí."
+    },
+    {
+      id: 25, level: 3,
+      title: "Pirámide de asteriscos",
+      topics: ["for"],
+      enunciado: "Lee un número N e imprime una pirámide de asteriscos de N filas. Ej: fila 1 → *, fila 2 → ***, fila 3 → *****.",
+      hint: "Para la fila <code>i</code> (de 1 a N), imprime <code>2*i - 1</code> asteriscos. Puedes usar <code>'*' * cantidad</code> para repetir el carácter. Agrega espacios al inicio para centrar."
+    },
+    {
+      id: 26, level: 3,
+      title: "Lista de números pares",
+      topics: ["listas", "for"],
+      enunciado: "Genera una lista con todos los números pares entre 1 y 50 usando un bucle <code>for</code> y muéstrala.",
+      hint: "Crea una lista vacía antes del bucle. En cada iteración verifica si <code>i % 2 == 0</code> y usa <code>.append()</code> para agregarlo. Alternativa: usa <code>range(2, 51, 2)</code>."
+    },
+    {
+      id: 27, level: 3,
+      title: "Diccionario de cuadrados",
+      topics: ["diccionarios", "for"],
+      enunciado: "Construye un diccionario donde las claves sean los números del 1 al 10 y los valores sean sus cuadrados. Luego muestra cada par.",
+      hint: "Empieza con un diccionario vacío. Con un <code>for</code> de 1 a 10, agrega cada par <code>diccionario[i] = i**2</code>. Para mostrar usa <code>.items()</code> en otro <code>for</code>."
+    },
+    {
+      id: 28, level: 3,
+      title: "Número con try/except robusto",
+      topics: ["try/except", "while"],
+      enunciado: "Crea un programa que siga pidiendo un número entero al usuario HASTA que realmente ingrese uno válido. No debe caerse nunca.",
+      hint: "Combina <code>while True</code> con <code>try/except</code>. Dentro del <code>try</code>, intenta convertir y si todo va bien usa <code>break</code>. En el <code>except ValueError</code> muestra el mensaje de error y el bucle continúa solo."
+    },
+
+    // ── NIVEL 4 (14 ejercicios) ──
+    {
+      id: 29, level: 4,
+      title: "Fibonacci hasta N",
+      topics: ["while"],
+      enunciado: "Lee un número N e imprime la secuencia de Fibonacci hasta que el valor supere N. Ej: N=30 → 0, 1, 1, 2, 3, 5, 8, 13, 21.",
+      hint: "Necesitas dos variables: <code>a = 0</code> y <code>b = 1</code>. En cada iteración: imprime <code>a</code>, luego actualiza ambas: <code>a, b = b, a + b</code>. El bucle se repite mientras <code>a <= N</code>."
+    },
+    {
+      id: 30, level: 4,
+      title: "Búsqueda en lista",
+      topics: ["listas", "for", "if/else"],
+      enunciado: "Crea una lista de 10 frutas. Pide al usuario que ingrese una fruta y muestra en qué posición(es) se encuentra o indica que no está en la lista.",
+      hint: "Recorre la lista con <code>for i in range(len(lista))</code> para tener el índice. Guarda las posiciones encontradas en otra lista. Si al final está vacía, la fruta no existe."
+    },
+    {
+      id: 31, level: 4,
+      title: "Menú con while",
+      topics: ["while", "if/else"],
+      enunciado: "Crea un menú que ofrezca: 1) Saludar, 2) Mostrar la hora (usa un string fijo), 3) Salir. El menú se repite hasta elegir la opción 3. Valida entradas inválidas.",
+      hint: "Usa <code>while True</code> y muestra el menú en cada iteración. Lee la opción con <code>input()</code>, compara con <code>if/elif</code>. Ante opción inválida, muestra error y vuelve a pedir. Con opción 3, usa <code>break</code>."
+    },
+    {
+      id: 32, level: 4,
+      title: "Eliminar duplicados",
+      topics: ["listas", "for"],
+      enunciado: "Dada la lista <code>[3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5]</code>, crea una nueva lista sin elementos repetidos, manteniendo el orden de aparición.",
+      hint: "Crea una lista vacía para el resultado. Recorre la lista original con <code>for</code>: si el elemento <strong>no</strong> está <code>in</code> la lista resultado, agrégalo con <code>.append()</code>."
+    },
+    {
+      id: 33, level: 4,
+      title: "Contar palabras en frase",
+      topics: ["diccionarios", "for"],
+      enunciado: "Lee una frase del usuario y cuenta cuántas veces aparece cada palabra (sin importar mayúsculas).",
+      hint: "Usa <code>.lower()</code> para unificar mayúsculas y <code>.split()</code> para obtener la lista de palabras. Luego recorre con <code>for</code> y construye el diccionario de frecuencias con <code>.get(palabra, 0) + 1</code>."
+    },
+    {
+      id: 34, level: 4,
+      title: "Validar contraseña",
+      topics: ["for", "if/else"],
+      enunciado: "Pide una contraseña y valida que tenga: al menos 8 caracteres, al menos una mayúscula, al menos un dígito. Muestra qué requisitos no cumple.",
+      hint: "Verifica el largo con <code>len()</code>. Para mayúsculas, recorre con <code>for</code> y usa <code>.isupper()</code>. Para dígitos usa <code>.isdigit()</code>. Lleva un registro de qué condiciones se cumplen con variables booleanas."
+    },
+    {
+      id: 35, level: 4,
+      title: "Conversor de bases",
+      topics: ["while", "if/else"],
+      enunciado: "Lee un número decimal positivo e imprímelo en binario SIN usar <code>bin()</code>. Usa divisiones sucesivas entre 2.",
+      hint: "Divide repetidamente entre 2 con <code>//</code> y guarda los restos con <code>%</code>. Los restos leídos al revés forman el binario. Acumúlalos en una lista y muéstralos en orden inverso."
+    },
+    {
+      id: 36, level: 4,
+      title: "Agenda con diccionario",
+      topics: ["diccionarios", "while", "if/else"],
+      enunciado: "Crea una agenda simple: el usuario puede agregar un contacto (nombre, teléfono), buscar por nombre, o salir. Usa un diccionario y un menú <code>while</code>.",
+      hint: "Empieza con un diccionario vacío. El menú tiene al menos 3 opciones. Para agregar: <code>agenda[nombre] = telefono</code>. Para buscar: usa <code>.get(nombre)</code> y muestra el resultado o un aviso."
+    },
+    {
+      id: 37, level: 4,
+      title: "Ordenar lista sin sort()",
+      topics: ["listas", "for"],
+      enunciado: "Lee 5 números, guárdalos en una lista y ordénalos de menor a mayor implementando el método de burbuja (bubble sort). No uses <code>.sort()</code>.",
+      hint: "El bubble sort usa dos <code>for</code> anidados. El externo controla los pases (N-1 veces) y el interno compara pares adyacentes. Si <code>lista[j] > lista[j+1]</code>, intercámbialos usando una variable temporal."
+    },
+    {
+      id: 38, level: 4,
+      title: "Manejo de múltiples excepciones",
+      topics: ["try/except", "if/else"],
+      enunciado: "Pide dos números y realiza la división. Maneja por separado: entrada no numérica (<code>ValueError</code>), división entre cero (<code>ZeroDivisionError</code>) y cualquier otro error (<code>Exception</code>).",
+      hint: "Un bloque <code>try</code> puede tener varios <code>except</code> encadenados, uno por tipo de error. El <code>except Exception as e</code> captura cualquier otro error y puedes imprimir <code>e</code> para ver el mensaje."
+    },
+    {
+      id: 39, level: 4,
+      title: "Lista de diccionarios: estudiantes",
+      topics: ["listas", "diccionarios", "for"],
+      enunciado: "Crea una lista de al menos 4 estudiantes, donde cada uno es un diccionario con <em>nombre</em> y <em>nota</em>. Muestra los que aprobaron (nota ≥ 4.0) y el promedio del curso.",
+      hint: "Define la lista de diccionarios con datos fijos. Recórrela con <code>for</code>, accede a los valores con <code>estudiante['nombre']</code> y <code>estudiante['nota']</code>. Acumula la suma para el promedio."
+    },
+    {
+      id: 40, level: 4,
+      title: "Número a letras (1–19)",
+      topics: ["diccionarios", "if/else"],
+      enunciado: "Lee un número entero entre 1 y 19 y muestra su nombre en español. Usa un diccionario como tabla de traducción.",
+      hint: "Crea un diccionario <code>{1: 'uno', 2: 'dos', ...}</code>. Valida que el número esté entre 1 y 19. Usa <code>.get(numero, 'fuera de rango')</code> para buscar o manejar valores inválidos."
+    },
+    {
+      id: 41, level: 4,
+      title: "Histograma en consola",
+      topics: ["diccionarios", "for"],
+      enunciado: "Dada una lista de notas (1–7), calcula cuántas caen en cada rango (1, 2, 3, 4, 5, 6, 7) y muestra un histograma con asteriscos.",
+      hint: "Usa un diccionario con claves 1 a 7 inicializadas en 0. Recorre las notas con <code>for</code> e incrementa el contador. Para el histograma, imprime la clave, dos puntos, y <code>'*' * frecuencia</code>."
+    },
+    {
+      id: 42, level: 4,
+      title: "Registro de ventas",
+      topics: ["diccionarios", "while"],
+      enunciado: "El usuario ingresa productos y precios (termina con 'fin'). Al final muestra el total vendido, el producto más caro y el más barato.",
+      hint: "Guarda los productos en un diccionario <code>{nombre: precio}</code>. Para el más caro y barato, usa comparaciones en un <code>for</code> recorriendo <code>.items()</code>. Inicializa con el primer elemento."
+    },
+
+    // ── NIVEL 5 (8 ejercicios) ──
+    {
+      id: 43, level: 5,
+      title: "Calculadora con historial",
+      topics: ["listas", "diccionarios", "while", "try/except"],
+      enunciado: "Calculadora con menú que permite: realizar operaciones (+, -, *, /), ver el historial de operaciones (guardado en una lista de diccionarios), limpiar el historial y salir. Valida todas las entradas.",
+      hint: "Cada operación se guarda como un diccionario: <code>{'op': '+', 'a': 3, 'b': 4, 'resultado': 7}</code>. Usa <code>try/except ValueError</code> para entradas inválidas y <code>ZeroDivisionError</code> para divisiones. El menú se muestra en cada iteración del <code>while</code>."
+    },
+    {
+      id: 44, level: 5,
+      title: "Análisis de texto avanzado",
+      topics: ["diccionarios", "for", "listas"],
+      enunciado: "Lee un párrafo (varias palabras). Muestra: cantidad de palabras, cantidad de caracteres sin espacios, la palabra más frecuente y las 3 palabras más largas.",
+      hint: "Usa <code>.split()</code> para palabras y <code>.replace(' ', '')</code> para chars sin espacio. Para la más frecuente, construye un diccionario de frecuencias. Para las más largas, ordena por <code>len</code> usando <code>sorted()</code> con <code>key=len</code> y toma los últimos 3."
+    },
+    {
+      id: 45, level: 5,
+      title: "Sistema de notas con menú completo",
+      topics: ["listas", "diccionarios", "while", "try/except"],
+      enunciado: "Crea un sistema que permita: agregar estudiante y sus notas, mostrar todos, calcular el promedio de cada uno, eliminar un estudiante por nombre y salir. Datos en una lista de diccionarios.",
+      hint: "Cada elemento es <code>{'nombre': ..., 'notas': [...]}</code>. Para agregar notas, lee varias con un bucle. Para eliminar, busca el índice con <code>enumerate</code> y usa <code>del lista[i]</code> o <code>.pop()</code>. Valida entradas con <code>try/except</code>."
+    },
+    {
+      id: 46, level: 5,
+      title: "Cifrado César",
+      topics: ["for", "if/else", "listas"],
+      enunciado: "Implementa el cifrado César: desplaza cada letra del mensaje por N posiciones en el alfabeto. Las letras no alfabéticas quedan igual. Muestra el mensaje cifrado y permite descifrarlo.",
+      hint: "Usa <code>ord()</code> para obtener el código ASCII y <code>chr()</code> para volver a carácter. Para letras minúsculas: <code>chr((ord(c) - ord('a') + desplazamiento) % 26 + ord('a'))</code>. Para descifrar, usa el desplazamiento negativo."
+    },
+    {
+      id: 47, level: 5,
+      title: "Triángulo de Pascal",
+      topics: ["listas", "for"],
+      enunciado: "Genera el triángulo de Pascal con N filas. Cada fila es una lista. Cada elemento (excepto los extremos) es la suma de los dos elementos de la fila anterior.",
+      hint: "Empieza con <code>[[1]]</code>. Para generar cada nueva fila, toma la anterior: los extremos son 1 y los del medio son <code>fila_ant[j] + fila_ant[j+1]</code>. Guarda todas las filas en una lista de listas."
+    },
+    {
+      id: 48, level: 5,
+      title: "Validador de paréntesis",
+      topics: ["listas", "for", "if/else"],
+      enunciado: "Lee una expresión matemática y determina si los paréntesis, corchetes y llaves están correctamente balanceados. Ej: <code>({[]})</code> → válido, <code>({)</code> → inválido.",
+      hint: "Usa una lista como pila (stack). Al encontrar un abridor, agrégalo con <code>.append()</code>. Al encontrar un cerrador, verifica que el último de la pila sea su correspondiente par; si no, es inválido. Al final, la pila debe estar vacía."
+    },
+    {
+      id: 49, level: 5,
+      title: "Inventario de tienda",
+      topics: ["diccionarios", "listas", "while", "try/except"],
+      enunciado: "Sistema de inventario: agregar producto (nombre, precio, stock), vender unidades (descuenta del stock, valida que haya suficiente), mostrar inventario y calcular valor total del stock.",
+      hint: "Usa un diccionario de diccionarios: <code>inventario[nombre] = {'precio': ..., 'stock': ...}</code>. Al vender, verifica primero que <code>stock >= unidades</code> antes de descontar. El valor total es <code>sum(p['precio'] * p['stock'] for p in inventario.values())</code>."
+    },
+    {
+      id: 50, level: 5,
+      title: "Juego: Ahorcado con estadísticas",
+      topics: ["listas", "diccionarios", "while", "for", "if/else"],
+      enunciado: "Implementa el juego del ahorcado. El programa elige una palabra al azar de una lista predefinida. El jugador adivina letra por letra (7 vidas). Al terminar cada partida muestra si ganó o perdió, la palabra correcta y un resumen de estadísticas acumuladas (partidas jugadas, ganadas, perdidas) guardadas en un diccionario. El menú permite jugar de nuevo o salir.",
+      hint: "Guarda las palabras en una lista. Usa <code>import random</code> y <code>random.choice(lista)</code> para elegir. Representa el progreso con una lista de <code>'_'</code> del mismo largo que la palabra; cuando se adivina una letra, reemplaza las posiciones correctas con un <code>for range(len(palabra))</code>. Las estadísticas van en un diccionario: <code>{'jugadas': 0, 'ganadas': 0, 'perdidas': 0}</code>. El bucle principal es un <code>while True</code> con menú; el turno del jugador es otro <code>while</code> que se repite mientras queden vidas y letras por descubrir."
+    }
+  ];
+
+  // ────────── RENDER ──────────
+  function levelLabel(n) {
+    const labels = ['', 'Básico', 'Fácil', 'Medio', 'Avanzado', 'Experto'];
+    return labels[n];
+  }
+
+  function buildCard(ex) {
+    const topicsHtml = ex.topics.map(t => `<span class="topic-tag">${t}</span>`).join('');
+    return `
+  <div class="ex-card" data-level="${ex.level}" data-topics="${ex.topics.join(',')}">
+    <div class="ex-header">
+      <span class="ex-num">#${String(ex.id).padStart(2,'0')}</span>
+      <span class="ex-title">${ex.title}</span>
+      <span class="level-dot lvl-${ex.level}" title="Nivel ${ex.level}"></span>
+    </div>
+    <div class="ex-body">
+      <p class="ex-enunciado">${ex.enunciado}</p>
+    </div>
+    <div class="topic-tags">${topicsHtml}</div>
+    <div class="ex-footer">
+      <span class="level-badge lvl-${ex.level}">N${ex.level} · ${levelLabel(ex.level)}</span>
+      <button class="btn-hint" onclick="toggleHint(this)">💡 Ver pista</button>
+    </div>
+    <div class="hint-box">
+      <div class="hint-label">Pista</div>
+      ${ex.hint}
+    </div>
+  </div>`;
+  }
+
+  const grid = document.getElementById('grid');
+  grid.innerHTML = EXERCISES.map(buildCard).join('');
+
+  // ────────── FILTROS ──────────
+  let activeLevel = 'all';
+  let activeTopic = 'all';
+
+  function updateFilters() {
+    const cards = grid.querySelectorAll('.ex-card');
+    let visible = 0;
+    cards.forEach(card => {
+      const lvl = card.dataset.level;
+      const topics = card.dataset.topics.split(',');
+      const matchLevel = activeLevel === 'all' || lvl === activeLevel;
+      const matchTopic = activeTopic === 'all' || topics.includes(activeTopic);
+      const show = matchLevel && matchTopic;
+      card.classList.toggle('hidden', !show);
+      if (show) visible++;
+    });
+    document.getElementById('visible-count').textContent = visible;
+    document.getElementById('header-count').textContent = `${visible} ejercicio${visible !== 1 ? 's' : ''}`;
+    document.getElementById('no-results').style.display = visible === 0 ? 'block' : 'none';
+  }
+
+  // Nivel buttons
+  document.querySelectorAll('.btn-filter').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeLevel = btn.dataset.val;
+      updateFilters();
+    });
+  });
+
+  // Topic buttons
+  document.querySelectorAll('.btn-topic').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.btn-topic').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeTopic = btn.dataset.topic;
+      updateFilters();
+    });
+  });
+
+  // ────────── HINT TOGGLE ──────────
+  function toggleHint(btn) {
+    const card = btn.closest('.ex-card');
+    const hint = card.querySelector('.hint-box');
+    const showing = hint.classList.toggle('visible');
+    btn.textContent = showing ? '🙈 Ocultar pista' : '💡 Ver pista';
+    btn.classList.toggle('shown', showing);
+  }
+</script>
+</body>
+</html>

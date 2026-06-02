@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Actividad: Cajero Automático con Listas y Diccionarios — FPY-1101</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;1,300&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+
+  <style>
+    :root {
+      --bg:       #f5f4f0;
+      --surface:  #ffffff;
+      --ink:      #141210;
+      --mid:      #6b6560;
+      --rule:     #dedad4;
+      --red:      #d1341b;
+      --red-lt:   #fce9e5;
+      --green:    #1a7a4a;
+      --green-lt: #e4f4ec;
+      --blue:     #1a4fd6;
+      --blue-lt:  #e8eefb;
+      --yellow:   #c97d10;
+      --yellow-lt:#fef3e2;
+      --sans:     'IBM Plex Sans', sans-serif;
+      --mono:     'IBM Plex Mono', monospace;
+      --display:  'Syne', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-weight: 300;
+    }
+
+    /* ── HERO ───────────────────────────────── */
+    .hero {
+      background: var(--ink);
+      color: #fff;
+      padding: 0;
+      overflow: hidden;
+    }
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: stretch;
+      min-height: 260px;
+    }
+    .hero-content {
+      padding: 3rem 2.5rem 3rem 3rem;
+    }
+    .hero-stripe {
+      width: 220px;
+      background: var(--red);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: .5rem;
+      padding: 2rem 1rem;
+    }
+    @media(max-width:600px){
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-stripe { width: 100%; flex-direction: row; padding: 1rem 2rem; min-height: 70px; }
+    }
+    .hero-stripe-icon { font-size: 3.5rem; opacity: .9; }
+    .hero-stripe-label {
+      font-family: var(--mono);
+      font-size: .6rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      opacity: .7;
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+    }
+    @media(max-width:600px){ .hero-stripe-label { writing-mode: horizontal-tb; transform: none; } }
+
+    .hero-eyebrow {
+      font-family: var(--mono);
+      font-size: .68rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 1rem;
+    }
+    .hero h1 {
+      font-family: var(--display);
+      font-size: clamp(1.8rem, 4.5vw, 3rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin: 0 0 .75rem;
+    }
+    .hero h1 mark {
+      background: var(--red);
+      color: #fff;
+      padding: 0 .15em;
+      border-radius: 2px;
+    }
+    .hero-sub {
+      font-size: .88rem;
+      color: rgba(255,255,255,.5);
+      font-weight: 300;
+    }
+
+    /* ── META STRIP ─────────────────────────── */
+    .meta-strip {
+      background: var(--surface);
+      border-bottom: 2px solid var(--ink);
+      padding: .6rem 0;
+    }
+    .meta-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      font-family: var(--mono);
+      font-size: .72rem;
+      background: var(--bg);
+      border: 1px solid var(--rule);
+      border-radius: 2px;
+      padding: .2rem .6rem;
+      color: var(--ink);
+    }
+    .meta-pill i { color: var(--red); }
+
+    /* ── SECTION LABEL ──────────────────────── */
+    .section-label {
+      font-family: var(--mono);
+      font-size: .65rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--mid);
+      border-left: 3px solid var(--red);
+      padding-left: .6rem;
+      margin-bottom: 1.25rem;
+    }
+
+    /* ── CARD ───────────────────────────────── */
+    .card-flat {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+      padding: 1.75rem;
+    }
+    .card-flat p, .card-flat li {
+      font-size: .91rem;
+      line-height: 1.8;
+      color: #3a3530;
+    }
+
+    /* ── DATA STRUCTURE DISPLAY ─────────────── */
+    .code-block {
+      background: var(--ink);
+      color: #e8e4dc;
+      font-family: var(--mono);
+      font-size: .82rem;
+      line-height: 1.8;
+      border-radius: 3px;
+      padding: 1.5rem 1.75rem;
+      overflow-x: auto;
+    }
+    .code-block .c-key   { color: #6bb5ff; }
+    .code-block .c-str   { color: #a8d9a8; }
+    .code-block .c-num   { color: #f0b77a; }
+    .code-block .c-kw    { color: #ff8fa3; }
+    .code-block .c-cm    { color: #6b6560; font-style: italic; }
+    .code-block .c-bracket { color: #c8c0b4; }
+
+    /* ── NUEVO vs ELIMINADO ─────────────────── */
+    .change-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      font-family: var(--mono);
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: .2rem .6rem;
+      border-radius: 2px;
+      margin-bottom: .6rem;
+    }
+    .badge-new  { background: var(--green-lt); color: var(--green); border: 1px solid #b2dfc4; }
+    .badge-gone { background: #f5f5f5; color: #999; border: 1px solid #ddd; text-decoration: line-through; }
+    .badge-mod  { background: var(--blue-lt); color: var(--blue); border: 1px solid #b8cdf5; }
+
+    /* ── DIFF TABLE ─────────────────────────── */
+    .diff-table { width: 100%; border-collapse: collapse; }
+    .diff-table th {
+      font-family: var(--mono);
+      font-size: .7rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--mid);
+      border-bottom: 2px solid var(--ink);
+      padding: .5rem .75rem;
+      text-align: left;
+    }
+    .diff-table td {
+      font-size: .87rem;
+      padding: .65rem .75rem;
+      border-bottom: 1px solid var(--rule);
+      vertical-align: top;
+    }
+    .diff-table tr:last-child td { border-bottom: none; }
+    .diff-gone { color: #bbb; text-decoration: line-through; font-family: var(--mono); font-size: .8rem; }
+    .diff-new  { color: var(--green); font-family: var(--mono); font-size: .8rem; font-weight: 600; }
+
+    /* ── OP CARDS ───────────────────────────── */
+    .op-row {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: .75rem;
+      align-items: start;
+      padding: 1.1rem 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .op-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .op-n {
+      width: 28px;
+      height: 28px;
+      background: var(--ink);
+      color: #fff;
+      font-family: var(--mono);
+      font-size: .75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 2px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .op-title {
+      font-family: var(--display);
+      font-size: .95rem;
+      font-weight: 700;
+      margin-bottom: .35rem;
+    }
+    .op-body { font-size: .86rem; color: #4a4540; line-height: 1.7; }
+    .op-body ul { margin: .35rem 0 0; padding-left: 1.1rem; }
+    .op-body li { margin-bottom: .1rem; }
+
+    /* ── CHIPS ──────────────────────────────── */
+    .chip {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: .7rem;
+      padding: .18rem .6rem;
+      border-radius: 2px;
+      margin: .15rem;
+    }
+    .chip-allow { background: var(--green-lt); border: 1px solid #b2dfc4; color: var(--green); }
+    .chip-deny  { background: var(--red-lt);   border: 1px solid #f0bcb2; color: var(--red); }
+    .chip-new   { background: var(--blue-lt);  border: 1px solid #b8cdf5; color: var(--blue); }
+
+    /* ── ALERT BOXES ────────────────────────── */
+    .alert-box {
+      border-radius: 3px;
+      padding: 1rem 1.25rem;
+      font-size: .89rem;
+      line-height: 1.7;
+    }
+    .alert-info   { background: var(--blue-lt);   border-left: 3px solid var(--blue);   color: #1a3a8a; }
+    .alert-warn   { background: var(--yellow-lt);  border-left: 3px solid var(--yellow); color: #7a4d08; }
+    .alert-danger { background: var(--red-lt);     border-left: 3px solid var(--red);    color: #8c1f0e; }
+    .alert-ok     { background: var(--green-lt);   border-left: 3px solid var(--green);  color: #0f4a2c; }
+
+    /* ── EVAL TABLE ─────────────────────────── */
+    .eval-table { width: 100%; border-collapse: collapse; }
+    .eval-table th {
+      font-family: var(--mono);
+      font-size: .68rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--mid);
+      border-bottom: 2px solid var(--ink);
+      padding: .55rem .85rem;
+      text-align: left;
+    }
+    .eval-table td {
+      font-size: .87rem;
+      padding: .7rem .85rem;
+      border-bottom: 1px solid var(--rule);
+      color: #3a3530;
+    }
+    .eval-table tr:last-child td { border-bottom: none; }
+    .eval-table .tag-alto { font-family:var(--mono); font-size:.72rem; font-weight:600; color:var(--red); }
+    .eval-table .tag-med  { font-family:var(--mono); font-size:.72rem; font-weight:600; color:var(--blue); }
+
+    /* ── HR ─────────────────────────────────── */
+    .rule { border:none; border-top:1px solid var(--rule); margin:2.5rem 0; }
+
+    /* ── FOOTER ─────────────────────────────── */
+    footer {
+      background: var(--ink);
+      color: rgba(255,255,255,.35);
+      padding: 1.75rem 0;
+      font-size: .78rem;
+      text-align: center;
+    }
+    footer strong { color: rgba(255,255,255,.75); }
+
+    /* ── FADE IN ─────────────────────────────── */
+    .fade-up { opacity:0; transform:translateY(16px); transition:opacity .5s, transform .5s; }
+    .fade-up.visible { opacity:1; transform:translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-inner container-fluid px-0">
+    <div class="hero-content">
+      <p class="hero-eyebrow">FPY-1101 &nbsp;·&nbsp; Taller de Fundamentos de Programación</p>
+      <h1>Cajero Automático<br>con <mark>Listas</mark> y <mark>Diccionarios</mark></h1>
+      <p class="hero-sub mt-2">Versión 2 — uso de estructuras de datos compuestas en Python</p>
+    </div>
+    <div class="hero-stripe">
+      <i class="bi bi-list-ul hero-stripe-icon"></i>
+      <span class="hero-stripe-label">Estructuras de Datos</span>
+    </div>
+  </div>
+</header>
+
+<!-- META -->
+<div class="meta-strip">
+  <div class="container">
+    <div class="d-flex flex-wrap gap-2 py-1">
+      <span class="meta-pill"><i class="bi bi-mortarboard-fill"></i> Ing. en Informática · Analista en Programación</span>
+      <span class="meta-pill"><i class="bi bi-code-slash"></i> Python — Consola</span>
+      <span class="meta-pill"><i class="bi bi-file-earmark-code"></i> Entrega: .py</span>
+      <span class="meta-pill"><i class="bi bi-person"></i> Trabajo individual</span>
+      <span class="meta-pill" style="background:var(--red-lt); border-color:#f0bcb2; color:var(--red);"><i class="bi bi-arrow-up-circle-fill"></i> Evolución del ejercicio anterior</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="container py-5">
+
+  <!-- OBJETIVO -->
+  <section class="mb-5 fade-up">
+    <p class="section-label">Objetivo</p>
+    <div class="card-flat">
+      <p class="mb-0">
+        Evolucionar el programa de cajero automático desarrollado anteriormente, incorporando el uso de
+        <strong>listas</strong> y <strong>diccionarios</strong> como estructuras de datos.
+        La información de los usuarios ya no se ingresa en tiempo de ejecución: en cambio, el programa
+        <strong>parte con una lista de usuarios precargada en el código</strong>, donde cada usuario es
+        un diccionario con sus datos. El sistema debe autenticar al usuario que quiera operar el cajero
+        y luego ofrecer el mismo menú de acciones bancarias de la versión anterior.
+      </p>
+    </div>
+  </section>
+
+  <!-- QUÉ CAMBIA -->
+  <section class="mb-5 fade-up">
+    <p class="section-label">¿Qué cambia respecto a la versión anterior?</p>
+
+    <div class="alert-info mb-3">
+      <i class="bi bi-info-circle-fill me-2"></i>
+      <strong>La diferencia clave:</strong> ya no existe un "Paso 1" de inicialización donde el usuario ingresa datos.
+      Los datos de las cuentas están definidos directamente en el código como una lista de diccionarios.
+      El programa comienza directamente en la autenticación.
+    </div>
+
+    <div class="card-flat">
+      <table class="diff-table">
+        <thead>
+          <tr>
+            <th>Aspecto</th>
+            <th>Versión anterior</th>
+            <th>Esta versión</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Datos de usuarios</strong></td>
+            <td><span class="diff-gone">Ingresados por consola al inicio</span></td>
+            <td><span class="diff-new">Precargados en el código como lista</span></td>
+          </tr>
+          <tr>
+            <td><strong>Estructura de datos</strong></td>
+            <td><span class="diff-gone">Variables simples separadas</span></td>
+            <td><span class="diff-new">Lista de diccionarios</span></td>
+          </tr>
+          <tr>
+            <td><strong>Número de cuentas</strong></td>
+            <td><span class="diff-gone">Una sola cuenta</span></td>
+            <td><span class="diff-new">Múltiples cuentas en la lista</span></td>
+          </tr>
+          <tr>
+            <td><strong>Inicio del programa</strong></td>
+            <td><span class="diff-gone">Paso 1: registrar datos → Paso 2: cajero</span></td>
+            <td><span class="diff-new">Directamente: autenticación → menú</span></td>
+          </tr>
+          <tr>
+            <td><strong>Menú de operaciones</strong></td>
+            <td>Idéntico</td>
+            <td>Idéntico (sin cambios)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="rule"/>
+
+  <!-- ESTRUCTURA DE DATOS -->
+  <section class="mb-5 fade-up">
+    <p class="section-label">Estructura de Datos — Lista de Usuarios</p>
+
+    <p style="font-size:.91rem; color:var(--mid); margin-bottom:1.25rem;">
+      El programa debe definir al inicio una lista llamada <code>usuarios</code> que contenga
+      al menos <strong>3 usuarios</strong> precargados. Cada usuario es un diccionario con los
+      siguientes campos como mínimo:
+    </p>
+
+    <div class="code-block mb-4">
+<span class="c-cm"># Lista de usuarios precargada — definida al inicio del programa</span>
+<br>
+<span class="c-kw">usuarios</span> <span class="c-bracket">= [</span>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-bracket">{</span>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-key">"rut"</span><span class="c-bracket">:</span>         <span class="c-str">"12345678-9"</span><span class="c-bracket">,</span>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-key">"nombre"</span><span class="c-bracket">:</span>      <span class="c-str">"Ana García"</span><span class="c-bracket">,</span>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-key">"clave"</span><span class="c-bracket">:</span>       <span class="c-str">"1234"</span><span class="c-bracket">,</span>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-key">"montoCuenta"</span><span class="c-bracket">:</span> <span class="c-num">500000</span>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-bracket">},</span>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-bracket">{</span>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-key">"rut"</span><span class="c-bracket">:</span>         <span class="c-str">"98765432-1"</span><span class="c-bracket">,</span>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-key">"nombre"</span><span class="c-bracket">:</span>      <span class="c-str">"Carlos López"</span><span class="c-bracket">,</span>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-key">"clave"</span><span class="c-bracket">:</span>       <span class="c-str">"5678"</span><span class="c-bracket">,</span>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-key">"montoCuenta"</span><span class="c-bracket">:</span> <span class="c-num">1200000</span>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-bracket">},</span>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-bracket">{</span>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-key">"rut"</span><span class="c-bracket">:</span>         <span class="c-str">"11111111-1"</span><span class="c-bracket">,</span>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-key">"nombre"</span><span class="c-bracket">:</span>      <span class="c-str">"María Soto"</span><span class="c-bracket">,</span>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-key">"clave"</span><span class="c-bracket">:</span>       <span class="c-str">"9999"</span><span class="c-bracket">,</span>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-key">"montoCuenta"</span><span class="c-bracket">:</span> <span class="c-num">75000</span>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-bracket">}</span>
+<br>
+<span class="c-bracket">]</span>
+    </div>
+
+    <div class="alert-warn">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      <strong>Importante:</strong> Los campos del diccionario son un mínimo. Si su diseño necesita almacenar
+      información adicional por usuario (por ejemplo, un historial textual de operaciones), pueden agregar
+      más claves al diccionario — siempre que sean consistentes en todos los usuarios de la lista.
+    </div>
+  </section>
+
+  <hr class="rule"/>
+
+  <!-- FLUJO DEL PROGRAMA -->
+  <section class="mb-5 fade-up">
+    <p class="section-label">Flujo General del Programa</p>
+
+    <div class="card-flat">
+      <!-- Paso A -->
+      <div class="op-row">
+        <div class="op-n" style="background:var(--red);">A</div>
+        <div>
+          <div class="op-title">Autenticación</div>
+          <div class="op-body">
+            El programa solicita RUT y clave. Debe <strong>recorrer la lista de usuarios</strong> buscando
+            un diccionario cuyo <code>"rut"</code> y <code>"clave"</code> coincidan con los ingresados.
+            <ul>
+              <li>Si encuentra al usuario: accede al menú operando sobre ese diccionario.</li>
+              <li>Si no lo encuentra: informa que los datos son inválidos y ofrece reintentar o salir.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paso B -->
+      <div class="op-row">
+        <div class="op-n" style="background:var(--red);">B</div>
+        <div>
+          <div class="op-title">Menú de Acciones</div>
+          <div class="op-body">
+            Una vez autenticado, el sistema muestra el menú y permite ejecutar operaciones de forma repetida
+            hasta que el usuario decida salir. Todas las operaciones leen y modifican los datos
+            <strong>directamente desde el diccionario del usuario autenticado</strong> dentro de la lista.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OPERACIONES -->
+  <section class="mb-5 fade-up">
+    <p class="section-label">Operaciones del Menú</p>
+    <p style="font-size:.88rem; color:var(--mid); margin-bottom:1.25rem;">
+      Las operaciones son las mismas de la versión anterior. Se destacan los ajustes necesarios al trabajar con diccionarios.
+    </p>
+
+    <div class="card-flat">
+
+      <div class="op-row">
+        <div class="op-n">1</div>
+        <div>
+          <div class="op-title">Consultar Saldo</div>
+          <div class="op-body">
+            Muestra el saldo actual leyendo <code>usuario["montoCuenta"]</code> del usuario autenticado.
+            Debe mostrarse también el nombre del titular: <code>usuario["nombre"]</code>.
+          </div>
+        </div>
+      </div>
+
+      <div class="op-row">
+        <div class="op-n">2</div>
+        <div>
+          <div class="op-title">Retirar Dinero</div>
+          <div class="op-body">
+            Pide el monto a retirar y valida:
+            <ul>
+              <li>Que el monto sea mayor que 0.</li>
+              <li>Que exista saldo suficiente en <code>usuario["montoCuenta"]</code>.</li>
+            </ul>
+            Si es válido, descuenta el monto actualizando el valor en el diccionario.
+          </div>
+        </div>
+      </div>
+
+      <div class="op-row">
+        <div class="op-n">3</div>
+        <div>
+          <div class="op-title">Depositar Dinero</div>
+          <div class="op-body">
+            Pide el monto a depositar. Valida que sea mayor que 0.
+            Si es válido, suma el monto a <code>usuario["montoCuenta"]</code>.
+          </div>
+        </div>
+      </div>
+
+      <div class="op-row">
+        <div class="op-n">4</div>
+        <div>
+          <div class="op-title">Cambiar Clave</div>
+          <div class="op-body">
+            Solicita la clave actual para confirmar identidad, luego la nueva clave. Validaciones:
+            <ul>
+              <li>La clave actual debe coincidir con <code>usuario["clave"]</code>.</li>
+              <li>La nueva clave no puede quedar vacía.</li>
+              <li>La nueva clave debe ser distinta de la anterior.</li>
+            </ul>
+            Si es válida, actualiza <code>usuario["clave"]</code> en el diccionario.
+          </div>
+        </div>
+      </div>
+
+      <div class="op-row">
+        <div class="op-n">5</div>
+        <div>
+          <div class="op-title">Transferencia</div>
+          <div class="op-body">
+            Solicita RUT de destino y monto. Validaciones:
+            <ul>
+              <li>El RUT de destino no puede estar vacío.</li>
+              <li>El monto debe ser mayor que 0.</li>
+              <li>Debe existir saldo suficiente en <code>usuario["montoCuenta"]</code>.</li>
+              <li><strong>Nueva validación:</strong> el RUT de destino no puede ser el propio RUT del usuario autenticado.</li>
+            </ul>
+            Si es válida, descuenta el monto del saldo del usuario autenticado.
+            <div class="alert-ok mt-2" style="font-size:.83rem;">
+              <i class="bi bi-stars me-1"></i>
+              <strong>Desafío opcional:</strong> Si el RUT de destino corresponde a otro usuario
+              existente en la lista, sumar el monto a su <code>"montoCuenta"</code> también.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="op-row">
+        <div class="op-n">6</div>
+        <div>
+          <div class="op-title">Salir</div>
+          <div class="op-body">
+            Termina la sesión del usuario actual. Se recomienda confirmar con una pregunta antes de cerrar.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <hr class="rule"/>
+
+  <!-- USO DE LISTAS Y DICCIONARIOS -->
+  <section class="mb-5 fade-up">
+    <p class="section-label">Uso Correcto de Listas y Diccionarios</p>
+
+    <div class="row g-3">
+      <div class="col-12 col-md-6">
+        <div class="card-flat h-100">
+          <span class="change-badge badge-new"><i class="bi bi-check-circle-fill"></i> Deben aplicar</span>
+          <ul style="font-size:.89rem; padding-left:1.1rem; line-height:1.9; margin:0;">
+            <li>Recorrer la lista con <code>for</code> o <code>while</code> para buscar al usuario.</li>
+            <li>Acceder a los datos con <code>diccionario["clave"]</code>.</li>
+            <li>Modificar valores del diccionario directamente: <code>usuario["montoCuenta"] -= monto</code>.</li>
+            <li>Usar un índice o variable para referenciar al usuario autenticado dentro de la lista.</li>
+            <li>Usar <code>len(usuarios)</code> si necesitan conocer cuántos usuarios hay.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-12 col-md-6">
+        <div class="card-flat h-100">
+          <span class="change-badge badge-gone"><i class="bi bi-x-circle-fill"></i> Ya no corresponde</span>
+          <ul style="font-size:.89rem; padding-left:1.1rem; line-height:1.9; margin:0; color:#999;">
+            <li style="text-decoration:line-through;">Solicitar datos de usuario por consola al inicio.</li>
+            <li style="text-decoration:line-through;">Usar variables separadas (rut1, clave1, rut2…).</li>
+            <li style="text-decoration:line-through;">Asumir que solo existe una cuenta en el sistema.</li>
+          </ul>
+          <hr style="border-color:var(--rule); margin:1rem 0;"/>
+          <span class="change-badge badge-mod"><i class="bi bi-arrow-repeat"></i> Sigue sin permitirse</span>
+          <ul style="font-size:.89rem; padding-left:1.1rem; line-height:1.9; margin:0;">
+            <li>Funciones definidas por el estudiante (<code>def</code>).</li>
+            <li>Programación orientada a objetos (<code>class</code>).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESTRICCIONES -->
+  <section class="mb-5 fade-up">
+    <p class="section-label">Restricciones de Implementación</p>
+    <div class="card-flat">
+      <div class="row g-3">
+        <div class="col-12 col-md-6">
+          <p style="font-size:.8rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--mid); margin-bottom:.5rem;">Deben usar</p>
+          <div>
+            <span class="chip chip-allow">variables</span>
+            <span class="chip chip-allow">input()</span>
+            <span class="chip chip-allow">int() / str()</span>
+            <span class="chip chip-allow">if / elif / else</span>
+            <span class="chip chip-allow">while</span>
+            <span class="chip chip-allow">for</span>
+            <span class="chip chip-allow">op. aritméticas</span>
+            <span class="chip chip-allow">op. lógicos</span>
+            <span class="chip chip-allow">op. comparación</span>
+            <span class="chip chip-new">listas</span>
+            <span class="chip chip-new">diccionarios</span>
+            <span class="chip chip-new">indexación [ ]</span>
+            <span class="chip chip-new">len()</span>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <p style="font-size:.8rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--mid); margin-bottom:.5rem;">No deben usar</p>
+          <div>
+            <span class="chip chip-deny">funciones propias (def)</span>
+            <span class="chip chip-deny">class / POO</span>
+            <span class="chip chip-deny">tuplas</span>
+            <span class="chip chip-deny">sets</span>
+            <span class="chip chip-deny">módulos externos</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALIDACIONES -->
+  <section class="mb-5 fade-up">
+    <p class="section-label">Validaciones Mínimas Esperadas</p>
+    <div class="card-flat">
+      <div class="row g-0">
+        <div class="col-12 col-md-6">
+          <ul style="font-size:.9rem; padding-left:1.1rem; line-height:2;">
+            <li>Autenticación correcta buscando en la lista.</li>
+            <li>Opción de menú válida.</li>
+            <li>Montos positivos en todas las operaciones.</li>
+          </ul>
+        </div>
+        <div class="col-12 col-md-6">
+          <ul style="font-size:.9rem; padding-left:1.1rem; line-height:2;">
+            <li>Saldo suficiente en retiros y transferencias.</li>
+            <li>RUT de destino no vacío y distinto al propio.</li>
+            <li>Mensajes claros cuando ocurra un error.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule"/>
+
+  <!-- ENTREGABLE -->
+  <section class="mb-5 fade-up">
+    <p class="section-label">Entregable</p>
+    <div class="card-flat">
+      <div class="d-flex align-items-center gap-3">
+        <i class="bi bi-file-earmark-code-fill" style="font-size:2.75rem; color:var(--red); opacity:.8;"></i>
+        <ul class="mb-0" style="font-size:.92rem; padding-left:1.1rem; line-height:1.9;">
+          <li>Archivo <strong><code>.py</code></strong> con la solución completa.</li>
+          <li>Lista <code>usuarios</code> con al menos <strong>3 diccionarios</strong> precargados.</li>
+          <li>Código que se ejecute sin errores desde consola.</li>
+          <li>Cumplimiento de todas las restricciones indicadas.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- CRITERIOS -->
+  <section class="mb-2 fade-up">
+    <p class="section-label">Criterios de Evaluación</p>
+    <div class="card-flat p-0">
+      <table class="eval-table">
+        <thead>
+          <tr>
+            <th>Criterio</th>
+            <th style="text-align:right;">Relevancia</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><i class="bi bi-check2 me-2" style="color:var(--red);"></i>Lista de usuarios correctamente definida como lista de diccionarios</td>
+            <td class="tag-alto" style="text-align:right;">Alto</td>
+          </tr>
+          <tr>
+            <td><i class="bi bi-check2 me-2" style="color:var(--red);"></i>Búsqueda del usuario en la lista para autenticación</td>
+            <td class="tag-alto" style="text-align:right;">Alto</td>
+          </tr>
+          <tr>
+            <td><i class="bi bi-check2 me-2" style="color:var(--red);"></i>Acceso y modificación correcta de datos vía claves del diccionario</td>
+            <td class="tag-alto" style="text-align:right;">Alto</td>
+          </tr>
+          <tr>
+            <td><i class="bi bi-check2 me-2" style="color:var(--red);"></i>Funcionamiento correcto del menú y todas las operaciones</td>
+            <td class="tag-alto" style="text-align:right;">Alto</td>
+          </tr>
+          <tr>
+            <td><i class="bi bi-check2 me-2" style="color:var(--red);"></i>Validación de entradas y operaciones</td>
+            <td class="tag-med" style="text-align:right;">Medio</td>
+          </tr>
+          <tr>
+            <td><i class="bi bi-check2 me-2" style="color:var(--red);"></i>Claridad y orden de los mensajes al usuario</td>
+            <td class="tag-med" style="text-align:right;">Medio</td>
+          </tr>
+          <tr>
+            <td><i class="bi bi-check2 me-2" style="color:var(--red);"></i>Respeto por restricciones (sin def, sin class, sin sets/tuplas)</td>
+            <td class="tag-alto" style="text-align:right;">Alto</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <strong>Escuela de Ingeniería en Informática y Telecomunicaciones</strong><br>
+    Fundamentos de Programación &nbsp;·&nbsp; FPY-1101 &nbsp;|&nbsp; Taller de Fundamentos de Programación
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
