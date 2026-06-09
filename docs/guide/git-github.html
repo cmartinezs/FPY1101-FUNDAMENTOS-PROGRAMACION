@@ -1,0 +1,1920 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Git & GitHub — Paso a Paso</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ── Reset & Variables ── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --surface2: #21262d;
+            --border: #30363d;
+            --green: #39d353;
+            --green-dim: #238636;
+            --blue: #58a6ff;
+            --blue-dim: #1f6feb;
+            --purple: #bc8cff;
+            --yellow: #e3b341;
+            --red: #f85149;
+            --orange: #db6d28;
+            --text: #f0f6fc;
+            --text-muted: #8b949e;
+            --text-dim: #484f58;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-body: 'Inter', sans-serif;
+            --radius: 8px;
+            --radius-lg: 12px;
+            --shadow: 0 8px 24px rgba(0,0,0,.4);
+        }
+
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── Utilities ── */
+        .hidden { display: none !important; }
+        .mono { font-family: var(--font-mono); }
+        .muted { color: var(--text-muted); }
+        .green { color: var(--green); }
+        .blue { color: var(--blue); }
+        .yellow { color: var(--yellow); }
+        .red { color: var(--red); }
+        .purple { color: var(--purple); }
+
+        /* ── SPLASH SCREEN ── */
+        #splash {
+            position: fixed; inset: 0; z-index: 1000;
+            background: var(--bg);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 32px;
+            transition: opacity .6s, transform .6s;
+        }
+        #splash.exit {
+            opacity: 0; transform: scale(.97) translateY(-20px);
+            pointer-events: none;
+        }
+
+        .splash-logo {
+            width: 88px; height: 88px;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            animation: pulse-border 3s ease-in-out infinite;
+        }
+        @keyframes pulse-border {
+            0%,100% { border-color: var(--border); box-shadow: 0 0 0 0 rgba(88,166,255,.2); }
+            50% { border-color: var(--blue); box-shadow: 0 0 0 12px rgba(88,166,255,0); }
+        }
+        .splash-logo svg { width: 52px; height: 52px; fill: var(--text); }
+
+        .splash-title {
+            text-align: center;
+            font-family: var(--font-mono);
+        }
+        .splash-title h1 {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            font-weight: 700;
+            letter-spacing: -.02em;
+            line-height: 1.1;
+        }
+        .splash-title h1 span { color: var(--green); }
+        .splash-title p {
+            margin-top: 10px;
+            color: var(--text-muted);
+            font-size: .95rem;
+            font-family: var(--font-body);
+        }
+
+        /* Terminal widget in splash */
+        .terminal {
+            width: min(580px, 90vw);
+            background: #010409;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        .terminal-bar {
+            background: var(--surface2);
+            padding: 10px 14px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .terminal-dot {
+            width: 12px; height: 12px; border-radius: 50%;
+        }
+        .terminal-dot.red { background: #ff5f57; }
+        .terminal-dot.yellow { background: #febc2e; color:unset }
+        .terminal-dot.green { background: #28c840; color:unset }
+        .terminal-bar-title {
+            flex: 1; text-align: center;
+            font-family: var(--font-mono);
+            font-size: .78rem;
+            color: var(--text-muted);
+        }
+        .terminal-body {
+            padding: 20px;
+            font-family: var(--font-mono);
+            font-size: .88rem;
+            line-height: 1.7;
+            min-height: 120px;
+        }
+        .terminal-line { display: flex; align-items: flex-start; gap: 8px; }
+        .terminal-prompt { color: var(--green); flex-shrink: 0; }
+        .terminal-cmd { color: var(--text); }
+        .terminal-output { color: var(--text-muted); padding-left: 0; }
+        .cursor {
+            display: inline-block;
+            width: 9px; height: 16px;
+            background: var(--green);
+            animation: blink .9s step-end infinite;
+            vertical-align: text-bottom;
+        }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+        .splash-btn {
+            padding: 14px 36px;
+            background: var(--green-dim);
+            color: #fff;
+            border: none; cursor: pointer;
+            border-radius: var(--radius);
+            font-family: var(--font-mono);
+            font-size: 1rem; font-weight: 600;
+            letter-spacing: .02em;
+            transition: background .2s, transform .15s, box-shadow .2s;
+            box-shadow: 0 0 0 0 rgba(57,211,83,.3);
+        }
+        .splash-btn:hover {
+            background: #2ea043;
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(57,211,83,.4);
+        }
+        .splash-btn:active { transform: translateY(0); }
+
+        .splash-parts {
+            display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+        }
+        .splash-part-badge {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: .78rem;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+        }
+
+        /* ── INDEX SCREEN ── */
+        #index-screen {
+            min-height: 100vh;
+            padding: 48px 24px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: none; border: 1px solid var(--border);
+            color: var(--text-muted); cursor: pointer;
+            border-radius: var(--radius);
+            padding: 7px 14px;
+            font-family: var(--font-body);
+            font-size: .85rem;
+            transition: border-color .2s, color .2s;
+            margin-bottom: 36px;
+        }
+        .back-btn:hover { border-color: var(--blue); color: var(--blue); }
+
+        .index-header { margin-bottom: 36px; }
+        .index-header h2 {
+            font-family: var(--font-mono);
+            font-size: 1.6rem; font-weight: 700;
+            letter-spacing: -.02em;
+        }
+        .index-header p { color: var(--text-muted); margin-top: 8px; font-size: .95rem; }
+
+        .parts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+        }
+        .part-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            cursor: pointer;
+            transition: border-color .2s, transform .2s, box-shadow .2s;
+            position: relative; overflow: hidden;
+        }
+        .part-card::before {
+            content:''; position:absolute; top:0; left:0; right:0; height:3px;
+            background: linear-gradient(90deg, var(--card-color, var(--blue)), transparent);
+            opacity: 0; transition: opacity .2s;
+        }
+        .part-card:hover { border-color: var(--card-color, var(--blue)); transform: translateY(-3px); box-shadow: var(--shadow); }
+        .part-card:hover::before { opacity: 1; }
+
+        .part-card-number {
+            font-family: var(--font-mono);
+            font-size: .75rem; font-weight: 700;
+            color: var(--card-color, var(--blue));
+            text-transform: uppercase; letter-spacing: .08em;
+            margin-bottom: 10px;
+        }
+        .part-card h3 {
+            font-size: 1rem; font-weight: 600; line-height: 1.3;
+            margin-bottom: 10px;
+        }
+        .part-card ul {
+            list-style: none;
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        .part-card ul li {
+            font-size: .8rem; color: var(--text-muted);
+            display: flex; align-items: flex-start; gap: 6px;
+        }
+        .part-card ul li::before {
+            content: '›'; color: var(--card-color, var(--blue));
+            flex-shrink: 0; line-height: 1.4;
+        }
+        .step-count {
+            margin-top: 14px; padding-top: 14px;
+            border-top: 1px solid var(--border);
+            font-size: .78rem; color: var(--text-dim);
+            font-family: var(--font-mono);
+        }
+
+        /* ── MAIN GUIDE ── */
+        #guide {
+            min-height: 100vh;
+        }
+
+        /* Part header bar */
+        .part-header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .part-header-inner {
+            max-width: 960px; margin: 0 auto;
+            display: flex; align-items: center; gap: 16px;
+            height: 56px;
+        }
+        .part-header-back {
+            background: none; border: none; cursor: pointer;
+            color: var(--text-muted); display: flex; align-items: center; gap: 6px;
+            font-size: .85rem; padding: 6px 0;
+            transition: color .2s;
+        }
+        .part-header-back:hover { color: var(--blue); }
+        .part-header-title {
+            font-family: var(--font-mono);
+            font-size: .9rem; font-weight: 600;
+            flex: 1;
+        }
+        .part-header-badge {
+            font-family: var(--font-mono);
+            font-size: .75rem;
+            padding: 3px 10px;
+            border-radius: 12px;
+            background: var(--surface2);
+            color: var(--text-muted);
+        }
+
+        /* Step tabs */
+        .step-tabs {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .step-tabs::-webkit-scrollbar { display: none; }
+        .step-tabs-inner {
+            max-width: 960px; margin: 0 auto;
+            display: flex; gap: 2px;
+            padding: 8px 0;
+        }
+        .step-tab {
+            padding: 7px 16px;
+            border: none; cursor: pointer;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: .78rem; font-weight: 600;
+            background: transparent;
+            color: var(--text-muted);
+            white-space: nowrap;
+            transition: background .15s, color .15s;
+            display: flex; align-items: center; gap: 8px;
+            flex-shrink: 0;
+        }
+        .step-tab.active { background: var(--surface2); color: var(--text); }
+        .step-tab:hover:not(.active) { background: var(--surface2); color: var(--text-muted); }
+        .step-tab .tab-num {
+            width: 20px; height: 20px; border-radius: 50%;
+            background: var(--border);
+            display: flex; align-items: center; justify-content: center;
+            font-size: .72rem;
+            flex-shrink: 0;
+        }
+        .step-tab.active .tab-num { background: var(--active-color, var(--blue)); color: #fff; }
+        .step-tab.done .tab-num { background: var(--green-dim); color: #fff; }
+
+        /* Step content */
+        .guide-content {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 36px 24px 80px;
+        }
+        .step-panel { display: none; }
+        .step-panel.active { display: block; }
+
+        /* Step intro banner */
+        .step-intro {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px 32px;
+            margin-bottom: 32px;
+            display: flex; gap: 20px; align-items: flex-start;
+            position: relative; overflow: hidden;
+        }
+        .step-intro::after {
+            content:''; position:absolute;
+            top: -40px; right: -40px;
+            width: 140px; height: 140px;
+            border-radius: 50%;
+            background: var(--step-color, var(--blue));
+            opacity: .07;
+        }
+        .step-intro-icon {
+            font-size: 2.2rem; flex-shrink: 0; line-height: 1;
+        }
+        .step-intro-text h2 {
+            font-size: 1.25rem; font-weight: 700;
+            font-family: var(--font-mono);
+            margin-bottom: 8px;
+        }
+        .step-intro-text p { color: var(--text-muted); font-size: .93rem; line-height: 1.6; }
+        .step-num-label {
+            font-family: var(--font-mono);
+            font-size: .72rem; font-weight: 700;
+            color: var(--step-color, var(--blue));
+            text-transform: uppercase; letter-spacing: .1em;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* Content blocks */
+        .content-section {
+            margin-bottom: 28px;
+        }
+        .content-section h3 {
+            font-family: var(--font-mono);
+            font-size: 1rem; font-weight: 700;
+            margin-bottom: 14px;
+            display: flex; align-items: center; gap: 10px;
+            color: var(--text);
+        }
+        .content-section h3 .section-icon {
+            width: 28px; height: 28px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: .9rem; flex-shrink: 0;
+        }
+        .prose { color: var(--text-muted); font-size: .93rem; line-height: 1.7; }
+        .prose strong { color: var(--text); font-weight: 600; }
+        .prose a { color: var(--blue); text-decoration: none; }
+        .prose a:hover { text-decoration: underline; }
+
+        /* Steps list */
+        .steps-list {
+            display: flex; flex-direction: column; gap: 16px;
+        }
+        .step-item {
+            display: flex; gap: 16px; align-items: flex-start;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            transition: border-color .2s;
+        }
+        .step-item:hover { border-color: var(--blue-dim); }
+        .step-item-num {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: var(--surface2);
+            border: 2px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-mono);
+            font-size: .8rem; font-weight: 700;
+            flex-shrink: 0;
+            color: var(--blue);
+        }
+        .step-item-body { flex: 1; min-width: 0; }
+        .step-item-body strong {
+            display: block;
+            font-size: .95rem; margin-bottom: 6px;
+        }
+        .step-item-body p {
+            color: var(--text-muted);
+            font-size: .88rem; line-height: 1.6;
+        }
+
+        /* Code block */
+        .code-block {
+            background: #010409;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin: 12px 0;
+        }
+        .code-block-header {
+            background: var(--surface2);
+            padding: 8px 14px;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+        }
+        .code-block-lang {
+            font-family: var(--font-mono);
+            font-size: .72rem; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: .06em;
+        }
+        .code-block pre {
+            padding: 16px;
+            font-family: var(--font-mono);
+            font-size: .88rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            color: var(--text);
+        }
+        .code-block pre .cmd-green { color: var(--green); }
+        .code-block pre .cmd-blue { color: var(--blue); }
+        .code-block pre .cmd-yellow { color: var(--yellow); }
+        .code-block pre .cmd-muted { color: var(--text-muted); }
+        .code-block pre .cmd-purple { color: var(--purple); }
+
+        /* Info/warning/tip boxes */
+        .callout {
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            margin: 16px 0;
+            display: flex; gap: 12px; align-items: flex-start;
+            font-size: .88rem;
+            line-height: 1.6;
+        }
+        .callout-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+        .callout-body strong { display: block; margin-bottom: 4px; font-size: .9rem; }
+        .callout.tip { background: rgba(57,211,83,.08); border: 1px solid rgba(57,211,83,.25); }
+        .callout.tip .callout-icon { color: var(--green); }
+        .callout.warning { background: rgba(227,179,65,.08); border: 1px solid rgba(227,179,65,.25); }
+        .callout.warning .callout-icon { color: var(--yellow); }
+        .callout.info { background: rgba(88,166,255,.08); border: 1px solid rgba(88,166,255,.25); }
+        .callout.info .callout-icon { color: var(--blue); }
+        .callout.danger { background: rgba(248,81,73,.08); border: 1px solid rgba(248,81,73,.25); }
+        .callout.danger .callout-icon { color: var(--red); }
+
+        /* Image placeholder / screenshot boxes */
+        .screenshot-box {
+            background: var(--surface);
+            border: 1px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            text-align: center;
+            margin: 16px 0;
+            color: var(--text-dim);
+            font-size: .85rem;
+            font-family: var(--font-mono);
+        }
+        .screenshot-box .ss-icon { font-size: 2rem; display: block; margin-bottom: 8px; }
+
+        /* Navigation between steps */
+        .step-nav {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 36px; padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+        .step-nav-btn {
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-family: var(--font-mono);
+            font-size: .85rem;
+            transition: all .2s;
+        }
+        .step-nav-btn:hover:not(:disabled) { border-color: var(--blue); color: var(--blue); }
+        .step-nav-btn:disabled { opacity: .3; cursor: default; }
+        .step-nav-btn.primary {
+            background: var(--green-dim);
+            border-color: var(--green-dim);
+            color: #fff;
+        }
+        .step-nav-btn.primary:hover { background: #2ea043; border-color: #2ea043; }
+        .step-nav-center { font-family: var(--font-mono); font-size: .8rem; color: var(--text-dim); }
+
+        /* ── Responsive ── */
+        @media (max-width: 600px) {
+            .step-intro { flex-direction: column; gap: 12px; padding: 20px; }
+            .parts-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Tag pills */
+        .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .tag {
+            padding: 3px 10px; border-radius: 12px;
+            font-family: var(--font-mono); font-size: .72rem;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+        .tag.github { border-color: rgba(88,166,255,.4); color: var(--blue); }
+        .tag.git { border-color: rgba(219,109,40,.4); color: var(--orange); }
+        .tag.vscode { border-color: rgba(188,140,255,.4); color: var(--purple); }
+        .tag.collab { border-color: rgba(57,211,83,.4); color: var(--green); }
+
+        /* Divider */
+        .divider {
+            height: 1px; background: var(--border);
+            margin: 28px 0;
+        }
+
+        /* Part selector in index */
+        .index-legend {
+            display: flex; flex-wrap: wrap; gap: 12px;
+            margin-bottom: 24px;
+        }
+        .legend-item {
+            display: flex; align-items: center; gap: 6px;
+            font-size: .8rem; color: var(--text-muted);
+        }
+        .legend-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+        }
+
+        /* Checklist */
+        .checklist { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+        .check-item {
+            display: flex; align-items: flex-start; gap: 10px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-size: .88rem;
+            cursor: pointer;
+            transition: border-color .2s;
+            user-select: none;
+        }
+        .check-item:hover { border-color: var(--green-dim); }
+        .check-item input[type=checkbox] { margin-top: 2px; accent-color: var(--green); flex-shrink: 0; }
+        .check-item label { cursor: pointer; color: var(--text-muted); line-height: 1.5; }
+        .check-item.checked label { color: var(--text-dim); text-decoration: line-through; }
+
+        /* Progress bar */
+        .part-progress {
+            margin-bottom: 8px;
+        }
+        .progress-bar {
+            height: 3px; background: var(--surface2);
+            border-radius: 2px; overflow: hidden;
+            margin-top: 4px;
+        }
+        .progress-fill {
+            height: 100%; border-radius: 2px;
+            background: var(--green);
+            transition: width .4s ease;
+        }
+        .progress-label {
+            font-family: var(--font-mono);
+            font-size: .72rem;
+            color: var(--text-dim);
+            display: flex; justify-content: space-between;
+        }
+
+        /* Inline kbd */
+        kbd {
+            display: inline-block;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 2px 7px;
+            font-family: var(--font-mono);
+            font-size: .8rem;
+            color: var(--text);
+            box-shadow: 0 2px 0 var(--border);
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════ SPLASH ══════════════════════════════════ -->
+<div id="splash">
+    <div class="splash-logo">
+        <!-- GitHub Octocat simplified SVG -->
+        <svg viewBox="0 0 98 96" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z"/></svg>
+    </div>
+
+    <div class="splash-title">
+        <h1>Git &amp; <span>GitHub</span></h1>
+        <p>Guía práctica paso a paso · Ingeniería en Informática</p>
+    </div>
+
+    <div class="terminal">
+        <div class="terminal-bar">
+            <div class="terminal-dot red"></div>
+            <div class="terminal-dot yellow"></div>
+            <div class="terminal-dot green"></div>
+            <div class="terminal-bar-title">bash — ~/mi-proyecto</div>
+        </div>
+        <div class="terminal-body" id="terminal-output">
+            <div class="terminal-line">
+                <span class="terminal-prompt">$</span>
+                <span class="terminal-cmd" id="typed-cmd"></span><span class="cursor" id="cursor-el"></span>
+            </div>
+            <div id="terminal-extra"></div>
+        </div>
+    </div>
+
+    <div class="splash-parts">
+        <span class="splash-part-badge">Parte 1 · GitHub</span>
+        <span class="splash-part-badge">Parte 2 · Instalación</span>
+        <span class="splash-part-badge">Parte 3 · Flujo básico</span>
+        <span class="splash-part-badge">Parte 4 · Ramas</span>
+        <span class="splash-part-badge">Parte 5 · Colaboración</span>
+    </div>
+
+    <button class="splash-btn" id="splash-go-btn" disabled>Cargando…</button>
+</div>
+
+<!-- ══════════════════════════════════ INDEX ══════════════════════════════════ -->
+<div id="index-screen" class="hidden">
+    <div class="index-header">
+        <h2>// Índice de contenidos</h2>
+        <p>Selecciona una parte para comenzar. Sigue el orden recomendado si es tu primera vez.</p>
+    </div>
+
+    <div class="parts-grid" id="parts-grid">
+        <!-- Injected by JS -->
+    </div>
+</div>
+
+<!-- ══════════════════════════════════ GUIDE ══════════════════════════════════ -->
+<div id="guide" class="hidden">
+    <div class="part-header">
+        <div class="part-header-inner">
+            <button class="part-header-back" id="guide-back-btn">
+                ← Índice
+            </button>
+            <span class="part-header-title" id="guide-part-title">Parte 1</span>
+            <span class="part-header-badge" id="guide-step-badge">Paso 1 / 3</span>
+        </div>
+    </div>
+    <div class="step-tabs">
+        <div class="step-tabs-inner" id="step-tabs-inner"></div>
+    </div>
+    <div class="guide-content" id="guide-content"></div>
+</div>
+
+<script>
+    /* ═══════════════════════════════════════════════════════════
+       DATA — All guide content
+    ═══════════════════════════════════════════════════════════ */
+    const PARTS = [
+        {
+            id: 1,
+            title: "Cuenta GitHub y primer repositorio",
+            color: "#58a6ff",
+            icon: "🐙",
+            summary: "Crea tu cuenta en GitHub y tu primer repositorio con README.",
+            topics: ["Crear cuenta en GitHub.com", "Configurar perfil", "Crear repositorio", "Agregar README desde la web"],
+            steps: [
+                {
+                    title: "Crear cuenta en GitHub",
+                    icon: "👤",
+                    tags: ["github"],
+                    intro: "GitHub es la plataforma donde vivirá tu código. Crear una cuenta es gratis y toma solo unos minutos.",
+                    content: `
+<div class="content-section">
+  <h3><span class="section-icon">🌐</span> ¿Qué es GitHub?</h3>
+  <p class="prose">
+    <strong>GitHub</strong> es una plataforma en la nube que aloja repositorios Git. Piénsalo como
+    una <strong>red social para tu código</strong>: puedes guardar proyectos, colaborar con otros,
+    ver el historial de cambios y mucho más — todo desde el navegador.
+  </p>
+</div>
+<div class="divider"></div>
+<div class="content-section">
+  <h3><span class="section-icon">📋</span> Pasos para crear tu cuenta</h3>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">1</div><div class="step-item-body">
+      <strong>Abre tu navegador y ve a <a href="https://github.com" target="_blank">github.com</a></strong>
+      <p>Haz clic en el botón <kbd>Sign up</kbd> (Registrarse) en la esquina superior derecha.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">2</div><div class="step-item-body">
+      <strong>Ingresa tu email</strong>
+      <p>Usa un correo al que tengas acceso. Se recomienda usar tu correo institucional.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">3</div><div class="step-item-body">
+      <strong>Crea una contraseña segura</strong>
+      <p>Mínimo 15 caracteres, o 8 caracteres combinando letras, números y símbolos.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">4</div><div class="step-item-body">
+      <strong>Elige tu nombre de usuario (username)</strong>
+      <p>Este será tu identidad pública en GitHub. Elige algo profesional — por ejemplo <code>nombre-apellido</code>. Este nombre aparecerá en todos tus proyectos.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">5</div><div class="step-item-body">
+      <strong>Verifica que eres humano</strong>
+      <p>Completa el CAPTCHA que aparece en pantalla.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">6</div><div class="step-item-body">
+      <strong>Confirma tu email</strong>
+      <p>GitHub enviará un código de verificación a tu correo. Ingrésalo en la pantalla de confirmación.</p>
+    </div></div>
+  </div>
+</div>
+<div class="callout tip">
+  <span class="callout-icon">💡</span>
+  <div class="callout-body">
+    <strong>Elige bien tu username</strong>
+    Tu nombre de usuario en GitHub será visible en todos tus repositorios y aparecerá en tu URL personal (<code>github.com/tu-usuario</code>). Es parte de tu identidad profesional.
+  </div>
+</div>
+<div class="callout warning">
+  <span class="callout-icon">⚠️</span>
+  <div class="callout-body">
+    <strong>Guarda tus credenciales</strong>
+    Anota tu email y contraseña en un lugar seguro. Los necesitarás en los pasos siguientes cuando configures GitHub Desktop.
+  </div>
+</div>`
+                },
+                {
+                    title: "Crear primer repositorio",
+                    icon: "📁",
+                    tags: ["github"],
+                    intro: "Un repositorio (o 'repo') es el contenedor de tu proyecto. Aprenderás a crear uno directamente desde GitHub con un archivo README.",
+                    content: `
+<div class="content-section">
+  <h3><span class="section-icon">💡</span> ¿Qué es un repositorio?</h3>
+  <p class="prose">
+    Un <strong>repositorio</strong> es como una carpeta especial que registra <em>cada cambio</em> que haces en tus archivos.
+    No solo guarda los archivos actuales — guarda <strong>todo el historial</strong>:
+    quién hizo qué, cuándo, y por qué. Esto permite volver atrás en el tiempo si algo sale mal.
+  </p>
+</div>
+<div class="divider"></div>
+<div class="content-section">
+  <h3><span class="section-icon">📋</span> Crear el repositorio</h3>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">1</div><div class="step-item-body">
+      <strong>Inicia sesión en GitHub</strong>
+      <p>Ve a <a href="https://github.com" target="_blank">github.com</a> e inicia sesión con tu cuenta recién creada.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">2</div><div class="step-item-body">
+      <strong>Crea un nuevo repositorio</strong>
+      <p>Haz clic en el botón <kbd>+</kbd> (esquina superior derecha) → <kbd>New repository</kbd>. También puedes ir a <a href="https://github.com/new" target="_blank">github.com/new</a>.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">3</div><div class="step-item-body">
+      <strong>Configura el repositorio</strong>
+      <p>Completa los siguientes campos:</p>
+      <div class="code-block" style="margin-top:10px">
+        <div class="code-block-header"><span class="code-block-lang">Configuración</span></div>
+        <pre><span class="cmd-blue">Repository name:</span>  mi-primer-repositorio
+<span class="cmd-blue">Description:</span>       Mi primer proyecto en GitHub (opcional)
+<span class="cmd-blue">Visibility:</span>        ● Public  (o Private si lo prefieres)
+<span class="cmd-blue">Initialize with:</span>  ✓ Add a README file</pre>
+      </div>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">4</div><div class="step-item-body">
+      <strong>Haz clic en "Create repository"</strong>
+      <p>¡Listo! Tu primer repositorio está creado. Deberías ver una página con tu archivo README.md.</p>
+    </div></div>
+  </div>
+</div>
+<div class="content-section">
+  <h3><span class="section-icon">📄</span> Editar el README desde GitHub</h3>
+  <p class="prose" style="margin-bottom:12px">
+    El <strong>README.md</strong> es la portada de tu repositorio. Se usa para explicar qué hace el proyecto.
+    Vamos a editarlo directamente desde el navegador.
+  </p>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">1</div><div class="step-item-body">
+      <strong>Haz clic en el ícono de lápiz ✏️ en el archivo README.md</strong>
+      <p>Está en la vista del archivo, en la parte superior derecha del contenido.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">2</div><div class="step-item-body">
+      <strong>Escribe algo en el archivo</strong>
+      <p>El README usa formato <strong>Markdown</strong>. Puedes escribir algo como:</p>
+      <div class="code-block" style="margin-top:8px">
+        <div class="code-block-header"><span class="code-block-lang">README.md (Markdown)</span></div>
+        <pre><span class="cmd-green"># Mi Primer Repositorio</span>
+
+Este es mi primer proyecto en GitHub.
+
+<span class="cmd-green">## ¿Qué aprenderé?</span>
+- Usar Git y GitHub
+- Trabajar con ramas
+- Colaborar con otros</pre>
+      </div>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">3</div><div class="step-item-body">
+      <strong>Guarda los cambios (Commit)</strong>
+      <p>Desplázate hacia abajo y haz clic en <kbd>Commit changes</kbd>. Escribe un mensaje descriptivo como: <code>Actualizar README con descripción inicial</code>.</p>
+    </div></div>
+  </div>
+</div>
+<div class="callout tip">
+  <span class="callout-icon">💡</span>
+  <div class="callout-body">
+    <strong>¿Qué es un Commit?</strong>
+    Un <strong>commit</strong> es como tomar una foto de tu proyecto en un momento específico. Cada commit tiene un mensaje que explica qué cambiaste. Esta foto queda guardada permanentemente en el historial.
+  </div>
+</div>`
+                }
+            ]
+        },
+        {
+            id: 2,
+            title: "Instalación de herramientas",
+            color: "#db6d28",
+            icon: "⚙️",
+            summary: "Instala Git y GitHub Desktop para trabajar localmente.",
+            topics: ["Instalar Git", "Instalar GitHub Desktop", "Clonar tu repositorio"],
+            steps: [
+                {
+                    title: "Instalar Git",
+                    icon: "🔧",
+                    tags: ["git"],
+                    intro: "Git es el motor que registra los cambios. Necesitas instalarlo antes de usar GitHub Desktop.",
+                    content: `
+<div class="content-section">
+  <h3><span class="section-icon">🤔</span> Git vs GitHub — ¿Cuál es la diferencia?</h3>
+  <p class="prose">
+    <strong>Git</strong> es el programa que vive en tu computador y gestiona el historial de cambios.
+    <strong>GitHub</strong> es el servidor en la nube donde se sincroniza ese historial.
+    Uno no funciona sin el otro — Git hace el trabajo, GitHub lo almacena.
+  </p>
+</div>
+<div class="divider"></div>
+<div class="content-section">
+  <h3><span class="section-icon">💻</span> Instalación en Windows</h3>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">1</div><div class="step-item-body">
+      <strong>Descarga Git para Windows</strong>
+      <p>Ve a <a href="https://git-scm.com/download/win" target="_blank">git-scm.com/download/win</a>. La descarga debería iniciar automáticamente.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">2</div><div class="step-item-body">
+      <strong>Ejecuta el instalador</strong>
+      <p>Acepta todas las opciones por defecto. La configuración predeterminada está bien para empezar.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">3</div><div class="step-item-body">
+      <strong>En la pantalla "Choosing the default editor"</strong>
+      <p>Selecciona <kbd>Visual Studio Code</kbd> como editor por defecto (si ya lo tienes instalado). Si no, deja el editor por defecto (Vim).</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">4</div><div class="step-item-body">
+      <strong>En la pantalla "Adjusting your PATH environment"</strong>
+      <p>Selecciona <kbd>Git from the command line and also from 3rd-party software</kbd>. Esto es importante.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">5</div><div class="step-item-body">
+      <strong>Termina la instalación y verifica</strong>
+      <p>Abre <strong>Git Bash</strong> (busca "Git Bash" en el menú inicio) y escribe:</p>
+      <div class="code-block" style="margin-top:8px">
+        <div class="code-block-header"><span class="code-block-lang">Git Bash</span></div>
+        <pre><span class="cmd-green">$</span> git --version
+<span class="cmd-muted">git version 2.44.0.windows.1</span></pre>
+      </div>
+      <p style="margin-top:8px">Si ves un número de versión, ¡Git está instalado!</p>
+    </div></div>
+  </div>
+</div>
+<div class="content-section">
+  <h3><span class="section-icon">🍎</span> Instalación en macOS</h3>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">1</div><div class="step-item-body">
+      <strong>Abre la Terminal</strong>
+      <p>Ve a <kbd>Finder → Aplicaciones → Utilidades → Terminal</kbd> o busca "Terminal" con Spotlight (<kbd>⌘ + Espacio</kbd>).</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">2</div><div class="step-item-body">
+      <strong>Instala las Xcode Command Line Tools</strong>
+      <div class="code-block" style="margin-top:8px">
+        <div class="code-block-header"><span class="code-block-lang">Terminal (macOS)</span></div>
+        <pre><span class="cmd-green">$</span> xcode-select --install</pre>
+      </div>
+      <p style="margin-top:8px">Aparecerá un diálogo — haz clic en "Install". Git se instala automáticamente con estas herramientas.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">3</div><div class="step-item-body">
+      <strong>Verifica la instalación</strong>
+      <div class="code-block" style="margin-top:8px">
+        <div class="code-block-header"><span class="code-block-lang">Terminal (macOS)</span></div>
+        <pre><span class="cmd-green">$</span> git --version
+<span class="cmd-muted">git version 2.39.3 (Apple Git-145)</span></pre>
+      </div>
+    </div></div>
+  </div>
+</div>
+<div class="callout info">
+  <span class="callout-icon">ℹ️</span>
+  <div class="callout-body">
+    <strong>No necesitas usar Git desde la terminal</strong>
+    GitHub Desktop tiene una interfaz visual que hace todo esto por ti. Pero Git debe estar instalado en el sistema para que funcione.
+  </div>
+</div>`
+                },
+                {
+                    title: "Instalar GitHub Desktop",
+                    icon: "🖥️",
+                    tags: ["github", "git"],
+                    intro: "GitHub Desktop es la interfaz visual que usaremos para gestionar repositorios sin necesidad de comandos de terminal.",
+                    content: `
+<div class="content-section">
+  <h3><span class="section-icon">✨</span> ¿Por qué usar GitHub Desktop?</h3>
+  <p class="prose">
+    GitHub Desktop ofrece una <strong>interfaz visual</strong> para realizar todas las operaciones de Git:
+    ver cambios, hacer commits, sincronizar con GitHub, crear ramas y resolver conflictos.
+    Es ideal para empezar a aprender el flujo de trabajo sin memorizar comandos de terminal.
+  </p>
+</div>
+<div class="divider"></div>
+<div class="content-section">
+  <h3><span class="section-icon">📥</span> Descarga e instalación</h3>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">1</div><div class="step-item-body">
+      <strong>Descarga GitHub Desktop</strong>
+      <p>Ve a <a href="https://desktop.github.com" target="_blank">desktop.github.com</a> y descarga la versión para tu sistema operativo (Windows o macOS).</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">2</div><div class="step-item-body">
+      <strong>Instala la aplicación</strong>
+      <p><strong>Windows:</strong> Ejecuta el archivo <code>.exe</code> descargado. Se instalará automáticamente y se abrirá.<br>
+      <strong>macOS:</strong> Abre el archivo <code>.dmg</code> y arrastra GitHub Desktop a tu carpeta Aplicaciones.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">3</div><div class="step-item-body">
+      <strong>Inicia sesión con tu cuenta GitHub</strong>
+      <p>Al abrir GitHub Desktop por primera vez, haz clic en <kbd>Sign in to GitHub.com</kbd>. Se abrirá el navegador — autoriza la aplicación.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">4</div><div class="step-item-body">
+      <strong>Configura tu identidad Git</strong>
+      <p>GitHub Desktop te pedirá tu nombre y email. Estos datos aparecerán asociados a cada commit que hagas.</p>
+      <div class="code-block" style="margin-top:8px">
+        <div class="code-block-header"><span class="code-block-lang">Configuración</span></div>
+        <pre><span class="cmd-blue">Name:</span>   Tu Nombre Completo
+<span class="cmd-blue">Email:</span>  tu@email.com</pre>
+      </div>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">5</div><div class="step-item-body">
+      <strong>Haz clic en "Finish"</strong>
+      <p>¡GitHub Desktop está listo para usar! Deberías ver la pantalla principal de la aplicación.</p>
+    </div></div>
+  </div>
+</div>
+<div class="callout tip">
+  <span class="callout-icon">💡</span>
+  <div class="callout-body">
+    <strong>Zona de GitHub Desktop que usarás más</strong>
+    La barra lateral izquierda muestra los archivos cambiados. La zona inferior izquierda es donde escribes el mensaje de commit. El botón azul "Fetch/Pull/Push" en la parte superior sincroniza con GitHub.
+  </div>
+</div>`
+                },
+                {
+                    title: "Clonar el repositorio",
+                    icon: "📂",
+                    tags: ["github", "git"],
+                    intro: "Clonar es descargar una copia completa del repositorio de GitHub a tu computador para trabajar localmente.",
+                    content: `
+<div class="content-section">
+  <h3><span class="section-icon">💡</span> ¿Qué significa clonar?</h3>
+  <p class="prose">
+    <strong>Clonar</strong> un repositorio significa copiar todo el historial de cambios del servidor (GitHub)
+    a tu máquina local. No es una descarga simple — incluye el historial completo de todos los commits.
+    Después de clonar, tu copia está <em>conectada</em> a GitHub y puedes sincronizar cambios en ambas direcciones.
+  </p>
+</div>
+<div class="divider"></div>
+<div class="content-section">
+  <h3><span class="section-icon">📋</span> Clonar con GitHub Desktop</h3>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">1</div><div class="step-item-body">
+      <strong>Abre GitHub Desktop</strong>
+      <p>Si no tienes repositorios aún, verás la pantalla de bienvenida. Si ya tienes otros, ve a <kbd>File → Clone Repository</kbd>.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">2</div><div class="step-item-body">
+      <strong>Selecciona tu repositorio</strong>
+      <p>En la pestaña <kbd>GitHub.com</kbd> verás la lista de tus repositorios. Selecciona <strong>mi-primer-repositorio</strong>.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">3</div><div class="step-item-body">
+      <strong>Elige dónde guardarlo</strong>
+      <p>En el campo <kbd>Local path</kbd>, elige la carpeta donde quieres guardar el proyecto. Se recomienda crear una carpeta <code>Proyectos</code> o <code>Repos</code> en tus documentos.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">4</div><div class="step-item-body">
+      <strong>Haz clic en "Clone"</strong>
+      <p>GitHub Desktop descargará el repositorio. Cuando termine, verás el repositorio en la vista principal con el archivo README.md.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">5</div><div class="step-item-body">
+      <strong>Abre la carpeta del repositorio</strong>
+      <p>Haz clic en <kbd>Show in Explorer</kbd> (Windows) o <kbd>Show in Finder</kbd> (macOS) para ver los archivos del proyecto en tu sistema.</p>
+    </div></div>
+  </div>
+</div>
+<div class="callout tip">
+  <span class="callout-icon">💡</span>
+  <div class="callout-body">
+    <strong>La carpeta tiene una carpeta oculta <code>.git</code></strong>
+    Dentro de la carpeta del proyecto hay una carpeta oculta llamada <code>.git</code>. Esta carpeta contiene todo el historial de Git. <strong>Nunca la elimines</strong> — si lo haces, perderás el historial del repositorio.
+  </div>
+</div>`
+                }
+            ]
+        },
+        {
+            id: 3,
+            title: "Flujo básico de trabajo",
+            color: "#bc8cff",
+            icon: "🔄",
+            summary: "Edita archivos con VS Code, registra cambios y súbelos a GitHub.",
+            topics: ["Editar archivos con VS Code", "Agregar y commitear con GitHub Desktop", "Push a GitHub"],
+            steps: [
+                {
+                    title: "Editar con VS Code",
+                    icon: "✏️",
+                    tags: ["vscode"],
+                    intro: "VS Code (Visual Studio Code) es el editor de código que usaremos. Aprenderás a abrir tu repositorio y modificar archivos.",
+                    content: `
+<div class="content-section">
+  <h3><span class="section-icon">🚀</span> Abrir el repositorio en VS Code</h3>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">1</div><div class="step-item-body">
+      <strong>Desde GitHub Desktop</strong>
+      <p>Con tu repositorio abierto en GitHub Desktop, haz clic en el menú <kbd>Repository → Open in Visual Studio Code</kbd>, o presiona el botón <kbd>Open in Visual Studio Code</kbd> que aparece en la pantalla principal.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">2</div><div class="step-item-body">
+      <strong>VS Code abre la carpeta completa</strong>
+      <p>VS Code abrirá toda la carpeta del repositorio. En el panel izquierdo (<strong>Explorer</strong>) verás todos los archivos: <code>README.md</code> y la carpeta <code>.git</code> (oculta).</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">3</div><div class="step-item-body">
+      <strong>Abre el archivo README.md</strong>
+      <p>Haz doble clic en <code>README.md</code> en el panel Explorer. Se abrirá en el editor.</p>
+    </div></div>
+  </div>
+</div>
+<div class="divider"></div>
+<div class="content-section">
+  <h3><span class="section-icon">✏️</span> Hacer cambios en los archivos</h3>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">4</div><div class="step-item-body">
+      <strong>Modifica el README.md</strong>
+      <p>Agrega una nueva sección al archivo. Por ejemplo:</p>
+      <div class="code-block" style="margin-top:8px">
+        <div class="code-block-header"><span class="code-block-lang">README.md</span></div>
+        <pre><span class="cmd-green"># Mi Primer Repositorio</span>
+
+Este es mi primer proyecto en GitHub.
+
+<span class="cmd-green">## ¿Qué aprenderé?</span>
+- Usar Git y GitHub
+- Trabajar con ramas
+- Colaborar con otros
+
+<span class="cmd-yellow">## Autor</span>
+<span class="cmd-yellow">- Nombre: Tu Nombre</span>
+<span class="cmd-yellow">- Carrera: Ingeniería en Informática</span></pre>
+      </div>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">5</div><div class="step-item-body">
+      <strong>Crea un nuevo archivo</strong>
+      <p>Haz clic en el ícono de nuevo archivo en el panel Explorer. Nómbralo <code>hola.txt</code> y escribe algo adentro:</p>
+      <div class="code-block" style="margin-top:8px">
+        <div class="code-block-header"><span class="code-block-lang">hola.txt</span></div>
+        <pre>¡Hola! Este es mi primer archivo de texto en Git.</pre>
+      </div>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">6</div><div class="step-item-body">
+      <strong>Guarda los archivos</strong>
+      <p>Presiona <kbd>Ctrl+S</kbd> (Windows) o <kbd>⌘+S</kbd> (macOS) para guardar. VS Code mostrará un punto en la pestaña de archivos no guardados.</p>
+    </div></div>
+  </div>
+</div>
+<div class="callout info">
+  <span class="callout-icon">ℹ️</span>
+  <div class="callout-body">
+    <strong>VS Code te muestra los archivos cambiados</strong>
+    En la barra lateral de VS Code, el ícono de "Source Control" (bifurcación) mostrará un número indicando cuántos archivos han sido modificados. Esto viene de Git.
+  </div>
+</div>`
+                },
+                {
+                    title: "Commit con GitHub Desktop",
+                    icon: "📸",
+                    tags: ["git", "github"],
+                    intro: "Un commit es guardar una 'foto' del estado actual de tu proyecto. Aprenderás a crear commits desde GitHub Desktop.",
+                    content: `
+<div class="content-section">
+  <h3><span class="section-icon">🔄</span> Ver los cambios en GitHub Desktop</h3>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">1</div><div class="step-item-body">
+      <strong>Vuelve a GitHub Desktop</strong>
+      <p>Después de guardar en VS Code, vuelve a GitHub Desktop. Verás automáticamente los archivos que cambiaron en el panel izquierdo, bajo la sección <strong>Changes</strong>.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">2</div><div class="step-item-body">
+      <strong>Inspecciona las diferencias</strong>
+      <p>Haz clic en cualquier archivo para ver el <strong>diff</strong> (diferencias). Las líneas en <span style="color:#3fb950;background:rgba(63,185,80,.1);padding:0 4px;border-radius:3px">verde</span> son líneas añadidas, las <span style="color:#f85149;background:rgba(248,81,73,.1);padding:0 4px;border-radius:3px">rojas</span> son eliminadas.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">3</div><div class="step-item-body">
+      <strong>Selecciona los archivos a incluir</strong>
+      <p>Por defecto, todos los archivos cambiados están seleccionados (con un ✓). Puedes desmarcar archivos que NO quieras incluir en este commit.</p>
+    </div></div>
+  </div>
+</div>
+<div class="divider"></div>
+<div class="content-section">
+  <h3><span class="section-icon">📸</span> Crear el commit</h3>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">4</div><div class="step-item-body">
+      <strong>Escribe el mensaje del commit</strong>
+      <p>En la zona inferior izquierda, hay un campo <strong>Summary (required)</strong>. Escribe un mensaje descriptivo de lo que hiciste:</p>
+      <div class="code-block" style="margin-top:8px">
+        <div class="code-block-header"><span class="code-block-lang">Ejemplos de buenos mensajes</span></div>
+        <pre><span class="cmd-green">✓</span> Agregar sección de autor en README
+<span class="cmd-green">✓</span> Crear archivo hola.txt con saludo
+<span class="cmd-red">✗</span> cambios
+<span class="cmd-red">✗</span> actualizar
+<span class="cmd-red">✗</span> arreglar cosas</pre>
+      </div>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">5</div><div class="step-item-body">
+      <strong>Agrega una descripción (opcional)</strong>
+      <p>En el campo <strong>Description</strong> (más pequeño, debajo del Summary) puedes agregar más detalles sobre el cambio. Es útil pero no obligatorio.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">6</div><div class="step-item-body">
+      <strong>Haz clic en "Commit to main"</strong>
+      <p>El botón azul-oscuro en la parte inferior confirma el commit. Los cambios ahora están guardados en el historial local de Git. <strong>Todavía no están en GitHub</strong> — eso lo haremos en el siguiente paso.</p>
+    </div></div>
+  </div>
+</div>
+<div class="callout tip">
+  <span class="callout-icon">💡</span>
+  <div class="callout-body">
+    <strong>Guía para buenos mensajes de commit</strong>
+    Usa el imperativo en español o inglés: "Agregar", "Corregir", "Eliminar", "Actualizar". Responde la pregunta: ¿<em>Qué hace este commit?</em> No: ¿Qué hice yo?
+  </div>
+</div>`
+                },
+                {
+                    title: "Push a GitHub",
+                    icon: "🚀",
+                    tags: ["github"],
+                    intro: "Push significa enviar tus commits locales a GitHub. Así tu trabajo queda respaldado en la nube y visible para otros.",
+                    content: `
+<div class="content-section">
+  <h3><span class="section-icon">⬆️</span> Subir cambios con Push</h3>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">1</div><div class="step-item-body">
+      <strong>Observa el botón superior en GitHub Desktop</strong>
+      <p>Después de hacer el commit, el botón en la barra superior dirá <kbd>Push origin</kbd> (con un número indicando cuántos commits pendientes hay). Haz clic en él.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">2</div><div class="step-item-body">
+      <strong>Espera la sincronización</strong>
+      <p>GitHub Desktop subirá los cambios a GitHub. Si tienes buena conexión, será casi instantáneo.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">3</div><div class="step-item-body">
+      <strong>Verifica en GitHub.com</strong>
+      <p>Abre tu navegador y ve a tu repositorio en GitHub. Deberías ver:</p>
+      <ul style="padding-left:0;list-style:none;display:flex;flex-direction:column;gap:6px;margin-top:8px">
+        <li style="color:var(--text-muted);font-size:.88rem;display:flex;gap:8px"><span style="color:var(--green)">✓</span> El archivo <code>hola.txt</code> nuevo</li>
+        <li style="color:var(--text-muted);font-size:.88rem;display:flex;gap:8px"><span style="color:var(--green)">✓</span> El README.md actualizado con la sección de autor</li>
+        <li style="color:var(--text-muted);font-size:.88rem;display:flex;gap:8px"><span style="color:var(--green)">✓</span> El mensaje de tu commit en el historial</li>
+      </ul>
+    </div></div>
+  </div>
+</div>
+<div class="divider"></div>
+<div class="content-section">
+  <h3><span class="section-icon">📊</span> El flujo de trabajo completo</h3>
+  <p class="prose" style="margin-bottom:12px">Este es el ciclo básico que repetirás constantemente:</p>
+  <div class="code-block">
+    <div class="code-block-header"><span class="code-block-lang">Flujo básico de Git</span></div>
+    <pre><span class="cmd-blue">1. Editar</span>    → Modificas archivos en VS Code
+<span class="cmd-yellow">2. Stage</span>     → Seleccionas qué cambios incluir (✓ en GH Desktop)
+<span class="cmd-green">3. Commit</span>    → Guardas una "foto" con mensaje descriptivo
+<span class="cmd-purple">4. Push</span>      → Subes los commits a GitHub</pre>
+  </div>
+</div>
+<div class="callout tip">
+  <span class="callout-icon">💡</span>
+  <div class="callout-body">
+    <strong>¿Con qué frecuencia hacer commits?</strong>
+    Haz commits pequeños y frecuentes. Cada vez que completas algo funcional (una función, una corrección, una sección). Evita commits enormes con muchos cambios mezclados — dificultan entender qué cambió.
+  </div>
+</div>`
+                }
+            ]
+        },
+        {
+            id: 4,
+            title: "Trabajar con ramas",
+            color: "#39d353",
+            icon: "🌿",
+            summary: "Crea ramas para trabajar en paralelo sin afectar el código principal.",
+            topics: ["Crear una rama", "Ver diferencias entre ramas", "Subir rama y crear PR", "Aprobar y mergear PR", "Pull en main"],
+            steps: [
+                {
+                    title: "¿Qué son las ramas?",
+                    icon: "🌿",
+                    tags: ["git"],
+                    intro: "Las ramas te permiten trabajar en una nueva funcionalidad sin afectar el código principal (main). Es una de las características más poderosas de Git.",
+                    content: `
+<div class="content-section">
+  <h3><span class="section-icon">💡</span> El concepto de rama (branch)</h3>
+  <p class="prose">
+    Imagina que tu proyecto es un árbol. La rama <strong>main</strong> (o master) es el tronco principal — el código estable.
+    Cuando quieres agregar una nueva funcionalidad, creas una <strong>rama nueva</strong> que parte desde el tronco.
+    Trabajas en esa rama sin afectar el tronco. Cuando estás listo, <strong>mergeas</strong> (fusionas) tu rama de vuelta al tronco.
+  </p>
+</div>
+<div class="divider"></div>
+<div class="content-section">
+  <h3><span class="section-icon">📋</span> Crear una rama en GitHub Desktop</h3>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">1</div><div class="step-item-body">
+      <strong>Abre GitHub Desktop con tu repositorio</strong>
+      <p>Asegúrate de que estás en la rama <strong>main</strong>. Lo puedes ver en la barra superior: <kbd>Current Branch: main</kbd>.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">2</div><div class="step-item-body">
+      <strong>Crea una nueva rama</strong>
+      <p>Haz clic en el botón <kbd>Current Branch</kbd> en la barra superior → <kbd>New Branch</kbd>. Dale un nombre descriptivo:</p>
+      <div class="code-block" style="margin-top:8px">
+        <div class="code-block-header"><span class="code-block-lang">Nombres de rama recomendados</span></div>
+        <pre><span class="cmd-green">✓</span> feature/agregar-seccion-contacto
+<span class="cmd-green">✓</span> fix/corregir-error-typo
+<span class="cmd-green">✓</span> mejora/actualizar-readme
+<span class="cmd-red">✗</span> nueva
+<span class="cmd-red">✗</span> cambios2</pre>
+      </div>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">3</div><div class="step-item-body">
+      <strong>Haz clic en "Create Branch"</strong>
+      <p>GitHub Desktop cambia automáticamente a la nueva rama. Ahora todo lo que hagas será en esta rama, sin afectar main.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">4</div><div class="step-item-body">
+      <strong>Realiza cambios y haz un commit</strong>
+      <p>Abre VS Code, edita algún archivo (por ejemplo, agrega una nueva sección al README), guarda y vuelve a GitHub Desktop para hacer el commit.</p>
+    </div></div>
+  </div>
+</div>
+<div class="callout tip">
+  <span class="callout-icon">💡</span>
+  <div class="callout-body">
+    <strong>Cambiar entre ramas</strong>
+    Puedes cambiar de rama en cualquier momento con el menú <kbd>Current Branch</kbd>. Git guardará el estado de cada rama de forma independiente.
+  </div>
+</div>`
+                },
+                {
+                    title: "Ver diferencias entre ramas",
+                    icon: "🔍",
+                    tags: ["git", "github"],
+                    intro: "GitHub te permite comparar visualmente qué cambió entre tu rama y main antes de fusionarlas.",
+                    content: `
+<div class="content-section">
+  <h3><span class="section-icon">🔍</span> Comparar ramas en GitHub</h3>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">1</div><div class="step-item-body">
+      <strong>Sube tu rama a GitHub (Push)</strong>
+      <p>En GitHub Desktop, después de hacer commits en tu rama, haz clic en <kbd>Publish branch</kbd> (la primera vez) o <kbd>Push origin</kbd> para subir la rama.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">2</div><div class="step-item-body">
+      <strong>Ve a tu repositorio en GitHub.com</strong>
+      <p>Verás un banner amarillo que dice: "Compare &amp; pull request" para tu rama recién subida. Haz clic en él — o usa el menú <kbd>branches</kbd> para ver todas las ramas.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">3</div><div class="step-item-body">
+      <strong>Observa el diff</strong>
+      <p>En la pantalla de comparación, GitHub muestra exactamente qué cambios tiene tu rama respecto a main. Las líneas verdes son adiciones, las rojas son eliminaciones.</p>
+    </div></div>
+  </div>
+</div>
+<div class="callout info">
+  <span class="callout-icon">ℹ️</span>
+  <div class="callout-body">
+    <strong>Esto es el "diff"</strong>
+    La comparación línea a línea se llama <strong>diff</strong> (diferencia). Es la herramienta más útil para revisar cambios antes de incorporarlos al código principal.
+  </div>
+</div>`
+                },
+                {
+                    title: "Crear Pull Request (PR)",
+                    icon: "📬",
+                    tags: ["github"],
+                    intro: "Un Pull Request es una solicitud formal para integrar los cambios de tu rama en main. Es el centro del flujo de trabajo colaborativo.",
+                    content: `
+<div class="content-section">
+  <h3><span class="section-icon">💡</span> ¿Qué es un Pull Request?</h3>
+  <p class="prose">
+    Un <strong>Pull Request (PR)</strong> es una propuesta de cambios. Le dices al equipo: "Aquí están mis cambios,
+    por favor revísenlos y si están OK, inclúyanlos en main".
+    Es el mecanismo estándar de revisión de código en la industria.
+  </p>
+</div>
+<div class="divider"></div>
+<div class="content-section">
+  <h3><span class="section-icon">📬</span> Crear el PR</h3>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">1</div><div class="step-item-body">
+      <strong>Desde GitHub Desktop</strong>
+      <p>Con tu rama activa y commits subidos, haz clic en <kbd>Create Pull Request</kbd> (aparece en la barra superior después del push). Esto abrirá GitHub en el navegador.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">2</div><div class="step-item-body">
+      <strong>Completa la información del PR</strong>
+      <div class="code-block" style="margin-top:8px">
+        <div class="code-block-header"><span class="code-block-lang">Formulario del PR</span></div>
+        <pre><span class="cmd-blue">Title:</span>      Agregar sección de contacto al README
+<span class="cmd-blue">Description:</span>
+  ## ¿Qué hace este PR?
+  Agrega una nueva sección de contacto con email y redes.
+
+  ## ¿Por qué?
+  El README no tenía información de contacto.</pre>
+      </div>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">3</div><div class="step-item-body">
+      <strong>Verifica la dirección del merge</strong>
+      <p>Confirma que dice: <code>base: main ← compare: tu-rama</code>. Esto significa que tus cambios irán hacia main.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">4</div><div class="step-item-body">
+      <strong>Haz clic en "Create Pull Request"</strong>
+      <p>El PR está creado. Ahora puede ser revisado por ti mismo (o por tus colaboradores en la Parte 5).</p>
+    </div></div>
+  </div>
+</div>`
+                },
+                {
+                    title: "Aprobar y mergear PR",
+                    icon: "✅",
+                    tags: ["github"],
+                    intro: "Revisar y aprobar un PR es una parte clave del flujo de trabajo. Después del merge, los cambios pasan a main.",
+                    content: `
+<div class="content-section">
+  <h3><span class="section-icon">✅</span> Revisar el PR</h3>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">1</div><div class="step-item-body">
+      <strong>Navega a la pestaña "Files changed"</strong>
+      <p>En el PR, haz clic en la pestaña <kbd>Files changed</kbd>. Verás todas las diferencias línea a línea.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">2</div><div class="step-item-body">
+      <strong>Agrega comentarios (opcional)</strong>
+      <p>Puedes comentar en líneas específicas haciendo clic en el <kbd>+</kbd> que aparece al lado de cada línea. Esto es útil para sugerencias.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">3</div><div class="step-item-body">
+      <strong>Aprueba el PR</strong>
+      <p>Haz clic en <kbd>Review changes</kbd> → selecciona <kbd>Approve</kbd> → <kbd>Submit review</kbd>. (Cuando trabajas solo, puedes omitir este paso de aprobación formal).</p>
+    </div></div>
+  </div>
+</div>
+<div class="divider"></div>
+<div class="content-section">
+  <h3><span class="section-icon">🔀</span> Mergear el PR</h3>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">4</div><div class="step-item-body">
+      <strong>Haz clic en "Merge pull request"</strong>
+      <p>El botón verde grande en la pestaña <kbd>Conversation</kbd> del PR. Elige <kbd>Create a merge commit</kbd> (la opción por defecto).</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">5</div><div class="step-item-body">
+      <strong>Confirma el merge</strong>
+      <p>Haz clic en <kbd>Confirm merge</kbd>. ¡Tus cambios ahora están en main en GitHub!</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">6</div><div class="step-item-body">
+      <strong>Elimina la rama (opcional pero recomendado)</strong>
+      <p>Después del merge, GitHub sugiere eliminar la rama. Haz clic en <kbd>Delete branch</kbd> para mantener el repositorio limpio. Las ramas ya mergeadas no se necesitan más.</p>
+    </div></div>
+  </div>
+</div>`
+                },
+                {
+                    title: "Pull en main local",
+                    icon: "⬇️",
+                    tags: ["git", "github"],
+                    intro: "Después de mergear el PR en GitHub, tu copia local de main aún no tiene esos cambios. Debes hacer un Pull para actualizarla.",
+                    content: `
+<div class="content-section">
+  <h3><span class="section-icon">⬇️</span> Actualizar main local</h3>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">1</div><div class="step-item-body">
+      <strong>Cambia a la rama main en GitHub Desktop</strong>
+      <p>Haz clic en <kbd>Current Branch</kbd> y selecciona <strong>main</strong>.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">2</div><div class="step-item-body">
+      <strong>Haz clic en "Fetch origin"</strong>
+      <p>El botón en la barra superior. GitHub Desktop verificará si hay cambios nuevos en el servidor.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">3</div><div class="step-item-body">
+      <strong>Haz clic en "Pull origin"</strong>
+      <p>El botón cambiará a <kbd>Pull origin</kbd> si encontró cambios. Haz clic para descargar el merge a tu copia local.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">4</div><div class="step-item-body">
+      <strong>Verifica en VS Code</strong>
+      <p>Abre el proyecto en VS Code y confirma que el archivo tiene los cambios que hiciste en la rama. ¡Tu main local está al día!</p>
+    </div></div>
+  </div>
+</div>
+<div class="callout tip">
+  <span class="callout-icon">💡</span>
+  <div class="callout-body">
+    <strong>Hábito importante: hacer Pull antes de empezar a trabajar</strong>
+    Siempre que vayas a empezar a trabajar, haz <strong>Fetch + Pull</strong> en main. Esto asegura que tienes la versión más reciente y evita conflictos innecesarios.
+  </div>
+</div>`
+                }
+            ]
+        },
+        {
+            id: 5,
+            title: "Colaboración con ramas",
+            color: "#f0883e",
+            icon: "👥",
+            summary: "Trabaja con otro colaborador en el mismo repositorio usando el flujo de PRs.",
+            topics: [
+                "Agregar colaborador y clonar",
+                "Cada uno crea su rama",
+                "Realizar cambios y crear PRs",
+                "Aprobar primer PR",
+                "Manejar conflicto en segundo PR"
+            ],
+            steps: [
+                {
+                    title: "Agregar colaborador",
+                    icon: "🤝",
+                    tags: ["github", "collab"],
+                    intro: "El dueño del repositorio debe invitar al colaborador. El colaborador debe aceptar y clonar el repositorio.",
+                    content: `
+<div class="content-section">
+  <h3><span class="section-icon">👑</span> Pasos del Dueño del Repositorio</h3>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">1</div><div class="step-item-body">
+      <strong>Ve a la configuración del repositorio</strong>
+      <p>En GitHub.com, entra a tu repositorio → haz clic en <kbd>Settings</kbd> (la rueda dentada en la barra superior).</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">2</div><div class="step-item-body">
+      <strong>Entra a "Collaborators"</strong>
+      <p>En el menú lateral izquierdo, busca <kbd>Access → Collaborators</kbd>. Haz clic en <kbd>Add people</kbd>.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">3</div><div class="step-item-body">
+      <strong>Busca al colaborador por su username</strong>
+      <p>Escribe el nombre de usuario de GitHub de tu compañero. GitHub lo buscará en su base de datos. Haz clic en <kbd>Add [usuario] to this repository</kbd>.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">4</div><div class="step-item-body">
+      <strong>El colaborador recibe una invitación</strong>
+      <p>Tu compañero recibirá un email de GitHub con una invitación. Debe aceptarla haciendo clic en el enlace.</p>
+    </div></div>
+  </div>
+</div>
+<div class="divider"></div>
+<div class="content-section">
+  <h3><span class="section-icon">🧑‍💻</span> Pasos del Colaborador</h3>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">5</div><div class="step-item-body">
+      <strong>Acepta la invitación</strong>
+      <p>Revisa tu email y acepta la invitación de colaboración. Alternativamente, ve a <a href="https://github.com/notifications" target="_blank">github.com/notifications</a>.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">6</div><div class="step-item-body">
+      <strong>Clona el repositorio con GitHub Desktop</strong>
+      <p>Abre GitHub Desktop → <kbd>File → Clone Repository</kbd>. En la pestaña <kbd>GitHub.com</kbd>, el repositorio del dueño debería aparecer en la lista. Si no, búscalo por URL en la pestaña <kbd>URL</kbd>.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">7</div><div class="step-item-body">
+      <strong>Elige la carpeta local y clona</strong>
+      <p>Selecciona dónde guardar el repositorio localmente y haz clic en <kbd>Clone</kbd>.</p>
+    </div></div>
+  </div>
+</div>
+<div class="callout info">
+  <span class="callout-icon">ℹ️</span>
+  <div class="callout-body">
+    <strong>Ambos trabajan en el mismo repositorio</strong>
+    A partir de ahora, tanto el dueño como el colaborador tienen el mismo repositorio en sus máquinas. Ambos pueden crear ramas, hacer commits y crear PRs.
+  </div>
+</div>`
+                },
+                {
+                    title: "Crear ramas individuales",
+                    icon: "🌿",
+                    tags: ["git", "collab"],
+                    intro: "Cada integrante del equipo crea su propia rama para trabajar en paralelo sin interferir con el otro.",
+                    content: `
+<div class="content-section">
+  <h3><span class="section-icon">📋</span> Cada colaborador crea su propia rama</h3>
+  <p class="prose" style="margin-bottom:16px">
+    Este ejercicio simula que dos personas trabajan al mismo tiempo en el mismo proyecto.
+    Sigan las instrucciones según su rol.
+  </p>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">A</div><div class="step-item-body">
+      <strong>Colaborador A (Dueño): Crea la rama <code>feature/agregar-descripcion</code></strong>
+      <p>En GitHub Desktop → <kbd>Current Branch → New Branch</kbd>. Nombra la rama <code>feature/agregar-descripcion</code>. Asegúrate de crearla desde <strong>main</strong>.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">B</div><div class="step-item-body">
+      <strong>Colaborador B: Crea la rama <code>feature/agregar-tecnologias</code></strong>
+      <p>Igual que el colaborador A: en GitHub Desktop → <kbd>Current Branch → New Branch</kbd>, nombra la rama <code>feature/agregar-tecnologias</code>. También desde <strong>main</strong>.</p>
+    </div></div>
+  </div>
+</div>
+<div class="divider"></div>
+<div class="content-section">
+  <h3><span class="section-icon">✏️</span> Cada colaborador realiza cambios</h3>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">1</div><div class="step-item-body">
+      <strong>Colaborador A: Edita el README.md</strong>
+      <p>Agrega al inicio del README (después del título) una sección de descripción:</p>
+      <div class="code-block" style="margin-top:8px">
+        <div class="code-block-header"><span class="code-block-lang">README.md — Colaborador A</span></div>
+        <pre><span class="cmd-green">## Descripción del proyecto</span>
+<span class="cmd-yellow">Este proyecto fue creado para aprender a colaborar</span>
+<span class="cmd-yellow">con Git y GitHub de forma efectiva.</span></pre>
+      </div>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">2</div><div class="step-item-body">
+      <strong>Colaborador B: Edita el README.md</strong>
+      <p>En su copia local, agrega al <em>final</em> del README una sección de tecnologías:</p>
+      <div class="code-block" style="margin-top:8px">
+        <div class="code-block-header"><span class="code-block-lang">README.md — Colaborador B</span></div>
+        <pre><span class="cmd-green">## Tecnologías usadas</span>
+<span class="cmd-yellow">- Git</span>
+<span class="cmd-yellow">- GitHub</span>
+<span class="cmd-yellow">- Visual Studio Code</span></pre>
+      </div>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">3</div><div class="step-item-body">
+      <strong>Ambos hacen commit y push de sus ramas</strong>
+      <p>En GitHub Desktop, cada uno hace su commit con un mensaje descriptivo, luego <kbd>Publish branch</kbd> / <kbd>Push origin</kbd>.</p>
+    </div></div>
+  </div>
+</div>`
+                },
+                {
+                    title: "Crear PRs y aprobar el primero",
+                    icon: "📬",
+                    tags: ["github", "collab"],
+                    intro: "Ambos colaboradores crean sus PRs. El primero en ser mergeado no tendrá problemas. El segundo podría tener un conflicto.",
+                    content: `
+<div class="content-section">
+  <h3><span class="section-icon">📬</span> Ambos crean sus PRs</h3>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">1</div><div class="step-item-body">
+      <strong>Colaborador A crea su PR</strong>
+      <p>En GitHub Desktop (con su rama activa) → <kbd>Create Pull Request</kbd>. En GitHub, completa el título y descripción, luego crea el PR.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">2</div><div class="step-item-body">
+      <strong>Colaborador B crea su PR</strong>
+      <p>Lo mismo: desde GitHub Desktop con su rama → <kbd>Create Pull Request</kbd> → completa el formulario en GitHub.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">3</div><div class="step-item-body">
+      <strong>Ahora hay 2 PRs abiertos en el repositorio</strong>
+      <p>Ve a la pestaña <kbd>Pull requests</kbd> del repositorio en GitHub. Verás ambos PRs listados.</p>
+    </div></div>
+  </div>
+</div>
+<div class="divider"></div>
+<div class="content-section">
+  <h3><span class="section-icon">✅</span> Aprobar y mergear el PR del Colaborador A</h3>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">4</div><div class="step-item-body">
+      <strong>El dueño (Colaborador A) revisa y aprueba su PR</strong>
+      <p>En la práctica el dueño revisa el PR del colaborador. En este ejercicio, puede autoaprobarse o pedir a B que lo apruebe. Entra al PR de A → <kbd>Files changed</kbd> → revisa → <kbd>Review changes → Approve</kbd>.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">5</div><div class="step-item-body">
+      <strong>Mergea el PR del Colaborador A</strong>
+      <p>En la pestaña <kbd>Conversation</kbd> del PR de A → <kbd>Merge pull request → Confirm merge</kbd>.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">6</div><div class="step-item-body">
+      <strong>El PR de A está mergeado. ¿Qué pasa con el PR de B?</strong>
+      <p>Ve al PR del Colaborador B. Si ambos modificaron la misma parte del README, GitHub mostrará: <strong style="color:var(--red)">"This branch has conflicts that must be resolved"</strong>. Si los cambios fueron en partes diferentes, podrá mergearse sin problemas.</p>
+    </div></div>
+  </div>
+</div>
+<div class="callout warning">
+  <span class="callout-icon">⚠️</span>
+  <div class="callout-body">
+    <strong>¿Por qué puede haber un conflicto?</strong>
+    Cuando dos personas editan la misma línea o sección de un archivo, Git no sabe cuál versión conservar. Este es un <strong>conflicto de merge</strong> — la situación más común al colaborar en equipo.
+  </div>
+</div>`
+                },
+                {
+                    title: "Resolver conflicto (si existe)",
+                    icon: "⚡",
+                    tags: ["git", "collab"],
+                    intro: "Si el segundo PR tiene conflicto, el Colaborador B debe actualizar su rama con los cambios de main y resolver el conflicto antes de poder mergear.",
+                    content: `
+<div class="content-section">
+  <h3><span class="section-icon">⚡</span> Escenario A: El PR de B puede mergearse sin problemas</h3>
+  <p class="prose">
+    Si los cambios de A y B fueron en <strong>partes diferentes</strong> del README (A al inicio, B al final),
+    GitHub puede fusionarlos automáticamente. El botón "Merge pull request" estará disponible directamente.
+    Simplemente aprueba y mergea el PR de B. ¡Felicidades a los dos!
+  </p>
+</div>
+<div class="divider"></div>
+<div class="content-section">
+  <h3><span class="section-icon">🔥</span> Escenario B: El PR de B tiene conflictos</h3>
+  <p class="prose" style="margin-bottom:16px">
+    Si GitHub muestra un conflicto, el Colaborador B debe seguir estos pasos para resolverlo:
+  </p>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-item-num">1</div><div class="step-item-body">
+      <strong>Colaborador B: Cambia a main en GitHub Desktop</strong>
+      <p>En GitHub Desktop → <kbd>Current Branch → main</kbd>.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">2</div><div class="step-item-body">
+      <strong>Hace Pull de main para traer los cambios de A</strong>
+      <p>Haz clic en <kbd>Fetch origin</kbd> → <kbd>Pull origin</kbd>. Ahora main local tiene los cambios del PR de A.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">3</div><div class="step-item-body">
+      <strong>Vuelve a su rama: <code>feature/agregar-tecnologias</code></strong>
+      <p>En GitHub Desktop → <kbd>Current Branch → feature/agregar-tecnologias</kbd>.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">4</div><div class="step-item-body">
+      <strong>Mergea main hacia su rama</strong>
+      <p>En GitHub Desktop → <kbd>Branch → Merge into current branch</kbd> → selecciona <strong>main</strong>. Esto trae los cambios de A a la rama de B.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">5</div><div class="step-item-body">
+      <strong>Si hay conflictos: VS Code los muestra</strong>
+      <p>GitHub Desktop abrirá VS Code automáticamente. El archivo en conflicto tendrá marcadores especiales:</p>
+      <div class="code-block" style="margin-top:8px">
+        <div class="code-block-header"><span class="code-block-lang">README.md con conflicto</span></div>
+        <pre><span class="cmd-red">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD (tu rama)</span>
+## Tecnologías usadas
+- Git
+- GitHub
+<span class="cmd-yellow">=======</span>
+## Descripción del proyecto
+Este proyecto fue creado para aprender...
+<span class="cmd-green">&gt;&gt;&gt;&gt;&gt;&gt;&gt; main</span></pre>
+      </div>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">6</div><div class="step-item-body">
+      <strong>Edita el archivo para resolver el conflicto</strong>
+      <p>Elimina los marcadores (<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code>=======</code>, <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>) y deja el contenido como debería quedar:</p>
+      <div class="code-block" style="margin-top:8px">
+        <div class="code-block-header"><span class="code-block-lang">README.md — resuelto</span></div>
+        <pre><span class="cmd-green">## Descripción del proyecto</span>
+Este proyecto fue creado para aprender...
+
+<span class="cmd-green">## Tecnologías usadas</span>
+- Git
+- GitHub</pre>
+      </div>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">7</div><div class="step-item-body">
+      <strong>Guarda, vuelve a GitHub Desktop y haz commit</strong>
+      <p>Guarda el archivo en VS Code. En GitHub Desktop, verás el archivo resuelto. Haz commit con el mensaje: <code>Resolver conflicto: combinar descripción y tecnologías</code>.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">8</div><div class="step-item-body">
+      <strong>Hace Push y el PR se actualiza automáticamente</strong>
+      <p>Haz <kbd>Push origin</kbd>. En GitHub, el PR de B ahora mostrará el nuevo commit y el conflicto estará resuelto. Ya se puede mergear.</p>
+    </div></div>
+    <div class="step-item"><div class="step-item-num">9</div><div class="step-item-body">
+      <strong>Dueño aprueba y mergea el PR de B</strong>
+      <p>El dueño revisa el PR → lo aprueba → <kbd>Merge pull request</kbd>. ¡Ambos colaboradores tienen sus cambios en main!</p>
+    </div></div>
+  </div>
+</div>
+<div class="callout tip">
+  <span class="callout-icon">🎉</span>
+  <div class="callout-body">
+    <strong>¡Completaste el flujo colaborativo!</strong>
+    Acabas de experimentar el flujo de trabajo que usan los equipos de desarrollo profesionales. Clone → Rama → Cambios → PR → Revisión → Merge es el ciclo básico en cualquier empresa de tecnología.
+  </div>
+</div>`
+                }
+            ]
+        }
+    ];
+
+    /* ═══════════════════════════════════════════════════════════
+       ESTADO
+    ═══════════════════════════════════════════════════════════ */
+    let currentPart = null;
+    let currentStep = 0;
+    const stepProgress = {}; // partId → Set of completed stepIndexes
+
+    /* ═══════════════════════════════════════════════════════════
+       SPLASH TERMINAL ANIMATION
+    ═══════════════════════════════════════════════════════════ */
+    const sequences = [
+        { cmd: "git init", delay: 60, after: ["<span class='terminal-output'>Initialized empty Git repository in ~/mi-proyecto/.git/</span>"] },
+        { cmd: "git add README.md", delay: 70, after: [] },
+        { cmd: 'git commit -m "Initial commit"', delay: 50, after: [
+                "<span class='terminal-output'>[main (root-commit) a1b2c3d] Initial commit</span>",
+                "<span class='terminal-output'> 1 file changed, 3 insertions(+)</span>"
+            ]},
+        { cmd: "git push origin main", delay: 65, after: [
+                "<span class='terminal-output'>Enumerating objects: 3, done.</span>",
+                "<span class='terminal-output'>To github.com:usuario/mi-proyecto.git</span>",
+                "<span class='terminal-output'> * [new branch]  main → main</span>"
+            ]}
+    ];
+
+    async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    async function runTerminal() {
+        const typedEl = document.getElementById('typed-cmd');
+        const extraEl = document.getElementById('terminal-extra');
+        const cursorEl = document.getElementById('cursor-el');
+        const btn = document.getElementById('splash-go-btn');
+
+        for (let i = 0; i < sequences.length; i++) {
+            const seq = sequences[i];
+            typedEl.textContent = '';
+            // Type command
+            for (const ch of seq.cmd) {
+                typedEl.textContent += ch;
+                await sleep(seq.delay + Math.random() * 30);
+            }
+            await sleep(400);
+            cursorEl.style.display = 'none';
+            // Output lines
+            for (const line of seq.after) {
+                const div = document.createElement('div');
+                div.innerHTML = line;
+                extraEl.appendChild(div);
+                await sleep(150);
+            }
+            await sleep(600);
+            if (i < sequences.length - 1) {
+                extraEl.innerHTML = '';
+                typedEl.textContent = '';
+                cursorEl.style.display = 'inline-block';
+                await sleep(300);
+            }
+        }
+        btn.textContent = 'Comenzar →';
+        btn.disabled = false;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SCREEN TRANSITIONS
+    ═══════════════════════════════════════════════════════════ */
+    function showScreen(id) {
+        ['splash', 'index-screen', 'guide'].forEach(s => {
+            document.getElementById(s).classList.add('hidden');
+        });
+        document.getElementById(id).classList.remove('hidden');
+    }
+
+    document.getElementById('splash-go-btn').addEventListener('click', () => {
+        const splash = document.getElementById('splash');
+        splash.classList.add('exit');
+        setTimeout(() => {
+            showScreen('index-screen');
+            renderIndex();
+        }, 600);
+    });
+
+    /* ═══════════════════════════════════════════════════════════
+       INDEX
+    ═══════════════════════════════════════════════════════════ */
+    function renderIndex() {
+        const grid = document.getElementById('parts-grid');
+        grid.innerHTML = '';
+        PARTS.forEach(part => {
+            const card = document.createElement('div');
+            card.className = 'part-card';
+            card.style.setProperty('--card-color', part.color);
+
+            const done = stepProgress[part.id]?.size || 0;
+            const total = part.steps.length;
+            const pct = total ? Math.round((done / total) * 100) : 0;
+
+            card.innerHTML = `
+      <div class="part-card-number">Parte ${part.id}</div>
+      <h3>${part.icon} ${part.title}</h3>
+      <ul>${part.topics.map(t => `<li>${t}</li>`).join('')}</ul>
+      <div class="step-count">${total} paso${total !== 1 ? 's' : ''} · ${pct}% completado</div>
+      ${pct > 0 ? `<div class="progress-bar" style="margin-top:8px"><div class="progress-fill" style="width:${pct}%"></div></div>` : ''}
+    `;
+            card.addEventListener('click', () => openPart(part.id));
+            grid.appendChild(card);
+        });
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       GUIDE
+    ═══════════════════════════════════════════════════════════ */
+    function openPart(partId, stepIdx = 0) {
+        currentPart = PARTS.find(p => p.id === partId);
+        currentStep = stepIdx;
+        if (!stepProgress[partId]) stepProgress[partId] = new Set();
+
+        renderGuide();
+        showScreen('guide');
+        window.scrollTo(0, 0);
+    }
+
+    function renderGuide() {
+        const part = currentPart;
+        document.getElementById('guide-part-title').textContent = `Parte ${part.id} — ${part.title}`;
+        updateStepBadge();
+        renderTabs();
+        renderStep(currentStep);
+    }
+
+    function updateStepBadge() {
+        document.getElementById('guide-step-badge').textContent =
+            `Paso ${currentStep + 1} / ${currentPart.steps.length}`;
+    }
+
+    function renderTabs() {
+        const container = document.getElementById('step-tabs-inner');
+        container.innerHTML = '';
+        currentPart.steps.forEach((step, i) => {
+            const tab = document.createElement('button');
+            tab.className = 'step-tab' +
+                (i === currentStep ? ' active' : '') +
+                (stepProgress[currentPart.id]?.has(i) ? ' done' : '');
+            tab.style.setProperty('--active-color', currentPart.color);
+            tab.innerHTML = `<span class="tab-num">${i + 1}</span>${step.title}`;
+            tab.addEventListener('click', () => goToStep(i));
+            container.appendChild(tab);
+        });
+    }
+
+    function renderStep(idx) {
+        const step = currentPart.steps[idx];
+        const color = currentPart.color;
+
+        const content = document.getElementById('guide-content');
+        content.innerHTML = `
+    <div class="step-intro" style="--step-color:${color}">
+      <div class="step-intro-icon">${step.icon}</div>
+      <div class="step-intro-text">
+        <span class="step-num-label">Parte ${currentPart.id} · Paso ${idx + 1}</span>
+        <h2>${step.title}</h2>
+        <p>${step.intro}</p>
+        <div class="tag-row">${(step.tags || []).map(t => `<span class="tag ${t}">${t === 'github' ? '🐙 GitHub' : t === 'git' ? '🔧 Git' : t === 'vscode' ? '💻 VS Code' : '👥 Colaboración'}</span>`).join('')}</div>
+      </div>
+    </div>
+    ${step.content}
+    <div class="step-nav">
+      <button class="step-nav-btn" id="nav-prev" ${idx === 0 ? 'disabled' : ''}>← Anterior</button>
+      <span class="step-nav-center">${idx + 1} de ${currentPart.steps.length}</span>
+      ${idx < currentPart.steps.length - 1
+            ? `<button class="step-nav-btn primary" id="nav-next">Siguiente →</button>`
+            : `<button class="step-nav-btn primary" id="nav-finish">✓ Completar parte</button>`
+        }
+    </div>
+  `;
+
+        document.getElementById('nav-prev')?.addEventListener('click', () => {
+            if (currentStep > 0) goToStep(currentStep - 1);
+        });
+        document.getElementById('nav-next')?.addEventListener('click', () => {
+            markStepDone(currentStep);
+            goToStep(currentStep + 1);
+        });
+        document.getElementById('nav-finish')?.addEventListener('click', () => {
+            markStepDone(currentStep);
+            showScreen('index-screen');
+            renderIndex();
+        });
+
+        window.scrollTo(0, 0);
+    }
+
+    function goToStep(idx) {
+        currentStep = idx;
+        updateStepBadge();
+        renderTabs();
+        renderStep(idx);
+    }
+
+    function markStepDone(idx) {
+        if (!stepProgress[currentPart.id]) stepProgress[currentPart.id] = new Set();
+        stepProgress[currentPart.id].add(idx);
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       NAVIGATION BACK
+    ═══════════════════════════════════════════════════════════ */
+    document.getElementById('guide-back-btn').addEventListener('click', () => {
+        showScreen('index-screen');
+        renderIndex();
+    });
+
+    /* ═══════════════════════════════════════════════════════════
+       BOOT
+    ═══════════════════════════════════════════════════════════ */
+    runTerminal();
+</script>
+</body>
+</html>

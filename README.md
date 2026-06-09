@@ -27,15 +27,18 @@ La primera etapa del proyecto se centra en la [homologación entre PSeInt y Pyth
 
 ## Navegación rápida
 
-- [Documentación del curso](docs/README.md)
+- [Portal de actividades](docs/index.html)
 - [Lessons](docs/lessons/README.md)
 - [Extras](docs/extras/README.md)
+- [Guía interactiva Git y GitHub](docs/guide/git-github.html)
 - [Lección 01 - Homologación entre PSeInt y Python](docs/lessons/01-homologacion-pseint-python/README.md)
 
 ## Estructura
 
 ```text
 docs/
+├── guide/
+│   └── git-github.html
 ├── lessons/
 │   ├── 01-homologacion-pseint-python/
 │   ├── 02-variables-entrada-y-salida/
@@ -66,3 +69,5 @@ Cada lección debe desarrollarse con esta estructura:
 - `practica.md`: ejercicios para que el estudiante aplique la lección por su cuenta
 
 La carpeta [`docs/extras/`](docs/extras/README.md) contiene material complementario para consulta autónoma.
+
+La carpeta [`docs/guide/`](docs/guide/) contiene guías interactivas publicadas como páginas HTML independientes.
