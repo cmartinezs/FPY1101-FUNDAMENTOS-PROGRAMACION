@@ -31,6 +31,7 @@ La primera etapa del proyecto se centra en la [homologación entre PSeInt y Pyth
 - [Lessons](docs/lessons/README.md)
 - [Extras](docs/extras/README.md)
 - [Guía interactiva Git y GitHub](docs/guide/git-github.html)
+- [Guía GitHub Student Developer Pack](docs/guide/github-student-pack.html)
 - [Lección 01 - Homologación entre PSeInt y Python](docs/lessons/01-homologacion-pseint-python/README.md)
 
 ## Estructura
@@ -38,6 +39,7 @@ La primera etapa del proyecto se centra en la [homologación entre PSeInt y Pyth
 ```text
 docs/
 ├── guide/
+│   ├── github-student-pack.html
 │   └── git-github.html
 ├── lessons/
 │   ├── 01-homologacion-pseint-python/
