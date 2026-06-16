@@ -18,6 +18,7 @@ Cada carpeta representa una lección del curso y reúne el material principal de
 5. ciclos
 6. funciones
 7. listas y diccionarios
+8. matrices y listas asociadas
 
 ## Navegación
 
@@ -28,3 +29,4 @@ Cada carpeta representa una lección del curso y reúne el material principal de
 5. [Lección 05 - Ciclos](05-ciclos/README.md)
 6. [Lección 06 - Funciones](06-funciones/README.md)
 7. [Lección 07 - Listas y Diccionarios](07-listas-y-diccionarios/README.md)
+8. [Lección 08 - Matrices y Listas Asociadas](08-matrices-y-listas-asociadas/README.md)

@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrices en Python — FPY-1101</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:         #09090b;
+            --bg-1:       #111114;
+            --bg-2:       #18181c;
+            --bg-3:       #1e1e24;
+            --line:       rgba(255,255,255,0.06);
+            --line-2:     rgba(255,255,255,0.10);
+            --text:       #f4f4f5;
+            --text-2:     #a1a1aa;
+            --text-3:     #52525b;
+            --mono:       'JetBrains Mono', monospace;
+            --sans:       'Inter', system-ui, sans-serif;
+            --c-blue:     #3b82f6;
+            --c-blue-dim: rgba(59,130,246,0.12);
+            --c-blue-bdr: rgba(59,130,246,0.30);
+            --c-teal:     #2dd4bf;
+            --c-teal-dim: rgba(45,212,191,0.10);
+            --c-teal-bdr: rgba(45,212,191,0.25);
+            --c-green:    #4ade80;
+            --c-green-dim:rgba(74,222,128,0.10);
+            --c-green-bdr:rgba(74,222,128,0.25);
+            --c-amber:    #fbbf24;
+            --c-amber-dim:rgba(251,191,36,0.10);
+            --c-amber-bdr:rgba(251,191,36,0.25);
+            --c-red:      #f87171;
+            --c-red-dim:  rgba(248,113,113,0.10);
+            --c-red-bdr:  rgba(248,113,113,0.25);
+            --c-purple:   #a78bfa;
+            --c-purple-dim:rgba(167,139,250,0.10);
+            --c-purple-bdr:rgba(167,139,250,0.25);
+            --radius:     12px;
+            --radius-sm:  7px;
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth}
+        body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.65;min-height:100vh}
+
+        /* TOPBAR */
+        .topbar{position:sticky;top:0;z-index:200;background:rgba(9,9,11,0.88);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);padding:0 32px;height:52px;display:flex;align-items:center;gap:20px}
+        .topbar-logo{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--text);text-decoration:none;letter-spacing:-0.01em}
+        .topbar-logo-icon{width:28px;height:28px;border-radius:7px;background:var(--c-blue-dim);border:1px solid var(--c-blue-bdr);display:flex;align-items:center;justify-content:center;font-size:14px}
+        .topbar-sep{color:var(--text-3);font-size:18px;font-weight:200}
+        .topbar-course{font-size:12px;color:var(--text-2);font-family:var(--mono);letter-spacing:0.02em}
+        .topbar-nav{margin-left:auto;display:flex;gap:4px}
+        .topbar-nav a{font-size:12px;font-weight:500;color:var(--text-2);text-decoration:none;padding:5px 12px;border-radius:var(--radius-sm);transition:color .15s,background .15s}
+        .topbar-nav a:hover{color:var(--text);background:var(--bg-2)}
+        .topbar-nav a.active{color:var(--text);background:var(--bg-3)}
+
+        /* HERO */
+        .hero{padding:72px 40px 56px;max-width:800px;margin:0 auto;text-align:center}
+        .hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;font-weight:500;color:var(--c-blue);letter-spacing:0.08em;text-transform:uppercase;padding:4px 14px;border-radius:20px;background:var(--c-blue-dim);border:1px solid var(--c-blue-bdr);margin-bottom:24px}
+        .hero-dot{width:5px;height:5px;border-radius:50%;background:var(--c-blue)}
+        .hero h1{font-size:42px;font-weight:700;letter-spacing:-0.03em;line-height:1.1;color:var(--text);margin-bottom:16px}
+        .hero h1 em{font-style:normal;color:var(--c-blue)}
+        .hero p{font-size:15px;color:var(--text-2);max-width:520px;margin:0 auto 36px;line-height:1.75}
+        .hero-stats{display:flex;justify-content:center;gap:0;border:1px solid var(--line-2);border-radius:var(--radius);overflow:hidden;max-width:480px;margin:0 auto}
+        .hero-stat{flex:1;padding:16px 20px;text-align:center;border-right:1px solid var(--line-2);background:var(--bg-1)}
+        .hero-stat:last-child{border-right:none}
+        .hero-stat-n{font-size:22px;font-weight:700;color:var(--text)}
+        .hero-stat-l{font-size:11px;color:var(--text-3);margin-top:2px;text-transform:uppercase;letter-spacing:0.05em}
+
+        /* LEVEL LEGEND */
+        .level-legend{max-width:900px;margin:0 auto 56px;padding:0 32px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+        .level-card{padding:14px 18px;border-radius:var(--radius-sm);border:1px solid var(--line);background:var(--bg-1);display:flex;align-items:flex-start;gap:12px}
+        .level-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+        .level-dot.basic{background:var(--c-green);box-shadow:0 0 8px rgba(74,222,128,0.4)}
+        .level-dot.mid{background:var(--c-amber);box-shadow:0 0 8px rgba(251,191,36,0.4)}
+        .level-dot.high{background:var(--c-red);box-shadow:0 0 8px rgba(248,113,113,0.4)}
+        .level-card-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px}
+        .level-card-desc{font-size:12px;color:var(--text-3)}
+
+        /* LAYOUT */
+        .layout{display:grid;grid-template-columns:220px 1fr;gap:0;max-width:1160px;margin:0 auto;padding:0 32px 80px;align-items:start}
+
+        /* SIDEBAR */
+        .sidebar{position:sticky;top:64px;padding-right:24px;padding-top:4px}
+        .sidebar-section{margin-bottom:28px}
+        .sidebar-label{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-3);margin-bottom:8px;padding-left:10px}
+        .sidebar-link{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius-sm);font-size:12.5px;color:var(--text-2);text-decoration:none;transition:all .12s;margin-bottom:2px;position:relative}
+        .sidebar-link:hover{color:var(--text);background:var(--bg-2)}
+        .sidebar-link.active{color:var(--text);background:var(--bg-2)}
+        .sidebar-link.active::before{content:'';position:absolute;left:0;top:6px;bottom:6px;width:2px;border-radius:2px;background:var(--c-blue)}
+        .sidebar-badge{font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;margin-left:auto;font-family:var(--mono)}
+        .badge-b{background:var(--c-green-dim);color:var(--c-green)}
+        .badge-m{background:var(--c-amber-dim);color:var(--c-amber)}
+        .badge-h{background:var(--c-red-dim);color:var(--c-red)}
+
+        /* CONTENT */
+        .content{min-width:0}
+        .part-header{display:flex;align-items:center;gap:16px;margin-bottom:6px;padding-top:8px}
+        .part-number{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--text-3);letter-spacing:0.05em}
+        .part-title{font-size:22px;font-weight:700;letter-spacing:-0.02em;color:var(--text)}
+        .part-desc{font-size:13px;color:var(--text-2);margin-bottom:28px;line-height:1.7;max-width:620px}
+        .part-desc strong{color:var(--text);font-weight:500}
+        .part-desc code{font-family:var(--mono);font-size:12px;background:var(--bg-3);padding:1px 6px;border-radius:4px;color:var(--c-teal)}
+        .part-divider{border:none;border-top:1px solid var(--line);margin:52px 0 48px}
+
+        /* EXERCISE CARD */
+        .ex-card{background:var(--bg-1);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;transition:border-color .2s}
+        .ex-card:hover{border-color:var(--line-2)}
+        .ex-card-top{display:grid;grid-template-columns:auto 1fr auto;align-items:start;gap:16px;padding:20px 24px 18px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+        .ex-number{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:600;flex-shrink:0;margin-top:1px}
+        .ex-number.n-blue{background:var(--c-blue-dim);color:var(--c-blue);border:1px solid var(--c-blue-bdr)}
+        .ex-number.n-teal{background:var(--c-teal-dim);color:var(--c-teal);border:1px solid var(--c-teal-bdr)}
+        .ex-breadcrumb{font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:0.04em;margin-bottom:5px;text-transform:uppercase}
+        .ex-title{font-size:16px;font-weight:600;color:var(--text);letter-spacing:-0.01em;margin-bottom:3px}
+        .ex-scenario{font-size:12.5px;color:var(--text-2)}
+        .level-badge{font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:0.06em;white-space:nowrap;flex-shrink:0;align-self:flex-start}
+        .lv-basic{background:var(--c-green-dim);color:var(--c-green);border:1px solid var(--c-green-bdr)}
+        .lv-mid{background:var(--c-amber-dim);color:var(--c-amber);border:1px solid var(--c-amber-bdr)}
+        .lv-high{background:var(--c-red-dim);color:var(--c-red);border:1px solid var(--c-red-bdr)}
+
+        /* CARD BODY */
+        .ex-body{padding:22px 24px;display:flex;flex-direction:column;gap:18px}
+        .enunciado{font-size:13.5px;line-height:1.75;color:var(--text-2);padding:16px 18px;background:var(--bg);border:1px solid var(--line);border-left:2px solid var(--c-blue);border-radius:var(--radius-sm)}
+        .enunciado p+p{margin-top:8px}
+        .enunciado strong{color:var(--text);font-weight:600}
+
+        /* TWO-COL */
+        .ex-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+
+        /* REQUIREMENTS */
+        .block-label{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+        .block-label::after{content:'';flex:1;height:1px;background:var(--line)}
+        .req-list{list-style:none;display:flex;flex-direction:column;gap:5px}
+        .req-list li{font-size:12.5px;color:var(--text-2);display:flex;align-items:flex-start;gap:10px;padding:8px 12px;background:var(--bg-2);border-radius:var(--radius-sm);border:1px solid var(--line);line-height:1.55}
+        .req-list li code{font-family:var(--mono);font-size:11px;background:var(--bg-3);padding:0 4px;border-radius:3px;color:var(--c-teal)}
+        .req-num{font-family:var(--mono);font-size:10px;color:var(--text-3);flex-shrink:0;margin-top:1px;min-width:18px;text-align:right}
+
+        /* CODE BLOCK */
+        .code-block{background:var(--bg);border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden}
+        .code-block-head{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:var(--bg-2);border-bottom:1px solid var(--line)}
+        .code-block-title{font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:0.05em;text-transform:uppercase}
+        .code-block-dots{display:flex;gap:5px}
+        .code-block-dots span{width:8px;height:8px;border-radius:50%}
+        .d1{background:#ff5f57}.d2{background:#febc2e}.d3{background:#28c840}
+        .code-block pre{font-family:var(--mono);font-size:11.5px;color:var(--text-2);padding:14px 16px;line-height:1.65;overflow-x:auto;white-space:pre}
+
+        /* OUTPUT BLOCK */
+        .output-block{background:var(--bg);border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden}
+        .output-block-head{display:flex;align-items:center;gap:8px;padding:7px 14px;background:var(--bg-2);border-bottom:1px solid var(--line)}
+        .output-triangle{width:0;height:0;border-top:4px solid transparent;border-bottom:4px solid transparent;border-left:7px solid var(--c-green)}
+        .output-title{font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:0.05em;text-transform:uppercase}
+        .output-block pre{font-family:var(--mono);font-size:11.5px;color:var(--c-green);padding:14px 16px;line-height:1.65;overflow-x:auto;white-space:pre}
+
+        /* HINT */
+        .hint-block{display:flex;gap:14px;align-items:flex-start;padding:14px 16px;background:var(--c-purple-dim);border:1px solid var(--c-purple-bdr);border-radius:var(--radius-sm)}
+        .hint-icon{font-size:14px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:rgba(167,139,250,0.2);color:var(--c-purple)}
+        .hint-body{font-size:12.5px;color:rgba(220,210,255,0.75);line-height:1.65}
+        .hint-body code{font-family:var(--mono);font-size:11px;background:rgba(167,139,250,0.15);padding:0 5px;border-radius:3px;color:var(--c-purple)}
+        .hint-label{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--c-purple);text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:4px}
+
+        /* SYNTAX */
+        .k-s{color:#7dd3fc}.k-n{color:#93c5fd}.k-b{color:#c4b5fd}.k-c{color:#3d3d46;font-style:italic}
+
+        /* FOOTER */
+        footer{border-top:1px solid var(--line);padding:24px 40px;display:flex;align-items:center;justify-content:space-between}
+        .footer-left{font-size:12px;color:var(--text-3)}
+        .footer-right{font-family:var(--mono);font-size:11px;color:var(--text-3)}
+    </style>
+</head>
+<body>
+
+<nav class="topbar">
+    <a class="topbar-logo" href="#">
+        <span class="topbar-logo-icon">🐍</span>
+        Matrices en Python
+    </a>
+    <span class="topbar-sep">/</span>
+    <span class="topbar-course">FPY-1101</span>
+    <div class="topbar-nav">
+        <a href="#numeros" class="active">Parte 1 — Números</a>
+        <a href="#diccionarios">Parte 2 — Diccionarios</a>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="hero-eyebrow">
+        <span class="hero-dot"></span>
+        Fundamentos de Programación · Unidad 4
+    </div>
+    <h1>Estructuras de datos<br><em>bidimensionales</em></h1>
+    <p>Seis ejercicios situados en contextos reales — desde tableros y grillas hasta sistemas de venta — organizados en dos bloques y tres niveles de dificultad.</p>
+    <div class="hero-stats">
+        <div class="hero-stat">
+            <div class="hero-stat-n">6</div>
+            <div class="hero-stat-l">Ejercicios</div>
+        </div>
+        <div class="hero-stat">
+            <div class="hero-stat-n">2</div>
+            <div class="hero-stat-l">Bloques</div>
+        </div>
+        <div class="hero-stat">
+            <div class="hero-stat-n">3</div>
+            <div class="hero-stat-l">Niveles</div>
+        </div>
+    </div>
+</section>
+
+<div class="level-legend">
+    <div class="level-card">
+        <span class="level-dot basic"></span>
+        <div>
+            <div class="level-card-title">Básico</div>
+            <div class="level-card-desc">Creación, acceso directo y recorrido con doble for.</div>
+        </div>
+    </div>
+    <div class="level-card">
+        <span class="level-dot mid"></span>
+        <div>
+            <div class="level-card-title">Medio</div>
+            <div class="level-card-desc">Lógica de negocio, validación y modificación de celdas.</div>
+        </div>
+    </div>
+    <div class="level-card">
+        <span class="level-dot high"></span>
+        <div>
+            <div class="level-card-title">Avanzado</div>
+            <div class="level-card-desc">Procesamiento multicriterio, extremos y reportes complejos.</div>
+        </div>
+    </div>
+</div>
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-label">Parte 1 · Números</div>
+            <a class="sidebar-link active" href="#ej1">🅿️ Estacionamiento <span class="sidebar-badge badge-b">B</span></a>
+            <a class="sidebar-link" href="#ej2">🎬 Cine Online <span class="sidebar-badge badge-m">M</span></a>
+            <a class="sidebar-link" href="#ej3">⚡ Red Eléctrica <span class="sidebar-badge badge-h">A</span></a>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-label">Parte 2 · Diccionarios</div>
+            <a class="sidebar-link" href="#ej4">🎭 Teatro Municipal <span class="sidebar-badge badge-b">B</span></a>
+            <a class="sidebar-link" href="#ej5">🚌 Empresa de Buses <span class="sidebar-badge badge-m">M</span></a>
+            <a class="sidebar-link" href="#ej6">✈️ Check-in Aerolínea <span class="sidebar-badge badge-h">A</span></a>
+        </div>
+    </aside>
+
+    <main class="content">
+
+        <!-- PARTE 1 -->
+        <section id="numeros">
+            <div class="part-header">
+                <span class="part-number">PARTE 01</span>
+                <h2 class="part-title">Matrices de Números</h2>
+            </div>
+            <p class="part-desc">Contexto: <strong>tableros y grillas</strong>. Se trabaja con listas anidadas donde cada celda contiene un número entero o flotante. Los ejercicios simulan sistemas reales de gestión de espacios y consumo de datos estructurados en filas y columnas.</p>
+
+            <!-- EJ 1 -->
+            <div class="ex-card" id="ej1">
+                <div class="ex-card-top">
+                    <div class="ex-number n-blue">01</div>
+                    <div class="ex-meta">
+                        <div class="ex-breadcrumb">Parte 1 · Matrices de números</div>
+                        <div class="ex-title">🅿️ Control de Estacionamiento</div>
+                        <div class="ex-scenario">Un mall necesita saber cuántos espacios están disponibles en su estacionamiento de 3 pisos.</div>
+                    </div>
+                    <span class="level-badge lv-basic">Básico</span>
+                </div>
+                <div class="ex-body">
+                    <div class="enunciado">
+                        <p>Un centro comercial tiene un estacionamiento con <strong>3 pisos</strong> y <strong>8 espacios por piso</strong>. Cada celda de la matriz representa un espacio: <strong>0</strong> = libre, <strong>1</strong> = ocupado.</p>
+                        <p>Debes representar el estado del estacionamiento con una matriz 3×8 y mostrar un resumen de ocupación.</p>
+                    </div>
+                    <div class="ex-cols">
+                        <div>
+                            <div class="block-label">Lo que debe hacer el programa</div>
+                            <ul class="req-list">
+                                <li><span class="req-num">01</span> Definir la matriz con el estado inicial dado (hardcodeado)</li>
+                                <li><span class="req-num">02</span> Recorrer toda la matriz y contar los espacios libres y ocupados</li>
+                                <li><span class="req-num">03</span> Mostrar cuántos espacios libres hay en <strong>cada piso</strong></li>
+                                <li><span class="req-num">04</span> Mostrar el total de libres y ocupados en todo el estacionamiento</li>
+                                <li><span class="req-num">05</span> Indicar en qué piso hay más espacio disponible</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <div class="block-label">Estado inicial (usa estos datos)</div>
+                            <div class="code-block">
+                                <div class="code-block-head">
+                                    <span class="code-block-title">estacionamiento.py</span>
+                                    <div class="code-block-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+                                </div>
+                                <pre><span class="k-c"># 0 = libre, 1 = ocupado</span>
+estacionamiento = [
+    [<span class="k-n">0</span>,<span class="k-n">1</span>,<span class="k-n">1</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">1</span>,<span class="k-n">0</span>,<span class="k-n">1</span>],  <span class="k-c"># Piso 1</span>
+    [<span class="k-n">1</span>,<span class="k-n">1</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">1</span>,<span class="k-n">1</span>,<span class="k-n">1</span>,<span class="k-n">0</span>],  <span class="k-c"># Piso 2</span>
+    [<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">1</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">1</span>],  <span class="k-c"># Piso 3</span>
+]</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="block-label">Salida esperada</div>
+                        <div class="output-block">
+                            <div class="output-block-head"><span class="output-triangle"></span><span class="output-title">Terminal</span></div>
+                            <pre>===== ESTACIONAMIENTO DEL MALL =====
+Piso 1: 4 libres, 4 ocupados
+Piso 2: 3 libres, 5 ocupados
+Piso 3: 6 libres, 2 ocupados
+
+TOTAL: 13 libres / 11 ocupados
+El piso con más espacio disponible es el Piso 3</pre>
+                        </div>
+                    </div>
+                    <div class="hint-block">
+                        <span class="hint-icon">💡</span>
+                        <div class="hint-body">
+                            <span class="hint-label">Pista</span>
+                            Usa un doble for (fila, columna) para recorrer la matriz. Guarda un contador de libres por fila. Para encontrar el piso con más espacio, recorre la lista de contadores y guarda el índice del máximo.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EJ 2 -->
+            <div class="ex-card" id="ej2">
+                <div class="ex-card-top">
+                    <div class="ex-number n-blue">02</div>
+                    <div class="ex-meta">
+                        <div class="ex-breadcrumb">Parte 1 · Matrices de números</div>
+                        <div class="ex-title">🎬 Reserva de Asientos — Cine Online</div>
+                        <div class="ex-scenario">Una sala de cine necesita un sistema para consultar y reservar asientos en tiempo real.</div>
+                    </div>
+                    <span class="level-badge lv-mid">Medio</span>
+                </div>
+                <div class="ex-body">
+                    <div class="enunciado">
+                        <p>Una sala de cine tiene <strong>6 filas de 10 butacas</strong> cada una. La matriz representa el estado de cada butaca: <strong>0</strong> = disponible, <strong>1</strong> = reservado, <strong>2</strong> = bloqueado (mantenimiento).</p>
+                        <p>El programa debe permitir al usuario <strong>consultar disponibilidad</strong> y <strong>reservar un asiento</strong> ingresando fila y columna.</p>
+                    </div>
+                    <div class="ex-cols">
+                        <div>
+                            <div class="block-label">Lo que debe hacer el programa</div>
+                            <ul class="req-list">
+                                <li><span class="req-num">01</span> Mostrar el mapa de sala con: <code>[ ]</code> libre, <code>[X]</code> reservado, <code>[·]</code> bloqueado</li>
+                                <li><span class="req-num">02</span> Pedir al usuario fila y número de butaca para reservar</li>
+                                <li><span class="req-num">03</span> Validar que la fila y butaca existan dentro del rango de la sala</li>
+                                <li><span class="req-num">04</span> Validar que el asiento no esté ya reservado ni bloqueado</li>
+                                <li><span class="req-num">05</span> Si es válido, marcar como reservado y mostrar el mapa actualizado</li>
+                                <li><span class="req-num">06</span> Mostrar el total de asientos disponibles restantes</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <div class="block-label">Estado inicial de la sala</div>
+                            <div class="code-block">
+                                <div class="code-block-head">
+                                    <span class="code-block-title">sala.py</span>
+                                    <div class="code-block-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+                                </div>
+                                <pre><span class="k-c"># 0=libre 1=reservado 2=bloqueado</span>
+sala = [
+    [<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">1</span>,<span class="k-n">1</span>,<span class="k-n">1</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">0</span>], <span class="k-c"># A</span>
+    [<span class="k-n">0</span>,<span class="k-n">1</span>,<span class="k-n">1</span>,<span class="k-n">1</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">1</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">2</span>], <span class="k-c"># B</span>
+    [<span class="k-n">2</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">1</span>,<span class="k-n">1</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">1</span>,<span class="k-n">0</span>], <span class="k-c"># C</span>
+    [<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">1</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">2</span>,<span class="k-n">2</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">1</span>], <span class="k-c"># D</span>
+    [<span class="k-n">1</span>,<span class="k-n">1</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">1</span>,<span class="k-n">1</span>,<span class="k-n">0</span>,<span class="k-n">0</span>], <span class="k-c"># E</span>
+    [<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">0</span>,<span class="k-n">0</span>], <span class="k-c"># F</span>
+]
+filas = [<span class="k-s">"A"</span>,<span class="k-s">"B"</span>,<span class="k-s">"C"</span>,<span class="k-s">"D"</span>,<span class="k-s">"E"</span>,<span class="k-s">"F"</span>]</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="block-label">Ejemplo de interacción</div>
+                        <div class="output-block">
+                            <div class="output-block-head"><span class="output-triangle"></span><span class="output-title">Terminal</span></div>
+                            <pre>===== CINEMAX - SALA 3 =====
+     1   2   3   4   5   6   7   8   9  10
+A  [ ] [ ] [ ] [X] [X] [X] [ ] [ ] [ ] [ ]
+B  [ ] [X] [X] [X] [ ] [ ] [X] [ ] [ ] [·]
+C  [·] [ ] [ ] [ ] [X] [X] [ ] [ ] [X] [ ]
+D  [ ] [ ] [X] [ ] [ ] [·] [·] [ ] [ ] [X]
+E  [X] [X] [ ] [ ] [ ] [ ] [X] [X] [ ] [ ]
+F  [ ] [ ] [ ] [ ] [ ] [ ] [ ] [ ] [ ] [ ]
+
+Ingrese la fila (A-F): C
+Ingrese el número de butaca (1-10): 2
+✔ Asiento C2 reservado con éxito.
+
+Asientos disponibles restantes: 30</pre>
+                        </div>
+                    </div>
+                    <div class="hint-block">
+                        <span class="hint-icon">💡</span>
+                        <div class="hint-body">
+                            <span class="hint-label">Pista</span>
+                            Para la visualización usa un for por fila y otro por butaca, mapeando 0→<code>"[ ]"</code>, 1→<code>"[X]"</code>, 2→<code>"[·]"</code>. Para convertir la letra a índice usa <code>filas.index(entrada)</code>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EJ 3 -->
+            <div class="ex-card" id="ej3">
+                <div class="ex-card-top">
+                    <div class="ex-number n-blue">03</div>
+                    <div class="ex-meta">
+                        <div class="ex-breadcrumb">Parte 1 · Matrices de números</div>
+                        <div class="ex-title">⚡ Red Eléctrica — Consumo por Sector</div>
+                        <div class="ex-scenario">La empresa distribuidora de energía analiza el consumo diario por zona y período horario.</div>
+                    </div>
+                    <span class="level-badge lv-high">Avanzado</span>
+                </div>
+                <div class="ex-body">
+                    <div class="enunciado">
+                        <p>Una empresa eléctrica organiza su red en <strong>5 sectores</strong> (filas) y mide el consumo en <strong>4 períodos del día</strong>: madrugada, mañana, tarde, noche (columnas). Cada celda contiene el consumo en <strong>kWh</strong> (número decimal).</p>
+                        <p>Debes analizar la matriz para generar un <strong>reporte de eficiencia</strong>: picos de consumo, promedios por sector y alertas de sectores críticos (consumo total &gt; 400 kWh al día).</p>
+                    </div>
+                    <div class="ex-cols">
+                        <div>
+                            <div class="block-label">Lo que debe hacer el programa</div>
+                            <ul class="req-list">
+                                <li><span class="req-num">01</span> Calcular el consumo total y promedio por cada <strong>sector</strong> (fila)</li>
+                                <li><span class="req-num">02</span> Calcular el consumo total y promedio por cada <strong>período</strong> (columna)</li>
+                                <li><span class="req-num">03</span> Identificar la <strong>celda con mayor consumo</strong> (sector y período)</li>
+                                <li><span class="req-num">04</span> Identificar la <strong>celda con menor consumo</strong> (sector y período)</li>
+                                <li><span class="req-num">05</span> Listar los sectores que superan <strong>400 kWh</strong> como "CRÍTICO"</li>
+                                <li><span class="req-num">06</span> Mostrar qué período concentra el mayor consumo total de la red</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <div class="block-label">Matriz de consumo (kWh)</div>
+                            <div class="code-block">
+                                <div class="code-block-head">
+                                    <span class="code-block-title">red_electrica.py</span>
+                                    <div class="code-block-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+                                </div>
+                                <pre><span class="k-c"># [madrug, mañana, tarde, noche]</span>
+consumo = [
+    [<span class="k-n">45.2</span>, <span class="k-n">120.8</span>,<span class="k-n">98.5</span>, <span class="k-n">87.3</span> ],<span class="k-c"># Norte</span>
+    [<span class="k-n">33.1</span>, <span class="k-n">210.5</span>,<span class="k-n">185.2</span>,<span class="k-n">140.0</span>],<span class="k-c"># Sur</span>
+    [<span class="k-n">12.0</span>, <span class="k-n">88.3</span>, <span class="k-n">76.4</span>, <span class="k-n">55.1</span> ],<span class="k-c"># Este</span>
+    [<span class="k-n">67.8</span>, <span class="k-n">198.4</span>,<span class="k-n">220.1</span>,<span class="k-n">175.6</span>],<span class="k-c"># Oeste</span>
+    [<span class="k-n">22.5</span>, <span class="k-n">145.0</span>,<span class="k-n">162.3</span>,<span class="k-n">110.8</span>],<span class="k-c"># Centro</span>
+]
+sectores = [<span class="k-s">"Norte"</span>,<span class="k-s">"Sur"</span>,<span class="k-s">"Este"</span>,
+            <span class="k-s">"Oeste"</span>,<span class="k-s">"Centro"</span>]
+periodos = [<span class="k-s">"Madrugada"</span>,<span class="k-s">"Mañana"</span>,
+            <span class="k-s">"Tarde"</span>,<span class="k-s">"Noche"</span>]
+umbral = <span class="k-n">400</span></pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="block-label">Salida esperada</div>
+                        <div class="output-block">
+                            <div class="output-block-head"><span class="output-triangle"></span><span class="output-title">Terminal</span></div>
+                            <pre>======= RED ELÉCTRICA - REPORTE DIARIO =======
+
+--- CONSUMO POR SECTOR ---
+Sector Norte:  351.8 kWh | Promedio:  87.95 kWh
+Sector Sur:    568.8 kWh | Promedio: 142.20 kWh  ⚠ CRÍTICO
+Sector Este:   231.8 kWh | Promedio:  57.95 kWh
+Sector Oeste:  661.9 kWh | Promedio: 165.48 kWh  ⚠ CRÍTICO
+Sector Centro: 440.6 kWh | Promedio: 110.15 kWh  ⚠ CRÍTICO
+
+--- CONSUMO POR PERÍODO ---
+Madrugada:  180.6 kWh total
+Mañana:     762.0 kWh total  ← PICO DE LA RED
+Tarde:      742.5 kWh total
+Noche:      568.8 kWh total
+
+--- EXTREMOS ---
+Mayor consumo: Sector Oeste, Tarde (220.1 kWh)
+Menor consumo: Sector Este, Madrugada (12.0 kWh)
+
+3 sector(es) en estado CRÍTICO.</pre>
+                        </div>
+                    </div>
+                    <div class="hint-block">
+                        <span class="hint-icon">💡</span>
+                        <div class="hint-body">
+                            <span class="hint-label">Pista</span>
+                            Para totales por columna invierte el recorrido: el for externo recorre los períodos (0 a 3), el interno recorre los sectores sumando <code>consumo[sector][periodo]</code>. Para el máximo global usa dos variables: <code>max_val</code> y los índices <code>fila_max, col_max</code>, actualizándolos en cada iteración del doble for.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="part-divider">
+
+        <!-- PARTE 2 -->
+        <section id="diccionarios">
+            <div class="part-header">
+                <span class="part-number">PARTE 02</span>
+                <h2 class="part-title">Matrices de Diccionarios</h2>
+            </div>
+            <p class="part-desc">Contexto: <strong>venta de entradas y pasajes</strong>. Cada celda ya no es un número simple, sino un diccionario con múltiples atributos (precio, categoría, nombre del pasajero, etc.). Se trabaja con listas de listas donde cada elemento es un <code>dict</code>.</p>
+
+            <!-- EJ 4 -->
+            <div class="ex-card" id="ej4">
+                <div class="ex-card-top">
+                    <div class="ex-number n-teal">04</div>
+                    <div class="ex-meta">
+                        <div class="ex-breadcrumb">Parte 2 · Matrices de diccionarios</div>
+                        <div class="ex-title">🎭 Mapa de Butacas — Teatro Municipal</div>
+                        <div class="ex-scenario">El teatro necesita mostrar qué butacas están disponibles y cuánto cuestan.</div>
+                    </div>
+                    <span class="level-badge lv-basic">Básico</span>
+                </div>
+                <div class="ex-body">
+                    <div class="enunciado">
+                        <p>El Teatro Municipal tiene <strong>4 filas de 5 butacas</strong>. Cada butaca es un diccionario con su <strong>categoría</strong>, <strong>precio</strong> y si está <strong>disponible</strong> o no.</p>
+                        <p>El programa debe mostrar el mapa de butacas con su precio y calcular cuántas butacas disponibles hay por categoría.</p>
+                    </div>
+                    <div class="ex-cols">
+                        <div>
+                            <div class="block-label">Lo que debe hacer el programa</div>
+                            <ul class="req-list">
+                                <li><span class="req-num">01</span> Recorrer la matriz y mostrar cada butaca con categoría y precio</li>
+                                <li><span class="req-num">02</span> Indicar visualmente disponible (<code>✔</code>) u ocupada (<code>✘</code>)</li>
+                                <li><span class="req-num">03</span> Contar butacas disponibles por categoría (VIP, Preferente, General)</li>
+                                <li><span class="req-num">04</span> Calcular total de ingresos ya generados (butacas vendidas × precio)</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <div class="block-label">Estructura de cada butaca</div>
+                            <div class="code-block">
+                                <div class="code-block-head">
+                                    <span class="code-block-title">teatro.py</span>
+                                    <div class="code-block-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+                                </div>
+                                <pre>teatro = [
+  [  <span class="k-c"># Fila A — VIP $25.000</span>
+    {<span class="k-s">"butaca"</span>:<span class="k-s">"A1"</span>,<span class="k-s">"categoria"</span>:<span class="k-s">"VIP"</span>,
+     <span class="k-s">"precio"</span>:<span class="k-n">25000</span>,<span class="k-s">"disponible"</span>:<span class="k-b">False</span>},
+    {<span class="k-s">"butaca"</span>:<span class="k-s">"A2"</span>,<span class="k-s">"categoria"</span>:<span class="k-s">"VIP"</span>,
+     <span class="k-s">"precio"</span>:<span class="k-n">25000</span>,<span class="k-s">"disponible"</span>:<span class="k-b">False</span>},
+    {<span class="k-s">"butaca"</span>:<span class="k-s">"A3"</span>,<span class="k-s">"categoria"</span>:<span class="k-s">"VIP"</span>,
+     <span class="k-s">"precio"</span>:<span class="k-n">25000</span>,<span class="k-s">"disponible"</span>:<span class="k-b">True</span> },
+    <span class="k-c"># A4 True, A5 False...</span>
+  ],
+  [  <span class="k-c"># Fila B — Preferente $15.000</span>
+    <span class="k-c"># 5 butacas, misma estructura</span>
+  ],
+  [  <span class="k-c"># Filas C y D — General $8.000</span>
+    <span class="k-c"># 5 butacas, misma estructura</span>
+  ],
+]</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="block-label">Salida esperada</div>
+                        <div class="output-block">
+                            <div class="output-block-head"><span class="output-triangle"></span><span class="output-title">Terminal</span></div>
+                            <pre>===== TEATRO MUNICIPAL - MAPA DE SALA =====
+A1[VIP $25000]✘  A2[VIP $25000]✘  A3[VIP $25000]✔  A4[VIP $25000]✔  A5[VIP $25000]✘
+B1[PRE $15000]✔  B2[PRE $15000]✘  B3[PRE $15000]✔  B4[PRE $15000]✔  B5[PRE $15000]✘
+C1[GEN $8000]✔   C2[GEN $8000]✔   C3[GEN $8000]✘   C4[GEN $8000]✔   C5[GEN $8000]✔
+D1[GEN $8000]✔   D2[GEN $8000]✘   D3[GEN $8000]✔   D4[GEN $8000]✘   D5[GEN $8000]✔
+
+--- DISPONIBILIDAD POR CATEGORÍA ---
+VIP       : 2 butacas disponibles
+Preferente: 3 butacas disponibles
+General   : 7 butacas disponibles
+
+--- INGRESOS GENERADOS ---
+Butacas vendidas: 8
+Total recaudado : $175.000</pre>
+                        </div>
+                    </div>
+                    <div class="hint-block">
+                        <span class="hint-icon">💡</span>
+                        <div class="hint-body">
+                            <span class="hint-label">Pista</span>
+                            Accede a los atributos con <code>butaca["categoria"]</code>, <code>butaca["precio"]</code>, <code>butaca["disponible"]</code>. Para los ingresos suma el precio solo cuando <code>disponible == False</code>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EJ 5 -->
+            <div class="ex-card" id="ej5">
+                <div class="ex-card-top">
+                    <div class="ex-number n-teal">05</div>
+                    <div class="ex-meta">
+                        <div class="ex-breadcrumb">Parte 2 · Matrices de diccionarios</div>
+                        <div class="ex-title">🚌 Venta de Pasajes — Empresa de Buses</div>
+                        <div class="ex-scenario">Sistema de venta de pasajes para una empresa de transporte interurbano.</div>
+                    </div>
+                    <span class="level-badge lv-mid">Medio</span>
+                </div>
+                <div class="ex-body">
+                    <div class="enunciado">
+                        <p>Una empresa de buses tiene <strong>3 servicios diarios</strong> (mañana, tarde, noche) con <strong>5 asientos por bus</strong>. Cada asiento es un diccionario con la información del pasajero si está ocupado.</p>
+                        <p>El programa debe permitir <strong>vender un pasaje</strong>: elegir servicio y asiento, ingresar nombre y RUT, y registrar la compra calculando el precio según el servicio.</p>
+                    </div>
+                    <div class="ex-cols">
+                        <div>
+                            <div class="block-label">Lo que debe hacer el programa</div>
+                            <ul class="req-list">
+                                <li><span class="req-num">01</span> Mostrar los 3 servicios con asientos libres u ocupados (con nombre)</li>
+                                <li><span class="req-num">02</span> Pedir al usuario: servicio (1-3) y número de asiento (1-5)</li>
+                                <li><span class="req-num">03</span> Validar que el asiento exista y esté libre</li>
+                                <li><span class="req-num">04</span> Pedir nombre completo y RUT del pasajero</li>
+                                <li><span class="req-num">05</span> Registrar la venta actualizando el diccionario del asiento</li>
+                                <li><span class="req-num">06</span> Mostrar comprobante: mañana=$8.500, tarde=$9.000, noche=$11.000</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <div class="block-label">Estructura de datos</div>
+                            <div class="code-block">
+                                <div class="code-block-head">
+                                    <span class="code-block-title">buses.py</span>
+                                    <div class="code-block-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+                                </div>
+                                <pre>buses = [
+  [  <span class="k-c"># Servicio 1 — 08:00 $8.500</span>
+    {<span class="k-s">"asiento"</span>:<span class="k-n">1</span>,<span class="k-s">"libre"</span>:<span class="k-b">False</span>,
+     <span class="k-s">"pasajero"</span>:<span class="k-s">"Ana Pérez"</span>,
+     <span class="k-s">"rut"</span>:<span class="k-s">"12.345.678-9"</span>},
+    {<span class="k-s">"asiento"</span>:<span class="k-n">2</span>,<span class="k-s">"libre"</span>:<span class="k-b">True</span>,
+     <span class="k-s">"pasajero"</span>:<span class="k-s">""</span>,<span class="k-s">"rut"</span>:<span class="k-s">""</span>},
+    <span class="k-c"># asientos 3, 4, 5 ...</span>
+  ],
+  [  <span class="k-c"># Servicio 2 — 14:00 $9.000</span>
+    <span class="k-c"># misma estructura</span>
+  ],
+  [  <span class="k-c"># Servicio 3 — 22:00 $11.000</span>
+    <span class="k-c"># misma estructura</span>
+  ],
+]
+precios  = [<span class="k-n">8500</span>,<span class="k-n">9000</span>,<span class="k-n">11000</span>]
+horarios = [<span class="k-s">"08:00"</span>,<span class="k-s">"14:00"</span>,<span class="k-s">"22:00"</span>]</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="block-label">Ejemplo de interacción</div>
+                        <div class="output-block">
+                            <div class="output-block-head"><span class="output-triangle"></span><span class="output-title">Terminal</span></div>
+                            <pre>==== TRANSBUS - VENTA DE PASAJES ====
+
+[Servicio 1 - 08:00 | $8.500]
+  Asiento 1: OCUPADO  - Ana Pérez
+  Asiento 2: LIBRE
+  Asiento 3: OCUPADO  - Luis Mora
+  Asiento 4: LIBRE
+  Asiento 5: LIBRE
+
+Elija el servicio (1-3): 2
+Elija el asiento (1-5): 3
+Ingrese nombre completo: Sofía Tapia
+Ingrese RUT: 17.888.999-0
+
+=== COMPROBANTE DE VENTA ===
+Servicio  : Tarde (14:00)
+Asiento   : 3
+Pasajero  : Sofía Tapia
+RUT       : 17.888.999-0
+Precio    : $9.000
+¡Buen viaje, Sofía Tapia!</pre>
+                        </div>
+                    </div>
+                    <div class="hint-block">
+                        <span class="hint-icon">💡</span>
+                        <div class="hint-body">
+                            <span class="hint-label">Pista</span>
+                            El usuario ingresa servicio 1-3, pero el índice es 0-2. Recuerda restar 1: <code>idx = int(input(...)) - 1</code>. Para actualizar usa <code>buses[idx_serv][idx_asiento]["libre"] = False</code> y <code>buses[...][...]["pasajero"] = nombre</code>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EJ 6 -->
+            <div class="ex-card" id="ej6">
+                <div class="ex-card-top">
+                    <div class="ex-number n-teal">06</div>
+                    <div class="ex-meta">
+                        <div class="ex-breadcrumb">Parte 2 · Matrices de diccionarios</div>
+                        <div class="ex-title">✈️ Sistema de Check-in — Aerolínea</div>
+                        <div class="ex-scenario">Una aerolínea necesita gestionar el check-in de un vuelo, aplicar restricciones y generar el manifiesto de pasajeros.</div>
+                    </div>
+                    <span class="level-badge lv-high">Avanzado</span>
+                </div>
+                <div class="ex-body">
+                    <div class="enunciado">
+                        <p>Un avión tiene <strong>4 filas de 6 asientos</strong> (A, B, C — pasillo — D, E, F). Cada asiento tiene clase (Business/Economy), precio, nombre del pasajero y estado de check-in. La aerolínea aplica <strong>reglas de negocio</strong> reales: asientos ya confirmados no pueden volver a registrarse, y pasajeros menores de 18 no pueden ocupar la fila de emergencia (fila 3).</p>
+                        <p>El programa debe procesar el <strong>check-in</strong> de un pasajero, validar las reglas y generar el <strong>manifiesto de vuelo</strong>.</p>
+                    </div>
+                    <div class="ex-cols">
+                        <div>
+                            <div class="block-label">Lo que debe hacer el programa</div>
+                            <ul class="req-list">
+                                <li><span class="req-num">01</span> Mostrar el mapa del avión con clase, precio y estado de check-in</li>
+                                <li><span class="req-num">02</span> Pedir al usuario: fila (1-4) y asiento (A-F) para hacer check-in</li>
+                                <li><span class="req-num">03</span> Validar que el asiento tenga pasajero asignado y no haya hecho check-in</li>
+                                <li><span class="req-num">04</span> Pedir edad: si fila 3 y edad &lt; 18, rechazar y sugerir otro asiento</li>
+                                <li><span class="req-num">05</span> Registrar el check-in actualizando el campo del diccionario</li>
+                                <li><span class="req-num">06</span> Mostrar el manifiesto final y recaudación total por clase</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <div class="block-label">Estructura del vuelo LA-830</div>
+                            <div class="code-block">
+                                <div class="code-block-head">
+                                    <span class="code-block-title">checkin.py</span>
+                                    <div class="code-block-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+                                </div>
+                                <pre>vuelo = [
+  [  <span class="k-c"># Fila 1 — Business $850.000</span>
+    {<span class="k-s">"asiento"</span>:<span class="k-s">"1A"</span>,
+     <span class="k-s">"clase"</span>:<span class="k-s">"Business"</span>,
+     <span class="k-s">"precio"</span>:<span class="k-n">850000</span>,
+     <span class="k-s">"pasajero"</span>:<span class="k-s">"Isabel Rojas"</span>,
+     <span class="k-s">"checkin"</span>:<span class="k-b">True</span>},
+    {<span class="k-s">"asiento"</span>:<span class="k-s">"1B"</span>,
+     <span class="k-s">"clase"</span>:<span class="k-s">"Business"</span>,
+     <span class="k-s">"precio"</span>:<span class="k-n">850000</span>,
+     <span class="k-s">"pasajero"</span>:<span class="k-s">"Jorge Mendez"</span>,
+     <span class="k-s">"checkin"</span>:<span class="k-b">False</span>},
+    <span class="k-c"># 1C sin pasajero, 1D-1F...</span>
+  ],
+  [  <span class="k-c"># Fila 2 — Economy $320.000</span>
+    <span class="k-c"># misma estructura</span>
+  ],
+  [  <span class="k-c"># Fila 3 — Economy (EMERGENCIA)</span>
+    <span class="k-c"># requiere edad &gt;= 18</span>
+  ],
+  [  <span class="k-c"># Fila 4 — Economy</span>
+    <span class="k-c"># misma estructura</span>
+  ],
+]
+columnas = [<span class="k-s">"A"</span>,<span class="k-s">"B"</span>,<span class="k-s">"C"</span>,<span class="k-s">"D"</span>,<span class="k-s">"E"</span>,<span class="k-s">"F"</span>]</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="block-label">Ejemplo de interacción y manifiesto</div>
+                        <div class="output-block">
+                            <div class="output-block-head"><span class="output-triangle"></span><span class="output-title">Terminal</span></div>
+                            <pre>=== VUELO LA-830  SCL → MIA ===
+    A          B          C          D          E          F
+1 [BIZ ✔] [BIZ  ] [BIZ ---] [BIZ ✔] [BIZ  ] [BIZ ---]
+2 [ECO ✔] [ECO  ] [ECO ---] [ECO ✔] [ECO  ] [ECO ---]
+3 [ECO  ] [ECO ---] [ECO ✔] [ECO ---] [ECO  ] [ECO ---]  ⚠ EMERGENCIA
+4 [ECO  ] [ECO ✔] [ECO ---] [ECO  ] [ECO ---] [ECO  ]
+✔=check-in | espacio=pendiente | ---=sin pasajero
+
+Ingrese fila (1-4): 3
+Ingrese asiento (A-F): A
+Ingrese su edad: 16
+✘ Fila de emergencia requiere mayores de 18 años.
+  Asientos sugeridos: 2B, 2E, 4A...
+
+(con edad válida >= 18:)
+✔ Check-in registrado: Felipe Saez — Asiento 3A
+
+=== MANIFIESTO DE VUELO LA-830 ===
+N°  Asiento  Clase     Pasajero          Check-in
+1   1A       Business  Isabel Rojas      ✔
+2   1D       Business  Rosa Lillo        ✔
+3   2A       Economy   Carlos Ruiz       ✔
+4   2D       Economy   Tomás Vera        ✔
+5   3C       Economy   Paula Mora        ✔
+6   4B       Economy   Valentina R.      ✔
+
+Pasajeros con check-in : 6 / 14 totales
+Pendientes de check-in : 8
+Recaudación Business   : $2.550.000
+Recaudación Economy    : $1.920.000</pre>
+                        </div>
+                    </div>
+                    <div class="hint-block">
+                        <span class="hint-icon">💡</span>
+                        <div class="hint-body">
+                            <span class="hint-label">Pista</span>
+                            El usuario ingresa fila 1-4; el índice en la lista es 0-3. Para el asiento usa <code>columnas.index(letra)</code>. Valida fila de emergencia comparando <code>idx_fila == 2</code>. Para el manifiesto, recorre toda la matriz con doble for y muestra sólo si <code>checkin == True</code>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-left">Escuela de Ingeniería en Informática y Telecomunicaciones · Ingeniería en Informática</div>
+    <div class="footer-right">FPY-1101 · Unidad 4 — Estructuras 2D</div>
+</footer>
+
+<script>
+    const links = document.querySelectorAll('.sidebar-link');
+    const topLinks = document.querySelectorAll('.topbar-nav a');
+    const ids = ['ej1','ej2','ej3','ej4','ej5','ej6'];
+    const els = ids.map(id => document.getElementById(id));
+
+    window.addEventListener('scroll', () => {
+        let active = 0;
+        els.forEach((el, i) => { if (el && el.getBoundingClientRect().top <= 100) active = i; });
+        links.forEach((l, i) => l.classList.toggle('active', i === active));
+        topLinks.forEach((l, i) => l.classList.toggle('active', i === (active < 3 ? 0 : 1)));
+    }, { passive: true });
+</script>
+</body>
+</html>
