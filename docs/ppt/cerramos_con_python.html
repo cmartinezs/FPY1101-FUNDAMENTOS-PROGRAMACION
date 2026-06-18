@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cerramos con Python · FPY-1101</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════
+   DARK (default)
+══════════════════════════════════════════════ */
+:root {
+  --bg:        #0b0f0a;
+  --surface:   #131a10;
+  --surface2:  #1c2618;
+  --border:    #2a3a24;
+  --py-green:  #4ade80;
+  --py-yellow: #facc15;
+  --accent:    #4ade80;
+  --accent2:   #facc15;
+  --accent3:   #38bdf8;
+  --accent4:   #fb923c;
+  --accent5:   #f87171;
+  --text:      #ecfdf0;
+  --text-muted:#7aa87a;
+  --code-bg:   #090d08;
+}
+
+/* LIGHT */
+html[data-theme="light"] {
+  --bg:        #f0faf0;
+  --surface:   #ffffff;
+  --surface2:  #e8f5e8;
+  --border:    #c4e0c4;
+  --accent:    #16a34a;
+  --accent2:   #ca8a04;
+  --accent3:   #0284c7;
+  --accent4:   #ea580c;
+  --accent5:   #dc2626;
+  --text:      #0f1f0f;
+  --text-muted:#4a7a4a;
+  --code-bg:   #f0faf0;
+}
+html[data-theme="light"] .kw  { color: #15803d; }
+html[data-theme="light"] .fn  { color: #1d4ed8; }
+html[data-theme="light"] .str { color: #7c3aed; }
+html[data-theme="light"] .num { color: #b45309; }
+html[data-theme="light"] .cmt { color: #6b7280; }
+html[data-theme="light"] .var { color: #9a3412; }
+html[data-theme="light"] .blt { color: #0369a1; }
+html[data-theme="light"] .dec { color: #6d28d9; }
+
+/* HIGH CONTRAST */
+html[data-theme="hc"] {
+  --bg:        #000;
+  --surface:   #080808;
+  --surface2:  #111;
+  --border:    #ffffff;
+  --accent:    #00ff88;
+  --accent2:   #ffff00;
+  --accent3:   #00ccff;
+  --accent4:   #ff8800;
+  --accent5:   #ff4444;
+  --text:      #ffffff;
+  --text-muted:#cccccc;
+  --code-bg:   #000;
+}
+html[data-theme="hc"] pre  { border-width: 2px; }
+html[data-theme="hc"] .card { border-width: 2px; }
+
+/* ── BASE ── */
+html { font-size: 20px; transition: font-size .2s ease; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+  user-select: none;
+  transition: background .3s, color .3s;
+}
+
+/* ── SLIDE ENGINE ── */
+.slide { display:none; width:100%; height:100vh; position:relative; overflow:hidden; }
+.slide.active { display:flex; flex-direction:column; animation: fadeIn .3s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+/* ── TOPBAR ── */
+.topbar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.55em 1.75em;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink:0;
+}
+.topbar .course { font-weight:700; color:var(--accent); letter-spacing:.5px; text-transform:uppercase; font-size:.65rem; }
+.slide-counter { font-family:'Fira Code',monospace; font-size:.75rem; color:var(--text-muted); }
+
+/* ── PROGRESS ── */
+.progress-bar { position:fixed; top:0; left:0; height:3px; background:linear-gradient(90deg, var(--py-green), var(--py-yellow)); transition:width .4s ease; z-index:200; }
+
+/* ── SLIDE BODY ── */
+.slide-body {
+  flex:1; display:flex; flex-direction:column;
+  justify-content:center; align-items:center;
+  padding:24px 56px 90px;
+  position:relative; gap:14px;
+}
+.slide-body.scrollable { justify-content:flex-start; padding-top:20px; overflow-y:auto; }
+
+/* ── SECTION TAG ── */
+.section-tag {
+  display:inline-block; font-size:.65rem; font-weight:800; letter-spacing:2.5px;
+  text-transform:uppercase; color:var(--accent);
+  background:rgba(74,222,128,.08); border:1px solid rgba(74,222,128,.25);
+  border-radius:4px; padding:4px 12px;
+}
+
+/* ── TITLES ── */
+h2.title {
+  font-family:'Playfair Display', serif;
+  font-size:clamp(1.7rem,3.8vw,3rem);
+  font-weight:900; line-height:1.05; margin-bottom:4px;
+}
+h2.title span { color:var(--accent); }
+h2.title .y { color:var(--accent2); }
+
+.slide-title {
+  font-family:'Playfair Display', serif;
+  font-size:clamp(2.4rem,5.5vw,4.5rem);
+  font-weight:900; line-height:.95; text-align:center; letter-spacing:-.5px;
+}
+.lead { font-size:clamp(.8rem,1.3vw,1.05rem); color:var(--text-muted); max-width:840px; line-height:1.75; }
+
+/* ── HERO BG ── */
+.hero-bg {
+  position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse at 15% 55%, rgba(74,222,128,.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 20%, rgba(250,204,21,.05) 0%, transparent 48%),
+    radial-gradient(ellipse at 55% 85%, rgba(56,189,248,.04) 0%, transparent 45%);
+}
+.hero-grid {
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size:44px 44px; opacity:.25;
+}
+
+/* ── PYTHON LOGO WATERMARK ── */
+.py-watermark {
+  position:absolute; right:48px; top:50%; transform:translateY(-50%);
+  opacity:.04; pointer-events:none;
+  font-family:'Fira Code',monospace; font-size:14rem; font-weight:700;
+  color:var(--py-green); line-height:1; user-select:none;
+}
+
+/* ── CODE ── */
+pre {
+  background:var(--code-bg); border:1px solid var(--border);
+  border-radius:10px; padding:1em 1.25em;
+  font-family:'Fira Code',monospace;
+  font-size:clamp(.68rem,1vw,.87rem);
+  line-height:1.8; overflow-x:auto;
+  max-width:960px; width:100%;
+  position:relative;
+}
+.kw  { color:#4ade80; font-weight:700; }
+.fn  { color:#60a5fa; }
+.str { color:#a78bfa; }
+.num { color:#facc15; }
+.cmt { color:#4a6645; font-style:italic; }
+.var { color:#fb923c; }
+.blt { color:#38bdf8; }   /* builtins: print, input, int, str */
+.dec { color:#c084fc; }   /* decorators / special */
+.op  { color:#4ade80; }
+
+/* code filename tab */
+pre .code-tab {
+  display:block; font-size:.6rem; color:var(--text-muted); letter-spacing:1px;
+  text-transform:uppercase; margin-bottom:.5em; padding-bottom:.5em;
+  border-bottom:1px solid var(--border);
+}
+
+/* ── CARDS ── */
+.cards { display:grid; gap:14px; width:100%; max-width:960px; }
+.cards.col2 { grid-template-columns:1fr 1fr; }
+.cards.col3 { grid-template-columns:1fr 1fr 1fr; }
+.card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding:1.1em 1.4em;
+  transition:border-color .2s, transform .2s;
+}
+.card:hover { border-color:var(--accent); transform:translateY(-2px); }
+.card .icon { font-size:1.6rem; margin-bottom:8px; }
+.card h3 { font-size:.9rem; font-weight:700; margin-bottom:5px; }
+.card p { font-size:.78rem; color:var(--text-muted); line-height:1.6; }
+.card.green  { border-color:var(--accent);  background:rgba(74,222,128,.04); }
+.card.yellow { border-color:var(--accent2); background:rgba(250,204,21,.04); }
+.card.blue   { border-color:var(--accent3); background:rgba(56,189,248,.04); }
+.card.orange { border-color:var(--accent4); background:rgba(251,146,60,.04); }
+.card.red    { border-color:var(--accent5); background:rgba(248,113,113,.04); }
+
+/* ── SPLIT ── */
+.split { display:grid; grid-template-columns:1fr 1fr; gap:24px; width:100%; max-width:980px; align-items:start; }
+.split.lw  { grid-template-columns:1.35fr 1fr; }
+.split.rw  { grid-template-columns:1fr 1.35fr; }
+
+/* ── HIGHLIGHT BOX ── */
+.hbox {
+  background:rgba(74,222,128,.05); border-left:4px solid var(--accent);
+  border-radius:0 8px 8px 0; padding:.85em 1.1em;
+  font-size:.8rem; line-height:1.65; max-width:960px; width:100%;
+}
+.hbox.y  { border-left-color:var(--accent2); background:rgba(250,204,21,.05); }
+.hbox.b  { border-left-color:var(--accent3); background:rgba(56,189,248,.05); }
+.hbox.o  { border-left-color:var(--accent4); background:rgba(251,146,60,.05); }
+.hbox.r  { border-left-color:var(--accent5); background:rgba(248,113,113,.05); }
+
+/* ── TABLE ── */
+table.t { width:100%; border-collapse:collapse; font-size:.78rem; max-width:900px; }
+table.t th { background:var(--surface2); color:var(--accent); padding:.55em .9em; text-align:left; font-size:.65rem; letter-spacing:1px; text-transform:uppercase; }
+table.t td { padding:.5em .9em; border-bottom:1px solid var(--border); font-family:'Fira Code',monospace; }
+table.t tr:last-child td { border-bottom:none; }
+table.t tr:hover td { background:var(--surface); }
+table.t td.desc { font-family:'Outfit',sans-serif; }
+
+/* ── BADGE ── */
+.badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:.65rem; font-weight:700; letter-spacing:.5px; }
+.bg  { background:rgba(74,222,128,.12); color:var(--accent);  border:1px solid rgba(74,222,128,.3); }
+.by  { background:rgba(250,204,21,.12); color:var(--accent2); border:1px solid rgba(250,204,21,.3); }
+.bb  { background:rgba(56,189,248,.12); color:var(--accent3); border:1px solid rgba(56,189,248,.3); }
+.bo  { background:rgba(251,146,60,.12); color:var(--accent4); border:1px solid rgba(251,146,60,.3); }
+.br  { background:rgba(248,113,113,.12); color:var(--accent5); border:1px solid rgba(248,113,113,.3); }
+
+/* ── STEPS ── */
+.steps { display:flex; flex-direction:column; gap:9px; max-width:840px; width:100%; }
+.step { display:flex; align-items:flex-start; gap:14px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:.8em 1.1em; }
+.step-num { width:1.6rem; height:1.6rem; border-radius:50%; background:var(--accent); color:#000; font-weight:900; font-size:.75rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.step h4 { font-size:.85rem; font-weight:700; margin-bottom:2px; }
+.step p  { font-size:.73rem; color:var(--text-muted); line-height:1.5; }
+
+/* ── LIST ── */
+ul.fl { list-style:none; padding:0; display:flex; flex-direction:column; gap:7px; }
+ul.fl li { display:flex; align-items:flex-start; gap:9px; font-size:.8rem; line-height:1.5; }
+ul.fl li::before { content:'▸'; color:var(--accent); flex-shrink:0; margin-top:1px; }
+
+/* ── TIME BADGE ── */
+.time-badge { display:inline-flex; align-items:center; gap:6px; background:var(--surface2); border:1px solid var(--border); border-radius:20px; padding:4px 14px; font-size:.72rem; color:var(--text-muted); }
+
+/* ── SCORE BANNER ── */
+.score-banner {
+  display:flex; align-items:center; gap:14px;
+  background:rgba(250,204,21,.07); border:1.5px solid rgba(250,204,21,.35);
+  border-radius:12px; padding:10px 18px;
+  max-width:900px; width:100%;
+}
+.score-banner .trophy { font-size:1.6rem; flex-shrink:0; }
+.score-banner .rule   { font-size:.76rem; line-height:1.6; }
+.score-banner .rule strong { color:var(--accent2); }
+
+/* ── AGENDA GRID ── */
+.agenda-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; max-width:900px; width:100%; }
+.agenda-item { display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:.7em 1em; }
+.agenda-num  { font-family:'Fira Code',monospace; font-size:.65rem; color:var(--accent); font-weight:700; }
+.agenda-text { font-size:.78rem; font-weight:600; }
+.agenda-time { font-size:.65rem; color:var(--text-muted); margin-left:auto; white-space:nowrap; }
+
+/* ── COMPARISON TABLE (PSeInt vs Python) ── */
+.vs-table { display:grid; grid-template-columns:1fr auto 1fr; gap:0; max-width:880px; width:100%; border-radius:12px; overflow:hidden; border:1px solid var(--border); }
+.vs-header { background:var(--surface2); padding:.6em 1em; font-size:.7rem; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; text-align:center; }
+.vs-header.left  { color:#60a5fa; border-right:1px solid var(--border); }
+.vs-header.mid   { color:var(--text-muted); background:var(--bg); font-size:.6rem; width:40px; }
+.vs-header.right { color:var(--accent); border-left:1px solid var(--border); }
+.vs-row  { display:contents; }
+.vs-cell { padding:.5em .9em; font-family:'Fira Code',monospace; font-size:.73rem; border-top:1px solid var(--border); background:var(--surface); line-height:1.6; }
+.vs-mid  { display:flex; align-items:center; justify-content:center; background:var(--bg); border-top:1px solid var(--border); font-size:.65rem; color:var(--text-muted); }
+.vs-cell.left  { border-right:1px solid var(--border); color:#60a5fa; }
+.vs-cell.right { border-left:1px solid var(--border); color:var(--accent); }
+
+/* ── TRUTH TABLE ── */
+.truth-table { border-collapse:collapse; font-family:'Fira Code',monospace; font-size:.78rem; max-width:600px; width:100%; }
+.truth-table th { background:var(--surface2); color:var(--accent); padding:.5em .9em; border:1px solid var(--border); text-align:center; }
+.truth-table td { padding:.45em .9em; border:1px solid var(--border); text-align:center; }
+.truth-table .t { color:var(--accent);  font-weight:700; }
+.truth-table .f { color:var(--accent5); font-weight:700; }
+
+/* ── NAV ── */
+.nav {
+  position:fixed; bottom:22px; left:50%; transform:translateX(-50%);
+  display:flex; gap:10px; align-items:center;
+  background:var(--surface); border:1px solid var(--border);
+  padding:9px 18px; border-radius:50px; z-index:100;
+  box-shadow:0 8px 32px rgba(0,0,0,.5);
+}
+.nav button { background:none; border:none; color:var(--text); cursor:pointer; font-size:1.05rem; padding:3px 9px; border-radius:7px; transition:background .2s, color .2s; }
+.nav button:hover { background:var(--surface2); color:var(--accent); }
+.nav button:disabled { opacity:.3; cursor:default; }
+.nav-dots { display:flex; gap:5px; }
+.dot { width:6px; height:6px; border-radius:50%; background:var(--border); cursor:pointer; transition:all .2s; }
+.dot.active { background:var(--accent); width:18px; border-radius:3px; }
+.dot.quiz-dot { background:rgba(250,204,21,.45); border-radius:3px; width:8px; height:8px; }
+.dot.quiz-dot.active { background:var(--accent2); width:18px; }
+
+/* ── KB HINT ── */
+.kb-hint { position:fixed; bottom:72px; right:20px; font-size:.65rem; color:var(--text-muted); background:var(--surface); border:1px solid var(--border); padding:3px 9px; border-radius:6px; }
+
+/* ══ ACCESSIBILITY PANEL ══ */
+.a11y-panel { position:fixed; top:40px; right:14px; z-index:300; display:flex; flex-direction:column; gap:5px; align-items:flex-end; }
+.a11y-toggle-btn { background:var(--surface); border:1px solid var(--border); color:var(--text); cursor:pointer; width:2.2rem; height:2.2rem; border-radius:9px; font-size:1rem; display:flex; align-items:center; justify-content:center; transition:border-color .2s, transform .15s; box-shadow:0 2px 10px rgba(0,0,0,.3); }
+.a11y-toggle-btn:hover { border-color:var(--accent); transform:scale(1.08); }
+.a11y-box { background:var(--surface); border:1px solid var(--border); border-radius:13px; padding:.8rem .9rem; min-width:205px; box-shadow:0 8px 28px rgba(0,0,0,.4); display:none; flex-direction:column; gap:.8rem; }
+.a11y-box.open { display:flex; animation:popIn .2s ease; }
+@keyframes popIn { from { opacity:0; transform:translateY(-5px) scale(.97); } to { opacity:1; transform:none; } }
+.a11y-lbl { font-size:.58rem; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-muted); margin-bottom:3px; }
+.theme-row { display:flex; gap:5px; }
+.theme-btn { flex:1; padding:.45rem .2rem; border-radius:7px; cursor:pointer; border:2px solid var(--border); background:var(--surface2); color:var(--text); font-size:.65rem; font-weight:700; display:flex; flex-direction:column; align-items:center; gap:3px; transition:border-color .2s, transform .15s; font-family:'Outfit',sans-serif; }
+.theme-btn:hover { transform:translateY(-1px); }
+.theme-btn .ti { font-size:.95rem; }
+.theme-btn.active { border-color:var(--accent); background:rgba(74,222,128,.08); color:var(--accent); }
+html[data-theme="hc"] .theme-btn.active { border-color:#00ff88; color:#00ff88; background:rgba(0,255,136,.1); }
+
+  /* ── Scrollable code block ── */
+  pre::-webkit-scrollbar { width: 6px; height: 6px; }
+  pre::-webkit-scrollbar-track { background: var(--surface2); border-radius: 3px; }
+  pre::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
+  pre::-webkit-scrollbar-thumb:hover { background: var(--py-yellow); }
+.fs-row { display:flex; align-items:center; gap:8px; }
+.fs-lbl { font-size:.7rem; color:var(--text-muted); width:2.3rem; text-align:center; font-family:'Fira Code',monospace; font-weight:700; }
+.fs-btn { width:1.75rem; height:1.75rem; border-radius:7px; border:1px solid var(--border); background:var(--surface2); color:var(--text); cursor:pointer; font-size:.95rem; font-weight:700; display:flex; align-items:center; justify-content:center; transition:border-color .15s; flex-shrink:0; }
+.fs-btn:hover { border-color:var(--accent); color:var(--accent); }
+.fs-btn:disabled { opacity:.3; cursor:default; }
+.fs-track { flex:1; height:4px; background:var(--border); border-radius:2px; cursor:pointer; }
+.fs-fill  { height:100%; background:var(--accent); border-radius:2px; transition:width .2s; }
+.a11y-div { height:1px; background:var(--border); }
+
+/* ══ QUIZ SLIDES ══ */
+.slide.quiz-slide .slide-body { gap:0; padding:18px 48px 90px; justify-content:center; }
+.quiz-header { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+.quiz-num-badge { background:var(--accent2); color:#000; font-family:'Playfair Display',serif; font-weight:900; font-size:1.35rem; padding:3px 14px; border-radius:7px; flex-shrink:0; }
+.quiz-label { font-size:.65rem; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:var(--accent2); background:rgba(250,204,21,.09); border:1px solid rgba(250,204,21,.3); border-radius:4px; padding:4px 11px; }
+.quiz-pts { margin-left:auto; display:inline-flex; align-items:center; gap:5px; background:rgba(74,222,128,.1); border:1px solid rgba(74,222,128,.3); border-radius:20px; padding:3px 13px; font-size:.72rem; font-weight:700; color:var(--accent); font-family:'Fira Code',monospace; }
+.quiz-q-box { background:var(--surface); border:2px solid var(--accent2); border-radius:13px; padding:20px 24px; max-width:860px; width:100%; margin-bottom:16px; }
+.q-text { font-size:clamp(.9rem,1.5vw,1.1rem); font-weight:700; line-height:1.5; margin-bottom:15px; }
+.quiz-options { display:flex; flex-direction:column; gap:9px; }
+.quiz-option { display:flex; align-items:center; gap:12px; background:var(--surface2); border:1px solid var(--border); border-radius:9px; padding:.65em 1.1em; font-size:.82rem; }
+.quiz-option .ol { width:1.5rem; height:1.5rem; border-radius:50%; background:var(--border); color:var(--text); font-weight:800; font-size:.72rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-family:'Fira Code',monospace; }
+.quiz-option.correct-answer { border-color:var(--accent)!important; background:rgba(74,222,128,.07)!important; }
+.quiz-option.correct-answer .ol { background:var(--accent)!important; color:#000!important; }
+.quiz-answer-wrap { max-width:860px; width:100%; }
+.reveal-btn { display:flex; align-items:center; gap:9px; background:none; border:2px dashed var(--border); color:var(--text-muted); border-radius:9px; padding:10px 20px; font-size:.82rem; font-weight:700; cursor:pointer; width:100%; justify-content:center; transition:border-color .25s, color .25s, background .25s; font-family:'Outfit',sans-serif; }
+.reveal-btn:hover { border-color:var(--accent); color:var(--accent); background:rgba(74,222,128,.04); }
+.answer-box { display:none; background:rgba(74,222,128,.06); border:2px solid var(--accent); border-radius:0 0 11px 11px; padding:14px 20px; margin-top:-2px; animation:slideDown .3s ease; }
+.answer-box.visible { display:block; }
+@keyframes slideDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }
+.correct-tag { font-size:.65rem; font-weight:900; letter-spacing:2px; text-transform:uppercase; color:var(--accent); display:flex; align-items:center; gap:5px; margin-bottom:7px; }
+.correct-tag::before { content:'✓'; font-size:.95rem; }
+.ans-content { font-size:.82rem; line-height:1.65; }
+.ans-hl { display:inline-block; background:rgba(74,222,128,.16); border-radius:5px; padding:1px 9px; font-weight:700; color:var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress"></div>
+
+<!-- ══════════════════════════════════ SLIDE 1 – PORTADA -->
+<div class="slide active" id="s1">
+  <div class="topbar">
+    <span class="course">Escuela de Ingeniería en Informática y Telecomunicaciones</span>
+    <span class="slide-counter">01 / 20</span>
+  </div>
+  <div class="hero-grid"></div>
+  <div class="hero-bg"></div>
+  <div class="py-watermark">{ }</div>
+
+  <div class="slide-body" style="z-index:1; justify-content:space-between; padding:26px 72px 90px; gap:0;">
+
+    <!-- TOP -->
+    <div style="text-align:center; width:100%;">
+      <div style="display:inline-flex; align-items:center; gap:13px; margin-bottom:16px;">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0; opacity:.9;">
+          <polygon points="24,3 45,13 45,28 24,45 3,28 3,13" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+          <polygon points="24,9 39,17 39,27 24,39 9,27 9,17" fill="none" stroke="var(--accent2)" stroke-width="1" opacity=".5"/>
+          <text x="24" y="29" text-anchor="middle" font-family="'Playfair Display',serif" font-size="12" fill="var(--accent)" font-weight="900">EIT</text>
+        </svg>
+        <div style="text-align:left;">
+          <div style="font-size:.6rem; font-weight:800; letter-spacing:2.5px; text-transform:uppercase; color:var(--text-muted); margin-bottom:2px;">Escuela de</div>
+          <div style="font-size:.88rem; font-weight:700; color:var(--text); line-height:1.2;">Ingeniería en Informática y Telecomunicaciones</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
+        <div style="height:1px; flex:1; max-width:100px; background:linear-gradient(to right, transparent, var(--border));"></div>
+        <span style="font-size:.63rem; font-weight:700; letter-spacing:1.8px; text-transform:uppercase; color:var(--text-muted);">Ingeniería en Informática &nbsp;·&nbsp; Analista en Programación</span>
+        <div style="height:1px; flex:1; max-width:100px; background:linear-gradient(to left, transparent, var(--border));"></div>
+      </div>
+    </div>
+
+    <!-- CENTER -->
+    <div style="text-align:center; width:100%; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;">
+      <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(74,222,128,.07); border:1px solid rgba(74,222,128,.22); border-radius:6px; padding:4px 16px;">
+        <span style="font-family:'Fira Code',monospace; font-size:.68rem; color:var(--accent); font-weight:700; letter-spacing:2px;">FPY-1101</span>
+        <span style="width:1px; height:11px; background:var(--border); display:inline-block;"></span>
+        <span style="font-size:.68rem; color:var(--text-muted); font-weight:600;">Fundamentos de Programación</span>
+      </div>
+      <div style="font-size:.68rem; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:var(--text-muted);">Taller de Fundamentos de Programación</div>
+
+      <div style="display:flex; align-items:center; gap:18px; margin:6px 0;">
+        <svg width="54" height="54" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+          <path d="M24.05 1.75C13.2 1.75 13.87 6.6 13.87 6.6l.01 5.04h10.4v1.51H9.1S2.35 12.4 2.35 23.36c0 10.97 6.08 10.58 6.08 10.58H12V28.7s-.22-6.08 5.98-6.08h10.3s5.78.09 5.78-5.6V7.42S34.9 1.75 24.05 1.75zm-5.74 3.32c1.04 0 1.88.84 1.88 1.88s-.84 1.88-1.88 1.88-1.88-.84-1.88-1.88.84-1.88 1.88-1.88z" fill="var(--accent3)"/>
+          <path d="M24.27 46.25c10.86 0 10.18-4.86 10.18-4.86l-.01-5.04H24.04v-1.51H39.2s6.76.75 6.76-10.21c0-10.97-6.08-10.58-6.08-10.58H36.3v5.24s.22 6.08-5.98 6.08H20.02s-5.78-.09-5.78 5.6v9.6s-.87 5.68 10 5.68zm5.74-3.32c-1.04 0-1.88-.84-1.88-1.88s.84-1.88 1.88-1.88 1.88.84 1.88 1.88-.84 1.88-1.88 1.88z" fill="var(--accent2)"/>
+        </svg>
+        <div class="slide-title" style="font-size:clamp(2.6rem,5.5vw,4.6rem); letter-spacing:-.5px; text-align:left;">
+          Cerramos<br>con <span style="color:var(--accent);">Python</span>
+        </div>
+      </div>
+
+      <p style="font-size:.82rem; color:var(--text-muted); max-width:600px; line-height:1.7; margin-top:2px;">
+        Listas, diccionarios, matrices, funciones y control de versiones con Git &amp; GitHub
+      </p>
+      <div style="display:flex; gap:9px; flex-wrap:wrap; justify-content:center; margin-top:4px;">
+        <div class="time-badge"><span>📐</span> Unidad 3 · Módulo Final</div>
+        <div class="time-badge"><span>⏱</span> 45 – 50 min</div>
+        <div class="time-badge"><span>🔀</span> Git &amp; GitHub</div>
+      </div>
+    </div>
+
+    <!-- BOTTOM: docente -->
+    <div style="width:100%; text-align:center;">
+      <div style="height:1px; background:linear-gradient(to right, transparent, var(--border) 30%, var(--border) 70%, transparent); margin-bottom:13px;"></div>
+      <div style="display:inline-flex; align-items:center; gap:24px; flex-wrap:wrap; justify-content:center;">
+        <div style="text-align:left;">
+          <div style="font-size:.57rem; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted); margin-bottom:2px;">Docente</div>
+          <div style="font-size:.85rem; font-weight:700; color:var(--text);">Prof. Carlos Martínez Sánchez</div>
+        </div>
+        <div style="width:1px; height:30px; background:var(--border);"></div>
+        <div style="text-align:left;">
+          <div style="font-size:.57rem; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted); margin-bottom:2px;">Asignatura</div>
+          <div style="font-size:.85rem; font-weight:600; color:var(--text-muted);">Fundamentos de Programación &nbsp;<span style="font-family:'Fira Code',monospace; color:var(--accent); font-size:.73rem;">FPY-1101</span></div>
+        </div>
+        <div style="width:1px; height:30px; background:var(--border);"></div>
+        <div style="text-align:left;">
+          <div style="font-size:.57rem; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted); margin-bottom:2px;">Periodo</div>
+          <div style="font-size:.85rem; font-weight:600; color:var(--text-muted);" id="coverYear">Primer Año · 2026</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 2 – AGENDA -->
+<div class="slide" id="s2">
+  <div class="topbar"><span class="course">FPY-1101 · Prof. Carlos Martínez Sánchez</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Contenidos</div>
+    <h2 class="title">¿Qué vamos a <span>ver hoy</span>?</h2>
+    <p class="lead" style="margin-bottom:16px;">Último módulo: estructuras de datos, funciones y control de versiones</p>
+    <div class="agenda-grid">
+      <div class="agenda-item"><span class="agenda-num">01</span><span class="agenda-text">Listas: creación y acceso</span><span class="agenda-time">4 min</span></div>
+      <div class="agenda-item"><span class="agenda-num">02</span><span class="agenda-text">Listas: métodos y recorrido</span><span class="agenda-time">4 min</span></div>
+      <div class="agenda-item"><span class="agenda-num">03</span><span class="agenda-text">Diccionarios: creación y acceso</span><span class="agenda-time">4 min</span></div>
+      <div class="agenda-item"><span class="agenda-num">04</span><span class="agenda-text">Diccionarios: métodos y recorrido</span><span class="agenda-time">4 min</span></div>
+      <div class="agenda-item"><span class="agenda-num">05</span><span class="agenda-text">Matrices: listas de listas</span><span class="agenda-time">5 min</span></div>
+      <div class="agenda-item"><span class="agenda-num">06</span><span class="agenda-text">Listas de diccionarios · Diccionarios de listas</span><span class="agenda-time">5 min</span></div>
+      <div class="agenda-item"><span class="agenda-num">07</span><span class="agenda-text">Funciones: definición y sintaxis</span><span class="agenda-time">4 min</span></div>
+      <div class="agenda-item"><span class="agenda-num">08</span><span class="agenda-text">Funciones: ejemplo práctico</span><span class="agenda-time">4 min</span></div>
+      <div class="agenda-item"><span class="agenda-num">09</span><span class="agenda-text">Git: control de versiones</span><span class="agenda-time">5 min</span></div>
+      <div class="agenda-item"><span class="agenda-num">10</span><span class="agenda-text">GitHub: trabajo individual y colaborativo</span><span class="agenda-time">6 min</span></div>
+    </div>
+    <div class="score-banner">
+      <span class="trophy">🏆</span>
+      <div class="rule"><strong>¡Puntos extra!</strong> Cada pregunta relámpago correcta vale <strong>+1.5 décimas</strong>. Máximo <strong>3 décimas por clase</strong>. ¡Cualquiera puede ser preguntado!</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 3 – LISTAS: CREACIÓN Y ACCESO -->
+<div class="slide" id="s3">
+  <div class="topbar"><span class="course">Python · Listas</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Estructuras de Datos</div>
+    <h2 class="title">Listas — <span>creación y acceso</span></h2>
+    <div class="split lw" style="max-width:940px; gap:20px; align-items:start;">
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div class="hbox" style="margin:0; font-size:.78rem;">
+          Una <strong>lista</strong> es una colección ordenada y modificable de elementos. Se define con corchetes <code>[ ]</code> y cada elemento se accede por su <strong>índice</strong>, que comienza en <strong>0</strong>.
+        </div>
+        <div style="display:flex; gap:6px; justify-content:center; margin:4px 0;">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+            <div style="width:64px; height:40px; background:var(--surface2); border:1px solid var(--border); border-radius:6px; display:flex; align-items:center; justify-content:center; font-family:'Fira Code',monospace; font-size:.72rem; color:var(--accent2);">"manzana"</div>
+            <span style="font-size:.62rem; color:var(--text-muted); font-family:'Fira Code',monospace;">[0]</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+            <div style="width:64px; height:40px; background:var(--surface2); border:1px solid var(--border); border-radius:6px; display:flex; align-items:center; justify-content:center; font-family:'Fira Code',monospace; font-size:.72rem; color:var(--accent2);">"pera"</div>
+            <span style="font-size:.62rem; color:var(--text-muted); font-family:'Fira Code',monospace;">[1]</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+            <div style="width:64px; height:40px; background:var(--surface2); border:1px solid var(--border); border-radius:6px; display:flex; align-items:center; justify-content:center; font-family:'Fira Code',monospace; font-size:.72rem; color:var(--accent2);">"uva"</div>
+            <span style="font-size:.62rem; color:var(--text-muted); font-family:'Fira Code',monospace;">[2] / [-1]</span>
+          </div>
+        </div>
+        <div class="hbox y" style="margin:0; font-size:.74rem;">
+          💡 El índice <code>-1</code> accede al <strong>último</strong> elemento, <code>-2</code> al anteúltimo, y así.
+        </div>
+      </div>
+      <div>
+        <pre style="font-size:.72rem;"><span class="code-tab">listas_basico.py</span><span class="var">frutas</span> = [<span class="str">"manzana"</span>, <span class="str">"pera"</span>, <span class="str">"uva"</span>]
+
+<span class="blt">print</span>(<span class="var">frutas</span>[<span class="num">0</span>])     <span class="cmt"># manzana</span>
+<span class="blt">print</span>(<span class="var">frutas</span>[-<span class="num">1</span>])    <span class="cmt"># uva (último)</span>
+<span class="blt">print</span>(<span class="var">frutas</span>[<span class="num">1</span>:<span class="num">3</span>])   <span class="cmt"># ['pera', 'uva']</span>
+
+<span class="var">frutas</span>[<span class="num">1</span>] = <span class="str">"kiwi"</span>      <span class="cmt"># modificar</span>
+<span class="var">frutas</span>.<span class="fn">append</span>(<span class="str">"piña"</span>)  <span class="cmt"># agregar al final</span>
+
+<span class="blt">print</span>(<span class="var">frutas</span>)
+<span class="cmt"># ['manzana', 'kiwi', 'uva', 'piña']</span>
+
+<span class="blt">print</span>(<span class="blt">len</span>(<span class="var">frutas</span>))   <span class="cmt"># 4</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 4 – LISTAS: MÉTODOS Y RECORRIDO -->
+<div class="slide" id="s4">
+  <div class="topbar"><span class="course">Python · Listas</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Estructuras de Datos</div>
+    <h2 class="title">Listas — <span>métodos y recorrido</span></h2>
+    <div class="split" style="max-width:940px; gap:20px; align-items:start;">
+      <div>
+        <table class="t" style="max-width:100%;">
+          <tr><th>Método</th><th>Qué hace</th></tr>
+          <tr><td>.append(x)</td><td class="desc">Agrega x al final</td></tr>
+          <tr><td>.insert(i, x)</td><td class="desc">Inserta x en la posición i</td></tr>
+          <tr><td>.remove(x)</td><td class="desc">Elimina la primera coincidencia de x</td></tr>
+          <tr><td>.pop(i)</td><td class="desc">Elimina y retorna el elemento en i</td></tr>
+          <tr><td>.sort()</td><td class="desc">Ordena la lista (de menor a mayor)</td></tr>
+          <tr><td>len(lista)</td><td class="desc">Cantidad de elementos</td></tr>
+          <tr><td>x in lista</td><td class="desc">True si x está en la lista</td></tr>
+        </table>
+        <div class="hbox" style="margin-top:10px; font-size:.74rem;">
+          🔁 Para recorrer una lista usamos <code style="color:var(--accent);">for</code>. Si necesitamos el índice además del valor, usamos <code style="color:var(--accent);">range(len(...))</code>.
+        </div>
+      </div>
+      <div>
+        <pre style="font-size:.72rem;"><span class="code-tab">recorrer_listas.py</span><span class="var">notas</span> = [<span class="num">85</span>, <span class="num">90</span>, <span class="num">78</span>, <span class="num">95</span>]
+
+<span class="cmt"># Recorrido simple</span>
+<span class="kw">for</span> <span class="var">nota</span> <span class="kw">in</span> <span class="var">notas</span>:
+    <span class="blt">print</span>(<span class="var">nota</span>)
+
+<span class="cmt"># Recorrido con índice</span>
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="blt">range</span>(<span class="blt">len</span>(<span class="var">notas</span>)):
+    <span class="blt">print</span>(<span class="var">i</span>, <span class="str">"->"</span>, <span class="var">notas</span>[<span class="var">i</span>])
+
+<span class="cmt"># Buscar y modificar</span>
+<span class="kw">if</span> <span class="num">90</span> <span class="kw">in</span> <span class="var">notas</span>:
+    <span class="blt">print</span>(<span class="str">"Está en la lista"</span>)
+
+<span class="var">notas</span>.<span class="fn">sort</span>()
+<span class="blt">print</span>(<span class="var">notas</span>)        <span class="cmt"># [78, 85, 90, 95]</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 5 – DICCIONARIOS: CREACIÓN Y ACCESO -->
+<div class="slide" id="s5">
+  <div class="topbar"><span class="course">Python · Diccionarios</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Estructuras de Datos</div>
+    <h2 class="title">Diccionarios — <span>creación y acceso</span></h2>
+    <div class="split lw" style="max-width:940px; gap:20px; align-items:start;">
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="hbox" style="margin:0; font-size:.78rem;">
+          Un <strong>diccionario</strong> almacena pares <code>clave: valor</code>. Se define con llaves <code>{ }</code> y se accede por <strong>clave</strong>, no por posición numérica.
+        </div>
+        <table class="t" style="max-width:100%;">
+          <tr><th>Estructura</th><th>Acceso</th></tr>
+          <tr><td>Lista</td><td class="desc">lista[<span style="color:var(--num);">0</span>] &nbsp;— por posición</td></tr>
+          <tr><td>Diccionario</td><td class="desc">dic[<span style="color:#a78bfa;">"clave"</span>] &nbsp;— por nombre</td></tr>
+        </table>
+        <div class="hbox y" style="margin:0; font-size:.74rem;">
+          💡 Las claves suelen ser cadenas (str), y los valores pueden ser de cualquier tipo: número, texto, lista, incluso otro diccionario.
+        </div>
+      </div>
+      <div>
+        <pre style="font-size:.72rem;"><span class="code-tab">diccionarios_basico.py</span><span class="var">alumno</span> = {
+    <span class="str">"nombre"</span>: <span class="str">"Ana"</span>,
+    <span class="str">"edad"</span>: <span class="num">20</span>,
+    <span class="str">"carrera"</span>: <span class="str">"Informática"</span>
+}
+
+<span class="blt">print</span>(<span class="var">alumno</span>[<span class="str">"nombre"</span>])   <span class="cmt"># Ana</span>
+
+<span class="var">alumno</span>[<span class="str">"edad"</span>] = <span class="num">21</span>        <span class="cmt"># modificar</span>
+<span class="var">alumno</span>[<span class="str">"seccion"</span>] = <span class="str">"A"</span>    <span class="cmt"># agregar clave nueva</span>
+
+<span class="blt">print</span>(<span class="var">alumno</span>)
+<span class="cmt"># {'nombre': 'Ana', 'edad': 21,</span>
+<span class="cmt">#  'carrera': 'Informática', 'seccion': 'A'}</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 6 – DICCIONARIOS: MÉTODOS Y RECORRIDO -->
+<div class="slide" id="s6">
+  <div class="topbar"><span class="course">Python · Diccionarios</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Estructuras de Datos</div>
+    <h2 class="title">Diccionarios — <span>métodos y recorrido</span></h2>
+    <div class="split" style="max-width:940px; gap:20px; align-items:start;">
+      <div>
+        <table class="t" style="max-width:100%;">
+          <tr><th>Método</th><th>Qué hace</th></tr>
+          <tr><td>.keys()</td><td class="desc">Retorna todas las claves</td></tr>
+          <tr><td>.values()</td><td class="desc">Retorna todos los valores</td></tr>
+          <tr><td>.items()</td><td class="desc">Retorna pares (clave, valor)</td></tr>
+          <tr><td>.get(clave, x)</td><td class="desc">Busca clave; si no existe, retorna x</td></tr>
+        </table>
+        <div class="hbox o" style="margin-top:10px; font-size:.74rem;">
+          🚨 <code>diccionario["clave_inexistente"]</code> lanza <strong>KeyError</strong>. Por eso <code>.get()</code> es más seguro cuando la clave podría no existir.
+        </div>
+      </div>
+      <div>
+        <pre style="font-size:.72rem;"><span class="code-tab">recorrer_dict.py</span><span class="cmt"># Recorrer solo claves</span>
+<span class="kw">for</span> <span class="var">clave</span> <span class="kw">in</span> <span class="var">alumno</span>:
+    <span class="blt">print</span>(<span class="var">clave</span>, <span class="str">"->"</span>, <span class="var">alumno</span>[<span class="var">clave</span>])
+
+<span class="cmt"># Recorrer clave y valor juntos</span>
+<span class="kw">for</span> <span class="var">clave</span>, <span class="var">valor</span> <span class="kw">in</span> <span class="var">alumno</span>.<span class="fn">items</span>():
+    <span class="blt">print</span>(<span class="str">f"<span style="color:var(--accent4);">{clave}</span>: <span style="color:var(--accent4);">{valor}</span>"</span>)
+
+<span class="cmt"># Acceso seguro con valor por defecto</span>
+<span class="blt">print</span>(<span class="var">alumno</span>.<span class="fn">get</span>(<span class="str">"telefono"</span>, <span class="str">"No registrado"</span>))
+
+<span class="blt">print</span>(<span class="var">alumno</span>.<span class="fn">keys</span>())
+<span class="blt">print</span>(<span class="var">alumno</span>.<span class="fn">values</span>())</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ QUIZ 1 – LISTAS Y DICCIONARIOS -->
+<div class="slide quiz-slide" id="sq1">
+  <div class="topbar"><span class="course">⚡ Pregunta Relámpago</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="quiz-header">
+      <span class="quiz-num-badge">Q1</span>
+      <span class="quiz-label">Tema: Listas · Diccionarios</span>
+      <span class="quiz-pts">+1.5 décimas</span>
+    </div>
+    <div class="quiz-q-box">
+      <p class="q-text">¿Qué imprime este código?</p>
+      <pre style="background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:.7em 1em; font-size:.78rem; margin-bottom:0; width:100%;"><span class="var">datos</span> = {<span class="str">"a"</span>: <span class="num">1</span>, <span class="str">"b"</span>: <span class="num">2</span>}
+<span class="var">datos</span>[<span class="str">"c"</span>] = <span class="num">3</span>
+<span class="blt">print</span>(<span class="blt">len</span>(<span class="var">datos</span>))</pre>
+      <div class="quiz-options" style="margin-top:12px;">
+        <div class="quiz-option"><span class="ol">A</span> 2</div>
+        <div class="quiz-option correct-reveal"><span class="ol">B</span> 3</div>
+        <div class="quiz-option"><span class="ol">C</span> 4</div>
+        <div class="quiz-option"><span class="ol">D</span> Error: la clave "c" no existe</div>
+      </div>
+    </div>
+    <div class="quiz-answer-wrap">
+      <button class="reveal-btn" onclick="revealAnswer(this)"><span>👁</span> Mostrar respuesta correcta</button>
+      <div class="answer-box">
+        <div class="correct-tag">Respuesta correcta: opción B — 3</div>
+        <div class="ans-content">Asignar <span class="ans-hl">datos["c"] = 3</span> a una clave que <strong>no existe</strong> no genera error — Python la <strong>crea</strong> automáticamente. El diccionario queda con 3 claves: "a", "b" y "c". Por eso <code>len(datos)</code> retorna 3. El error (KeyError) solo ocurre al <em>leer</em> una clave inexistente, no al asignarla.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 7 – MATRICES: LISTAS DE LISTAS -->
+<div class="slide" id="s7">
+  <div class="topbar"><span class="course">Python · Matrices</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Matrices</div>
+    <h2 class="title">Listas de <span>Listas</span></h2>
+    <div class="split lw" style="max-width:940px; gap:20px; align-items:start;">
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div class="hbox" style="margin:0; font-size:.78rem;">
+          Una <strong>matriz</strong> en Python es una <strong>lista cuyos elementos son a su vez listas</strong>. Cada lista interna representa una <strong>fila</strong>. Se accede con doble índice: <code style="color:var(--accent);">matriz[fila][columna]</code>.
+        </div>
+        <div style="display:flex; justify-content:center; margin:6px 0;">
+          <div style="display:inline-grid; grid-template-columns:repeat(3, 46px); gap:4px;">
+            <div style="background:var(--surface2); border:1px solid var(--border); border-radius:5px; height:36px; display:flex; align-items:center; justify-content:center; font-family:'Fira Code',monospace; font-size:.85rem; color:var(--num);">1</div>
+            <div style="background:var(--surface2); border:1px solid var(--border); border-radius:5px; height:36px; display:flex; align-items:center; justify-content:center; font-family:'Fira Code',monospace; font-size:.85rem; color:var(--num);">2</div>
+            <div style="background:var(--surface2); border:1px solid var(--border); border-radius:5px; height:36px; display:flex; align-items:center; justify-content:center; font-family:'Fira Code',monospace; font-size:.85rem; color:var(--num);">3</div>
+            <div style="background:rgba(74,222,128,.12); border:1px solid var(--accent); border-radius:5px; height:36px; display:flex; align-items:center; justify-content:center; font-family:'Fira Code',monospace; font-size:.85rem; color:var(--accent); font-weight:700;">4</div>
+            <div style="background:var(--surface2); border:1px solid var(--border); border-radius:5px; height:36px; display:flex; align-items:center; justify-content:center; font-family:'Fira Code',monospace; font-size:.85rem; color:var(--num);">5</div>
+            <div style="background:rgba(250,204,21,.15); border:1px solid var(--accent2); border-radius:5px; height:36px; display:flex; align-items:center; justify-content:center; font-family:'Fira Code',monospace; font-size:.85rem; color:var(--accent2); font-weight:700;">6</div>
+            <div style="background:var(--surface2); border:1px solid var(--border); border-radius:5px; height:36px; display:flex; align-items:center; justify-content:center; font-family:'Fira Code',monospace; font-size:.85rem; color:var(--num);">7</div>
+            <div style="background:var(--surface2); border:1px solid var(--border); border-radius:5px; height:36px; display:flex; align-items:center; justify-content:center; font-family:'Fira Code',monospace; font-size:.85rem; color:var(--num);">8</div>
+            <div style="background:var(--surface2); border:1px solid var(--border); border-radius:5px; height:36px; display:flex; align-items:center; justify-content:center; font-family:'Fira Code',monospace; font-size:.85rem; color:var(--num);">9</div>
+          </div>
+        </div>
+        <div class="hbox y" style="margin:0; font-size:.73rem;">
+          <span style="color:var(--accent); font-weight:700;">matriz[1][0]</span> = 4 &nbsp;·&nbsp; <span style="color:var(--accent2); font-weight:700;">matriz[1][2]</span> = 6 — primer índice es la <strong>fila</strong>, segundo es la <strong>columna</strong>.
+        </div>
+      </div>
+      <div>
+        <pre style="font-size:.72rem;"><span class="code-tab">matrices.py</span><span class="var">matriz</span> = [
+    [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>],
+    [<span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>],
+    [<span class="num">7</span>, <span class="num">8</span>, <span class="num">9</span>]
+]
+
+<span class="blt">print</span>(<span class="var">matriz</span>[<span class="num">0</span>][<span class="num">0</span>])   <span class="cmt"># 1  (fila 0, col 0)</span>
+<span class="blt">print</span>(<span class="var">matriz</span>[<span class="num">1</span>][<span class="num">2</span>])   <span class="cmt"># 6  (fila 1, col 2)</span>
+
+<span class="cmt"># Recorrido completo: fila por fila</span>
+<span class="kw">for</span> <span class="var">fila</span> <span class="kw">in</span> <span class="var">matriz</span>:
+    <span class="kw">for</span> <span class="var">valor</span> <span class="kw">in</span> <span class="var">fila</span>:
+        <span class="blt">print</span>(<span class="var">valor</span>, end=<span class="str">" "</span>)
+    <span class="blt">print</span>()
+<span class="cmt"># 1 2 3</span>
+<span class="cmt"># 4 5 6</span>
+<span class="cmt"># 7 8 9</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 8 – LISTAS DE DICCIONARIOS -->
+<div class="slide" id="s8">
+  <div class="topbar"><span class="course">Python · Matrices</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Estructuras Combinadas</div>
+    <h2 class="title">Listas de <span>Diccionarios</span></h2>
+    <div class="split lw" style="max-width:940px; gap:20px; align-items:start;">
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="hbox" style="margin:0; font-size:.78rem;">
+          Una <strong>lista de diccionarios</strong> representa varios registros con la <strong>misma estructura</strong> — perfecta para una lista de alumnos, productos o cualquier conjunto de elementos similares.
+        </div>
+        <div class="card green" style="padding:.8em 1.1em;">
+          <p style="font-size:.76rem; margin:0;">📋 Cada elemento de la lista es un <strong>diccionario completo</strong>. Para llegar a un dato puntual: primero el índice de la lista, luego la clave del diccionario.</p>
+        </div>
+        <div class="hbox y" style="margin:0; font-size:.74rem;">
+          <code style="color:var(--accent);">alumnos[0]["nombre"]</code> → accede al nombre del primer alumno de la lista.
+        </div>
+      </div>
+      <div>
+        <pre style="font-size:.71rem;"><span class="code-tab">lista_de_dicts.py</span><span class="var">alumnos</span> = [
+    {<span class="str">"nombre"</span>: <span class="str">"Ana"</span>,  <span class="str">"nota"</span>: <span class="num">6.5</span>},
+    {<span class="str">"nombre"</span>: <span class="str">"Luis"</span>, <span class="str">"nota"</span>: <span class="num">5.2</span>},
+    {<span class="str">"nombre"</span>: <span class="str">"Eva"</span>,  <span class="str">"nota"</span>: <span class="num">7.0</span>}
+]
+
+<span class="blt">print</span>(<span class="var">alumnos</span>[<span class="num">0</span>][<span class="str">"nombre"</span>])   <span class="cmt"># Ana</span>
+
+<span class="kw">for</span> <span class="var">alumno</span> <span class="kw">in</span> <span class="var">alumnos</span>:
+    <span class="blt">print</span>(<span class="var">alumno</span>[<span class="str">"nombre"</span>], <span class="str">"->"</span>, <span class="var">alumno</span>[<span class="str">"nota"</span>])
+
+<span class="cmt"># Calcular promedio del curso</span>
+<span class="var">suma</span> = <span class="num">0</span>
+<span class="kw">for</span> <span class="var">alumno</span> <span class="kw">in</span> <span class="var">alumnos</span>:
+    <span class="var">suma</span> += <span class="var">alumno</span>[<span class="str">"nota"</span>]
+<span class="blt">print</span>(<span class="str">f"Promedio: <span style="color:var(--accent4);">{suma/len(alumnos):.2f}</span>"</span>)</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 9 – DICCIONARIOS DE LISTAS -->
+<div class="slide" id="s9">
+  <div class="topbar"><span class="course">Python · Matrices</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Estructuras Combinadas</div>
+    <h2 class="title">Diccionarios de <span>Listas</span></h2>
+    <div class="split lw" style="max-width:940px; gap:20px; align-items:start;">
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="hbox" style="margin:0; font-size:.78rem;">
+          Un <strong>diccionario de listas</strong> agrupa elementos por <strong>categoría</strong>: cada clave tiene asociada una lista de valores. Ideal para inventarios, agrupaciones o clasificaciones.
+        </div>
+        <table class="t" style="max-width:100%; margin-top:4px;">
+          <tr><th>Estructura</th><th>Cuándo usarla</th></tr>
+          <tr><td class="desc">Lista de diccionarios</td><td class="desc">Varios registros, misma estructura</td></tr>
+          <tr><td class="desc">Diccionario de listas</td><td class="desc">Agrupar valores por categoría</td></tr>
+        </table>
+        <div class="hbox y" style="margin:0; font-size:.74rem;">
+          💡 <code style="color:var(--accent);">inventario["frutas"]</code> devuelve la <strong>lista completa</strong> de frutas — luego se recorre o se modifica como cualquier lista.
+        </div>
+      </div>
+      <div>
+        <pre style="font-size:.71rem;"><span class="code-tab">dict_de_listas.py</span><span class="var">inventario</span> = {
+    <span class="str">"frutas"</span>:   [<span class="str">"manzana"</span>, <span class="str">"pera"</span>],
+    <span class="str">"verduras"</span>: [<span class="str">"zanahoria"</span>, <span class="str">"lechuga"</span>, <span class="str">"papa"</span>]
+}
+
+<span class="kw">for</span> <span class="var">categoria</span>, <span class="var">items</span> <span class="kw">in</span> <span class="var">inventario</span>.<span class="fn">items</span>():
+    <span class="blt">print</span>(<span class="var">categoria</span>, <span class="str">"->"</span>, <span class="blt">len</span>(<span class="var">items</span>), <span class="str">"items"</span>)
+    <span class="kw">for</span> <span class="var">item</span> <span class="kw">in</span> <span class="var">items</span>:
+        <span class="blt">print</span>(<span class="str">"   -"</span>, <span class="var">item</span>)
+
+<span class="cmt"># Agregar un elemento a una categoría</span>
+<span class="var">inventario</span>[<span class="str">"frutas"</span>].<span class="fn">append</span>(<span class="str">"kiwi"</span>)
+<span class="blt">print</span>(<span class="var">inventario</span>[<span class="str">"frutas"</span>])
+<span class="cmt"># ['manzana', 'pera', 'kiwi']</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ QUIZ 2 – MATRICES Y ESTRUCTURAS COMBINADAS -->
+<div class="slide quiz-slide" id="sq2">
+  <div class="topbar"><span class="course">⚡ Pregunta Relámpago</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="quiz-header">
+      <span class="quiz-num-badge">Q2</span>
+      <span class="quiz-label">Tema: Matrices · Estructuras Combinadas</span>
+      <span class="quiz-pts">+1.5 décimas</span>
+    </div>
+    <div class="quiz-q-box">
+      <p class="q-text">Necesitás guardar varios alumnos, cada uno con su <strong>nombre</strong> y su <strong>nota</strong>. ¿Qué estructura es la más adecuada?</p>
+      <div class="quiz-options">
+        <div class="quiz-option"><span class="ol">A</span> Una lista de listas: [["Ana", 6.5], ["Luis", 5.2]]</div>
+        <div class="quiz-option correct-reveal"><span class="ol">B</span> Una lista de diccionarios: [{"nombre": "Ana", "nota": 6.5}, ...]</div>
+        <div class="quiz-option"><span class="ol">C</span> Un diccionario de listas: {"nombre": [...], "nota": [...]}</div>
+        <div class="quiz-option"><span class="ol">D</span> Una matriz de números únicamente</div>
+      </div>
+    </div>
+    <div class="quiz-answer-wrap">
+      <button class="reveal-btn" onclick="revealAnswer(this)"><span>👁</span> Mostrar respuesta correcta</button>
+      <div class="answer-box">
+        <div class="correct-tag">Respuesta correcta: opción B</div>
+        <div class="ans-content">Una <span class="ans-hl">lista de diccionarios</span> es ideal porque cada alumno es un <strong>registro independiente</strong> con sus propios datos identificados por nombre de clave (<code>"nombre"</code>, <code>"nota"</code>) — mucho más claro que recordar posiciones numéricas como en una lista de listas. La opción C separaría los datos de cada alumno en listas distintas, perdiendo la relación directa entre nombre y nota de la misma persona.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 10 – FUNCIONES: DEFINICIÓN Y SINTAXIS -->
+<div class="slide" id="s10">
+  <div class="topbar"><span class="course">Python · Funciones</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Funciones</div>
+    <h2 class="title">Funciones — <span>definición y sintaxis</span></h2>
+    <div class="split" style="max-width:940px; gap:20px; align-items:start;">
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="hbox" style="margin:0; font-size:.78rem;">
+          Una <strong>función</strong> es un bloque de código reutilizable que realiza una tarea específica. Se define con <code style="color:var(--accent);">def</code>, puede recibir <strong>parámetros</strong>, y puede devolver un valor con <code style="color:var(--accent);">return</code>.
+        </div>
+        <pre style="font-size:.72rem;"><span class="code-tab">def_basico.py</span><span class="kw">def</span> <span class="fn">saludar</span>(<span class="var">nombre</span>):
+    <span class="blt">print</span>(<span class="str">f"Hola, <span style="color:var(--accent4);">{nombre}</span>!"</span>)
+
+<span class="fn">saludar</span>(<span class="str">"Ana"</span>)    <span class="cmt"># Hola, Ana!</span>
+<span class="fn">saludar</span>(<span class="str">"Luis"</span>)   <span class="cmt"># Hola, Luis!</span></pre>
+        <div class="hbox y" style="margin:0; font-size:.74rem;">
+          ⚠️ <code style="color:var(--accent2);">nombre</code> al definir la función es el <strong>parámetro</strong>; <code style="color:var(--accent2);">"Ana"</code> al llamarla es el <strong>argumento</strong>.
+        </div>
+      </div>
+      <div>
+        <table class="t" style="max-width:100%; margin-bottom:10px;">
+          <tr><th>print()</th><th>return</th></tr>
+          <tr><td class="desc">Muestra en pantalla</td><td class="desc">Entrega el valor a quien llamó</td></tr>
+          <tr><td class="desc">No se puede reutilizar</td><td class="desc">El resultado se puede guardar y usar</td></tr>
+        </table>
+        <pre style="font-size:.72rem;"><span class="code-tab">return_vs_print.py</span><span class="kw">def</span> <span class="fn">cuadrado</span>(<span class="var">numero</span>):
+    <span class="kw">return</span> <span class="var">numero</span> ** <span class="num">2</span>
+
+<span class="var">resultado</span> = <span class="fn">cuadrado</span>(<span class="num">5</span>)
+<span class="blt">print</span>(<span class="var">resultado</span>)          <span class="cmt"># 25</span>
+<span class="blt">print</span>(<span class="fn">cuadrado</span>(<span class="num">3</span>) + <span class="num">1</span>)  <span class="cmt"># 10</span>
+
+<span class="cmt"># El valor de "return" se puede</span>
+<span class="cmt"># guardar, sumar, comparar, etc.</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 11 – FUNCIONES: EJEMPLO PRÁCTICO -->
+<div class="slide" id="s11">
+  <div class="topbar"><span class="course">Python · Funciones</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Funciones</div>
+    <h2 class="title">Funciones — <span>reutilizar código</span></h2>
+    <div class="split lw" style="max-width:940px; gap:20px; align-items:start;">
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div class="hbox" style="margin:0; font-size:.78rem;">
+          Antes había que repetir el bloque de validación cada vez que pedíamos un número entero. Con una función, lo escribimos <strong>una sola vez</strong> y lo reutilizamos donde se necesite.
+        </div>
+        <div class="steps" style="margin:0;">
+          <div class="step"><div class="step-num">1</div><div><h4>Definir la función una vez</h4><p>Encapsula la lógica de validación</p></div></div>
+          <div class="step"><div class="step-num">2</div><div><h4>Llamarla con distintos mensajes</h4><p>Reutilizable para edad, nota, opción, etc.</p></div></div>
+          <div class="step"><div class="step-num">3</div><div><h4>return entrega el valor validado</h4><p>Listo para usar en el resto del programa</p></div></div>
+        </div>
+      </div>
+      <div>
+        <pre style="font-size:.71rem;"><span class="code-tab">funcion_reutilizable.py</span><span class="kw">def</span> <span class="fn">pedir_entero</span>(<span class="var">mensaje</span>):
+    <span class="kw">while</span> <span class="kw">True</span>:
+        <span class="var">texto</span> = <span class="blt">input</span>(<span class="var">mensaje</span>)
+        <span class="kw">if</span> <span class="var">texto</span>.<span class="fn">isdigit</span>():
+            <span class="kw">return</span> <span class="blt">int</span>(<span class="var">texto</span>)
+        <span class="blt">print</span>(<span class="str">"⚠ Ingresá un número entero"</span>)
+
+<span class="cmt"># Una sola función, usada varias veces</span>
+<span class="var">edad</span> = <span class="fn">pedir_entero</span>(<span class="str">"Edad: "</span>)
+<span class="var">nota</span> = <span class="fn">pedir_entero</span>(<span class="str">"Nota: "</span>)
+
+<span class="blt">print</span>(<span class="str">f"Edad: <span style="color:var(--accent4);">{edad}</span>, Nota: <span style="color:var(--accent4);">{nota}</span>"</span>)</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ QUIZ 3 – FUNCIONES -->
+<div class="slide quiz-slide" id="sq3">
+  <div class="topbar"><span class="course">⚡ Pregunta Relámpago</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="quiz-header">
+      <span class="quiz-num-badge">Q3</span>
+      <span class="quiz-label">Tema: Funciones</span>
+      <span class="quiz-pts">+1.5 décimas</span>
+    </div>
+    <div class="quiz-q-box">
+      <p class="q-text">¿Qué imprime este código?</p>
+      <pre style="background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:.7em 1em; font-size:.78rem; margin-bottom:0; width:100%;"><span class="kw">def</span> <span class="fn">doble</span>(<span class="var">n</span>):
+    <span class="var">n</span> * <span class="num">2</span>
+
+<span class="var">resultado</span> = <span class="fn">doble</span>(<span class="num">5</span>)
+<span class="blt">print</span>(<span class="var">resultado</span>)</pre>
+      <div class="quiz-options" style="margin-top:12px;">
+        <div class="quiz-option"><span class="ol">A</span> 10</div>
+        <div class="quiz-option correct-reveal"><span class="ol">B</span> None</div>
+        <div class="quiz-option"><span class="ol">C</span> 5</div>
+        <div class="quiz-option"><span class="ol">D</span> Error de sintaxis</div>
+      </div>
+    </div>
+    <div class="quiz-answer-wrap">
+      <button class="reveal-btn" onclick="revealAnswer(this)"><span>👁</span> Mostrar respuesta correcta</button>
+      <div class="answer-box">
+        <div class="correct-tag">Respuesta correcta: opción B — None</div>
+        <div class="ans-content">La función calcula <span class="ans-hl">n * 2</span> pero <strong>nunca usa return</strong> — el resultado se calcula y se descarta. Cuando una función no tiene <code>return</code> explícito, Python retorna <strong>None</strong> automáticamente. Por eso <code>resultado</code> vale <code>None</code>, no 10. Es un error muy común: confundir calcular un valor con devolverlo.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 12 – GIT: QUÉ ES Y COMANDOS BÁSICOS -->
+<div class="slide" id="s12">
+  <div class="topbar"><span class="course">Git & GitHub</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Control de Versiones</div>
+    <h2 class="title">Git — <span>qué es y comandos básicos</span></h2>
+    <div class="split lw" style="max-width:940px; gap:20px; align-items:start;">
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div class="hbox" style="margin:0; font-size:.78rem;">
+          <strong>Git</strong> es un sistema de control de versiones: registra el <strong>historial de cambios</strong> de un proyecto y permite volver a versiones anteriores. Funciona de forma <strong>local</strong> en tu computador.
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; justify-content:center; flex-wrap:wrap; margin:6px 0;">
+          <div class="badge bg" style="padding:6px 12px; font-size:.68rem;">Directorio de trabajo</div>
+          <span style="color:var(--text-muted); font-size:.7rem;">git add →</span>
+          <div class="badge by" style="padding:6px 12px; font-size:.68rem;">Área de preparación</div>
+          <span style="color:var(--text-muted); font-size:.7rem;">git commit →</span>
+          <div class="badge bb" style="padding:6px 12px; font-size:.68rem;">Repositorio (historial)</div>
+        </div>
+        <table class="t" style="max-width:100%;">
+          <tr><th>Comando</th><th>Qué hace</th></tr>
+          <tr><td>git init</td><td class="desc">Crea un repositorio nuevo</td></tr>
+          <tr><td>git status</td><td class="desc">Muestra cambios pendientes</td></tr>
+          <tr><td>git add archivo</td><td class="desc">Prepara un cambio para guardar</td></tr>
+          <tr><td>git commit -m "msj"</td><td class="desc">Guarda una versión con un mensaje</td></tr>
+          <tr><td>git log</td><td class="desc">Muestra el historial de versiones</td></tr>
+        </table>
+      </div>
+      <div>
+        <pre style="font-size:.72rem;"><span class="code-tab">terminal</span><span class="cmt"># Crear el repositorio</span>
+git init
+
+<span class="cmt"># Ver qué cambió</span>
+git status
+
+<span class="cmt"># Preparar el cambio</span>
+git add validaciones.py
+
+<span class="cmt"># Guardar la versión</span>
+git commit -m <span class="str">"Agrego validación de edad"</span>
+
+<span class="cmt"># Ver el historial</span>
+git log
+
+<span class="cmt"># ── salida típica de git log ──</span>
+<span class="cmt"># commit a3f9c2d</span>
+<span class="cmt"># Author: Tu Nombre</span>
+<span class="cmt"># Date:   hoy</span>
+<span class="cmt">#     Agrego validación de edad</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 13 – GITHUB: TRABAJO INDIVIDUAL -->
+<div class="slide" id="s13">
+  <div class="topbar"><span class="course">Git & GitHub</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Control de Versiones</div>
+    <h2 class="title">GitHub — <span>trabajo individual</span></h2>
+    <div class="split lw" style="max-width:940px; gap:20px; align-items:start;">
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div class="hbox" style="margin:0; font-size:.78rem;">
+          <strong>GitHub</strong> es una plataforma en la nube que aloja repositorios Git. Permite <strong>respaldar</strong> el proyecto, acceder desde cualquier lugar, y es la base para colaborar con otros.
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; justify-content:center; margin:8px 0;">
+          <div class="badge bg" style="padding:8px 16px; font-size:.72rem;">💻 Repositorio local</div>
+          <div style="text-align:center; font-size:.65rem; color:var(--text-muted); line-height:1.4;">push →<br>← pull</div>
+          <div class="badge by" style="padding:8px 16px; font-size:.72rem;">☁️ GitHub (remoto)</div>
+        </div>
+        <table class="t" style="max-width:100%;">
+          <tr><th>Comando</th><th>Qué hace</th></tr>
+          <tr><td>git remote add origin url</td><td class="desc">Conecta el repo local con GitHub</td></tr>
+          <tr><td>git push origin main</td><td class="desc">Sube los cambios locales</td></tr>
+          <tr><td>git pull origin main</td><td class="desc">Trae los cambios remotos</td></tr>
+          <tr><td>git clone url</td><td class="desc">Copia un repositorio existente</td></tr>
+        </table>
+      </div>
+      <div>
+        <pre style="font-size:.72rem;"><span class="code-tab">terminal</span><span class="cmt"># Conectar el repo local con GitHub</span>
+git remote add origin https://github.com/usuario/proyecto.git
+
+<span class="cmt"># Subir los cambios guardados</span>
+git push origin main
+
+<span class="cmt"># Traer cambios que hizo otra persona</span>
+<span class="cmt"># (o que subiste desde otro computador)</span>
+git pull origin main
+
+<span class="cmt"># Copiar un repositorio que ya existe</span>
+git clone https://github.com/usuario/proyecto.git
+
+<span class="cmt"># ↑ Crea una carpeta local con todo</span>
+<span class="cmt">#   el historial del proyecto</span></pre>
+        <div class="hbox y" style="margin-top:10px; font-size:.74rem;">
+          💡 <code>push</code> sube tus commits a GitHub; <code>pull</code> trae los commits que faltan en tu copia local.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 14 – GITHUB: TRABAJO COLABORATIVO -->
+<div class="slide" id="s14">
+  <div class="topbar"><span class="course">Git & GitHub</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Control de Versiones</div>
+    <h2 class="title">GitHub — <span>trabajo colaborativo</span></h2>
+    <div class="split lw" style="max-width:940px; gap:20px; align-items:start;">
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="hbox" style="margin:0; font-size:.76rem;">
+          Cuando varias personas trabajan en el mismo proyecto, se usan <strong>ramas (branches)</strong> para trabajar en paralelo sin afectar el código principal (<code style="color:var(--accent);">main</code>). Los cambios se integran mediante un <strong>Pull Request</strong>.
+        </div>
+        <div class="steps" style="margin:0;">
+          <div class="step"><div class="step-num">1</div><div><h4>Crear una rama</h4><p>git checkout -b nombre-rama</p></div></div>
+          <div class="step"><div class="step-num">2</div><div><h4>Trabajar y subir cambios</h4><p>git push origin nombre-rama</p></div></div>
+          <div class="step"><div class="step-num">3</div><div><h4>Abrir un Pull Request</h4><p>Proponer en GitHub que se integren los cambios</p></div></div>
+          <div class="step"><div class="step-num">4</div><div><h4>Revisar y hacer merge</h4><p>El equipo revisa, aprueba e integra a main</p></div></div>
+        </div>
+      </div>
+      <div>
+        <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="width:90px; font-size:.68rem; font-family:'Fira Code',monospace; color:var(--accent); text-align:right;">main</div>
+            <div style="flex:1; height:3px; background:var(--accent); border-radius:2px;"></div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; padding-left:60px;">
+            <div style="width:30px; font-size:.65rem; color:var(--text-muted);">└─</div>
+            <div style="width:50px; font-size:.68rem; font-family:'Fira Code',monospace; color:var(--accent2);">feature</div>
+            <div style="flex:1; height:3px; background:var(--accent2); border-radius:2px;"></div>
+            <div style="font-size:.62rem; color:var(--text-muted);">PR →</div>
+          </div>
+          <div style="font-size:.62rem; color:var(--text-muted); text-align:center; margin-top:2px;">la rama feature se integra a main mediante un Pull Request + merge</div>
+        </div>
+        <pre style="font-size:.71rem;"><span class="code-tab">terminal</span><span class="cmt"># Crear y moverse a una rama nueva</span>
+git checkout -b nueva-funcionalidad
+
+<span class="cmt"># ... trabajar y hacer commits ...</span>
+git add .
+git commit -m <span class="str">"Agrego validación de notas"</span>
+
+<span class="cmt"># Subir la rama a GitHub</span>
+git push origin nueva-funcionalidad
+
+<span class="cmt"># Luego: abrir Pull Request en GitHub.com</span>
+<span class="cmt"># El equipo revisa y aprueba el merge</span></pre>
+        <div class="hbox" style="margin-top:8px; font-size:.73rem;">
+          ✅ El Pull Request permite que el equipo <strong>revise</strong> el código antes de integrarlo — clave para trabajar en equipo sin pisarse los cambios.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ QUIZ 4 – GIT Y GITHUB -->
+<div class="slide quiz-slide" id="sq4">
+  <div class="topbar"><span class="course">⚡ Pregunta Relámpago</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="quiz-header">
+      <span class="quiz-num-badge">Q4</span>
+      <span class="quiz-label">Tema: Git · GitHub</span>
+      <span class="quiz-pts">+1.5 décimas</span>
+    </div>
+    <div class="quiz-q-box">
+      <p class="q-text">¿Cuál es el orden correcto para guardar un cambio localmente y luego subirlo a GitHub?</p>
+      <div class="quiz-options">
+        <div class="quiz-option"><span class="ol">A</span> git push → git add → git commit</div>
+        <div class="quiz-option"><span class="ol">B</span> git commit → git add → git push</div>
+        <div class="quiz-option correct-reveal"><span class="ol">C</span> git add → git commit → git push</div>
+        <div class="quiz-option"><span class="ol">D</span> git pull → git add → git push</div>
+      </div>
+    </div>
+    <div class="quiz-answer-wrap">
+      <button class="reveal-btn" onclick="revealAnswer(this)"><span>👁</span> Mostrar respuesta correcta</button>
+      <div class="answer-box">
+        <div class="correct-tag">Respuesta correcta: opción C</div>
+        <div class="ans-content">Primero <span class="ans-hl">git add</span> prepara el cambio (lo pone en el área de preparación). Luego <span class="ans-hl">git commit</span> lo guarda como una versión en el historial local. Finalmente <span class="ans-hl">git push</span> sube ese commit a GitHub. No se puede hacer commit sin haber hecho add antes, ni push sin tener un commit que subir.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 15 – RESUMEN VISUAL -->
+<div class="slide" id="s15">
+  <div class="topbar"><span class="course">Python · Resumen</span><span class="slide-counter"></span></div>
+  <div class="slide-body">
+    <div class="section-tag">Repaso</div>
+    <h2 class="title">Lo que <span>aprendimos</span> hoy</h2>
+    <div class="cards col3" style="max-width:920px; margin-top:8px;">
+      <div class="card green"><div class="icon">📋</div><h3>Listas</h3><p>Colección ordenada y mutable. Acceso por índice [0,1,2...]. append, remove, sort.</p></div>
+      <div class="card yellow"><div class="icon">🔑</div><h3>Diccionarios</h3><p>Pares clave:valor. Acceso por clave. keys(), values(), items(), get().</p></div>
+      <div class="card blue"><div class="icon">🔢</div><h3>Matrices</h3><p>Listas de listas: matriz[fila][columna]. For anidado para recorrer.</p></div>
+      <div class="card orange"><div class="icon">🧩</div><h3>Estructuras combinadas</h3><p>Lista de diccionarios (registros) y diccionario de listas (categorías).</p></div>
+      <div class="card red"><div class="icon">⚙️</div><h3>Funciones</h3><p>def, parámetros, return. Evitan repetir código — reutilizables.</p></div>
+      <div class="card green" style="border-color:var(--accent2); background:rgba(250,204,21,.04);"><div class="icon">🔀</div><h3>Git & GitHub</h3><p>add → commit → push. Branches y Pull Requests para trabajo en equipo.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ SLIDE 16 – CIERRE -->
+<div class="slide" id="s16">
+  <div class="topbar"><span class="course">FPY-1101 · Prof. Carlos Martínez Sánchez</span><span class="slide-counter"></span></div>
+  <div class="hero-grid"></div>
+  <div class="hero-bg"></div>
+  <div class="py-watermark" style="opacity:.03;">🐍</div>
+  <div class="slide-body" style="z-index:1;">
+    <div style="text-align:center; max-width:680px;">
+      <div class="section-tag">¡Cerramos el módulo!</div>
+      <div class="slide-title" style="font-size:clamp(2.4rem,6vw,4.8rem); margin:16px 0;">
+        ¡Ya programan<br>con <span style="color:var(--accent);">Python</span>! 🐍
+      </div>
+      <p style="font-size:.85rem; color:var(--text-muted); line-height:1.75; margin-bottom:20px;">
+        Ya manejan estructuras de datos, funciones y control de versiones — las bases de cualquier proyecto real. Sigan practicando y suban su código a GitHub.
+      </p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:20px;">
+        <div class="badge bg">🐍 python.org</div>
+        <div class="badge by">🔀 github.com</div>
+        <div class="badge bb">📘 Practiquen a diario</div>
+        <div class="badge bo">❓ Pregunten sin miedo</div>
+      </div>
+      <div class="time-badge" style="justify-content:center;">
+        <span>👏</span> Fin de la clase · Prof. Carlos Martínez Sánchez
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ══════════════════════════════════ ACCESSIBILITY PANEL -->
+<div class="a11y-panel" id="a11yPanel">
+  <button class="a11y-toggle-btn" id="a11yToggle" title="Accesibilidad" aria-label="Opciones de accesibilidad">♿</button>
+  <div class="a11y-box" id="a11yBox">
+    <div>
+      <div class="a11y-lbl">🎨 Tema</div>
+      <div class="theme-row">
+        <button class="theme-btn" id="btn-dark"  onclick="setTheme('dark')"><span class="ti">🌙</span>Oscuro</button>
+        <button class="theme-btn" id="btn-light" onclick="setTheme('light')"><span class="ti">☀️</span>Claro</button>
+        <button class="theme-btn" id="btn-hc"    onclick="setTheme('hc')"><span class="ti">⚡</span>A.Cont.</button>
+      </div>
+    </div>
+    <div class="a11y-div"></div>
+    <div>
+      <div class="a11y-lbl">🔠 Tamaño de texto</div>
+      <div class="fs-row">
+        <button class="fs-btn" id="fsDown" onclick="changeFontSize(-1)">−</button>
+        <div class="fs-track" onclick="trackClick(event)"><div class="fs-fill" id="fsFill"></div></div>
+        <button class="fs-btn" id="fsUp"   onclick="changeFontSize(1)">+</button>
+        <span class="fs-lbl" id="fsLabel">100%</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ NAV -->
+<div class="nav">
+  <button id="prevBtn" onclick="changeSlide(-1)" disabled>◀</button>
+  <div class="nav-dots" id="dots"></div>
+  <button id="nextBtn" onclick="changeSlide(1)">▶</button>
+</div>
+<div class="kb-hint">← → navegar &nbsp;|&nbsp; Ctrl +/− texto</div>
+
+<script>
+/* ══ SLIDE ENGINE ══ */
+const slides = Array.from(document.querySelectorAll('.slide'));
+const TOTAL  = slides.length;
+let current  = 0;
+
+const progress      = document.getElementById('progress');
+const prevBtn       = document.getElementById('prevBtn');
+const nextBtn       = document.getElementById('nextBtn');
+const dotsContainer = document.getElementById('dots');
+
+slides.forEach((s, i) => {
+  const d = document.createElement('div');
+  const isQuiz = s.classList.contains('quiz-slide');
+  d.className = 'dot' + (i === 0 ? ' active' : '') + (isQuiz ? ' quiz-dot' : '');
+  d.title = isQuiz ? '⚡ Pregunta' : 'Slide ' + (i + 1);
+  d.onclick = () => goTo(i);
+  dotsContainer.appendChild(d);
+
+  const c = s.querySelector('.slide-counter');
+  if (c) c.textContent = String(i + 1).padStart(2, '0') + ' / ' + String(TOTAL).padStart(2, '0');
+});
+
+function goTo(n) {
+  slides[current].classList.remove('active');
+  dotsContainer.children[current].classList.remove('active');
+  current = n;
+  slides[current].classList.add('active');
+  dotsContainer.children[current].classList.add('active');
+  prevBtn.disabled = current === 0;
+  nextBtn.disabled = current === TOTAL - 1;
+  progress.style.width = ((current + 1) / TOTAL * 100) + '%';
+}
+function changeSlide(dir) { const n = current + dir; if (n >= 0 && n < TOTAL) goTo(n); }
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changeSlide(1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   changeSlide(-1);
+});
+progress.style.width = (1 / TOTAL * 100) + '%';
+
+/* ══ QUIZ ══ */
+function revealAnswer(btn) {
+  const wrap    = btn.closest('.quiz-answer-wrap');
+  const ansBox  = wrap.querySelector('.answer-box');
+  const correct = btn.closest('.slide-body').querySelector('.correct-reveal');
+  ansBox.classList.add('visible');
+  if (correct) correct.classList.add('correct-answer');
+  btn.innerHTML = '<span style="display:inline-block;transform:rotate(180deg);">👁</span> Ocultar respuesta';
+  btn.style.cssText = 'border-color:var(--accent);color:var(--accent);background:rgba(74,222,128,.05);';
+  btn.onclick = () => hideAnswer(btn);
+}
+function hideAnswer(btn) {
+  const wrap    = btn.closest('.quiz-answer-wrap');
+  const ansBox  = wrap.querySelector('.answer-box');
+  const correct = btn.closest('.slide-body').querySelector('.correct-reveal');
+  ansBox.classList.remove('visible');
+  if (correct) correct.classList.remove('correct-answer');
+  btn.innerHTML = '<span>👁</span> Mostrar respuesta correcta';
+  btn.style.cssText = '';
+  btn.onclick = () => revealAnswer(btn);
+}
+
+/* ══ ACCESSIBILITY ══ */
+// Panel toggle
+document.getElementById('a11yToggle').addEventListener('click', e => {
+  e.stopPropagation();
+  document.getElementById('a11yBox').classList.toggle('open');
+});
+document.addEventListener('click', e => {
+  if (!document.getElementById('a11yPanel').contains(e.target))
+    document.getElementById('a11yBox').classList.remove('open');
+});
+
+// Theme
+let currentTheme = localStorage.getItem('cp3-theme') || 'dark';
+function setTheme(t) {
+  currentTheme = t;
+  if (t === 'dark') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('cp3-theme', t);
+  ['dark','light','hc'].forEach(x => document.getElementById('btn-' + x).classList.toggle('active', x === t));
+}
+
+// Font size
+const FS_SIZES  = [13, 15, 17, 20, 23, 27];
+const FS_LABELS = ['65%','75%','85%','100%','115%','135%'];
+let fsIdx = parseInt(localStorage.getItem('cp3-fs') || '3');
+function applyFontSize() {
+  document.documentElement.style.fontSize = FS_SIZES[fsIdx] + 'px';
+  document.getElementById('fsLabel').textContent = FS_LABELS[fsIdx];
+  document.getElementById('fsDown').disabled = fsIdx === 0;
+  document.getElementById('fsUp').disabled   = fsIdx === FS_SIZES.length - 1;
+  document.getElementById('fsFill').style.width = (fsIdx / (FS_SIZES.length - 1) * 100) + '%';
+  localStorage.setItem('cp3-fs', fsIdx);
+}
+function changeFontSize(dir) {
+  const n = fsIdx + dir;
+  if (n >= 0 && n < FS_SIZES.length) { fsIdx = n; applyFontSize(); }
+}
+function trackClick(e) {
+  const r = e.currentTarget.getBoundingClientRect();
+  fsIdx = Math.round((e.clientX - r.left) / r.width * (FS_SIZES.length - 1));
+  fsIdx = Math.max(0, Math.min(FS_SIZES.length - 1, fsIdx));
+  applyFontSize();
+}
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && (e.key === '=' || e.key === '+')) { e.preventDefault(); changeFontSize(1); }
+  if (e.ctrlKey && e.key === '-')                    { e.preventDefault(); changeFontSize(-1); }
+});
+
+// Auto year
+const cy = document.getElementById('coverYear');
+if (cy) cy.textContent = 'Primer Año · ' + new Date().getFullYear();
+
+// Init
+setTheme(currentTheme);
+applyFontSize();
+</script>
+</body>
+</html>
