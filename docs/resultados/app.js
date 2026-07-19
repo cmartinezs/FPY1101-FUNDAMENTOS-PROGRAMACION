@@ -433,7 +433,7 @@ function updateDashboardPage(requestedPage) {
 function renderCourseDashboard(student) {
   const dashboard = student.course_dashboard || {};
   state.dashboardMetrics = dashboard.metrics || [];
-  const finalMetric = state.dashboardMetrics.find((item) => item.metric_code === "Nva_NF") || {};
+  const finalMetric = state.dashboardMetrics.find((item) => item.metric_code === "NF") || {};
   elements.dashboardCount.textContent = dashboard.section_size ? `Curso: ${dashboard.section_size} estudiantes` : "Curso: S/I";
   setMetricGrade(elements.dashboardAverage, finalMetric.average);
   setMetricComparison(elements.dashboardDifference, finalMetric.difference_from_average);
@@ -479,7 +479,7 @@ function renderProgressLineChart() {
     elements.progressLineChart.innerHTML = '<p class="text-secondary mb-0">Aún no hay datos suficientes para graficar tu progreso.</p>';
     return;
   }
-  const studentPoints = rows.map((item, index) => lineChartPoint(item.considered_grade, index, rows.length));
+  const studentPoints = rows.map((item, index) => lineChartPoint(metricByCode(item.evaluation_code).student_value, index, rows.length));
   const averagePoints = rows.map((item, index) => lineChartPoint(metricByCode(item.evaluation_code).average, index, rows.length));
   const studentPolyline = studentPoints.map((point) => `${point.x},${point.y}`).join(" ");
   const averagePolyline = averagePoints.map((point) => `${point.x},${point.y}`).join(" ");
@@ -492,7 +492,7 @@ function renderProgressLineChart() {
     const averagePoint = averagePoints[index];
     return `<circle class="chart-point-average" cx="${averagePoint.x}" cy="${averagePoint.y}" r="4"></circle>
       <circle class="chart-point-student" cx="${studentPoint.x}" cy="${studentPoint.y}" r="5"></circle>
-      <text class="chart-point-label" x="${studentPoint.x}" y="${studentPoint.y - 10}" text-anchor="middle">${grade(item.considered_grade)}</text>`;
+      <text class="chart-point-label" x="${studentPoint.x}" y="${studentPoint.y - 10}" text-anchor="middle">${grade(metricByCode(item.evaluation_code).student_value)}</text>`;
   }).join("");
   elements.progressLineChart.innerHTML = `<svg class="chart-svg" viewBox="0 0 400 220" role="img" aria-label="Gráfico de progreso EV1 a EV4">
     <line class="chart-grid" x1="40" y1="50" x2="360" y2="50"></line>
@@ -509,7 +509,7 @@ function renderProgressLineChart() {
 }
 
 function comparisonMetricCodes() {
-  return ["Nva_NF", "Nva_NP", "ET", "EV1", "EV2", "EV3", "EV4"];
+  return ["NF", "NP", "ET", "EV1", "EV2", "EV3", "EV4"];
 }
 
 function renderComparisonBars() {

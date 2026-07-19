@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-19T01:03:55.388Z",
+  "generated_at": "2026-07-19T01:42:37.426Z",
   "source": "exports/relational-3fn/views/student_portal.json",
   "course": {
     "course_id": "course:FPY1101",
