@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-19T01:03:55.388Z",
+  "source": "exports/relational-3fn/views/student_portal.json",
+  "course": {
+    "course_id": "course:FPY1101",
+    "course_code": "FPY1101",
+    "course_name": "Fundamentos de Programación",
+    "active": true
+  },
+  "section": {
+    "section_id": "section:FPY1101-010V:2026",
+    "course_id": "course:FPY1101",
+    "section_code": "FPY1101-010V",
+    "section_number": "010V",
+    "term_id": "2026",
+    "status": "ACTIVE"
+  },
+  "student_count": 31,
+  "crypto": {
+    "student_payloads": "encrypted",
+    "lookup": "sha256(section_code:normalized_rut:access_code)",
+    "algorithm": "AES-GCM",
+    "kdf": "PBKDF2",
+    "hash": "SHA-256",
+    "iterations": 250000
+  }
+}

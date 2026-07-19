@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FPY-1101 · Resultados</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="./styles.css" rel="stylesheet">
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg sticky-top">
+      <div class="container d-flex align-items-center justify-content-between">
+        <a class="navbar-brand d-flex align-items-center gap-2 fw-bold mb-0" href="../index.html">
+          <span class="brand-mark">Py</span>
+          <span>FPY-1101</span>
+        </a>
+        <a class="btn btn-ghost btn-sm" href="../index.html"><i class="bi bi-arrow-left me-1"></i>Volver al portal</a>
+      </div>
+    </nav>
+
+    <main class="container py-4 py-lg-5">
+      <section class="card border-0 shadow-sm mb-3 app-hero">
+        <div class="card-body p-4 d-flex flex-column flex-lg-row justify-content-between gap-3">
+          <div>
+            <p class="eyebrow mb-1" id="sectionLabel">Portal de resultados</p>
+            <h1 class="h3 mb-1" id="courseTitle">Evaluaciones</h1>
+            <p class="text-secondary mb-0">Consulta tus evaluaciones, la retroalimentación y el detalle de la rúbrica aplicada.</p>
+          </div>
+          <div>
+            <span class="badge rounded-pill text-bg-light border text-secondary fw-medium" id="generatedAt">Cargando fecha</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="card border-0 shadow-sm" id="lookupPanel">
+        <div class="card-body p-4">
+          <div class="mb-4">
+            <p class="text-uppercase text-secondary fw-semibold small mb-1">Acceso personal</p>
+            <h2 class="h4 mb-2">Ingresa con tu RUT y tu código de acceso</h2>
+            <p class="text-secondary mb-0">Este espacio fue preparado para que revises tus resultados con calma y puedas entender cómo se construyó tu nota.</p>
+          </div>
+          <form class="row g-3" id="lookupForm" autocomplete="off" novalidate>
+            <div class="col-12 col-lg-4">
+              <label class="form-label fw-semibold" for="rutInput">RUT</label>
+              <input class="form-control form-control-lg" id="rutInput" inputmode="text" placeholder="Ej: 12345678-9" aria-describedby="rutHelp rutError">
+              <div class="form-text" id="rutHelp">Puedes escribirlo con o sin puntos y guion.</div>
+              <div class="alert alert-danger py-2 px-3 mt-2 mb-0 d-none small" id="rutError" role="alert" aria-live="polite"></div>
+            </div>
+            <div class="col-12 col-lg-5">
+              <label class="form-label fw-semibold" for="accessCodeInput">Código de acceso</label>
+              <input class="form-control form-control-lg" id="accessCodeInput" placeholder="Código individual" spellcheck="false" aria-describedby="codeHelp codeError">
+              <div class="form-text" id="codeHelp">Usa el código que recibiste para esta publicación.</div>
+              <div class="alert alert-danger py-2 px-3 mt-2 mb-0 d-none small" id="codeError" role="alert" aria-live="polite"></div>
+            </div>
+            <div class="col-12 col-lg-3 d-grid align-self-start pt-lg-4">
+              <button class="btn btn-main btn-lg" id="submitButton" type="submit" data-default-label="Ver mis resultados">Ver mis resultados</button>
+            </div>
+          </form>
+          <div class="alert alert-info border mt-4 mb-0" id="securityNote">
+            <strong>Importante:</strong> revisa tu información con responsabilidad. Si algo no coincide con lo que esperabas, conserva el detalle y consúltalo por los canales del curso.
+          </div>
+        </div>
+      </section>
+
+      <section class="alert alert-danger d-none mt-3" id="errorBox" role="alert"></section>
+
+      <section class="student-view d-none" id="studentView">
+        <div class="card border-0 shadow-sm mt-3 mb-3">
+          <div class="card-body p-4 d-flex flex-column flex-lg-row justify-content-between gap-3">
+          <div>
+            <p class="text-uppercase text-secondary fw-semibold small mb-1">Tus resultados</p>
+            <h2 class="h4 mb-0" id="studentName"></h2>
+          </div>
+          <button class="btn btn-ghost" id="resetButton" type="button">Salir</button>
+          </div>
+        </div>
+
+        <ul class="nav nav-pills nav-fill gap-2 flex-column flex-lg-row results-tabs mb-3" id="resultsTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="summaryTab" type="button" role="tab" data-bs-toggle="tab" data-bs-target="#summaryPane" aria-controls="summaryPane" aria-selected="true">Resumen</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="calculationTab" type="button" role="tab" data-bs-toggle="tab" data-bs-target="#calculationPane" aria-controls="calculationPane" aria-selected="false">Cálculo</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="progressTab" type="button" role="tab" data-bs-toggle="tab" data-bs-target="#progressPane" aria-controls="progressPane" aria-selected="false">Curso y progreso</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="feedbackTab" type="button" role="tab" data-bs-toggle="tab" data-bs-target="#feedbackPane" aria-controls="feedbackPane" aria-selected="false">Retroalimentación</button>
+          </li>
+        </ul>
+
+        <div class="tab-content" id="resultsTabContent">
+          <div class="tab-pane fade show active" id="summaryPane" role="tabpanel" aria-labelledby="summaryTab" tabindex="0">
+            <div class="row g-3 mb-3">
+              <div class="col-12 col-md-6 col-xl-3">
+                <article class="card metric-card metric-card-final h-100">
+                  <div class="card-body">
+                    <span class="text-secondary small">Nota final</span>
+                    <strong class="metric-value text-primary-emphasis" id="finalGrade">S/I</strong>
+                    <small class="text-secondary d-block mt-2">Resultado final del curso</small>
+                  </div>
+                </article>
+              </div>
+              <div class="col-12 col-md-6 col-xl-3">
+                <article class="card metric-card metric-card-presentation h-100">
+                  <div class="card-body">
+                    <span class="text-secondary small">Nota de presentación</span>
+                    <strong class="metric-value" id="presentationGrade">S/I</strong>
+                    <small class="text-secondary d-block mt-2">Después de beneficios aplicados</small>
+                  </div>
+                </article>
+              </div>
+              <div class="col-12 col-md-6 col-xl-3">
+                <article class="card metric-card metric-card-exam h-100">
+                  <div class="card-body">
+                    <span class="text-secondary small">Examen transversal</span>
+                    <strong class="metric-value" id="examGrade">S/I</strong>
+                    <small class="text-secondary d-block mt-2">Componente ET</small>
+                  </div>
+                </article>
+              </div>
+              <div class="col-12 col-md-6 col-xl-3">
+                <article class="card metric-card metric-card-base h-100">
+                  <div class="card-body">
+                    <span class="text-secondary small">NF antes de beneficios</span>
+                    <strong class="metric-value" id="baseFinalGrade">S/I</strong>
+                    <small class="text-secondary d-block mt-2">Referencia antes de ajustes</small>
+                  </div>
+                </article>
+              </div>
+            </div>
+
+            <section class="card border-0 shadow-sm d-none mb-3 section-card section-observations" id="observationsSection">
+              <div class="card-body p-4">
+                <div class="d-flex flex-column flex-lg-row justify-content-between gap-2 mb-2">
+                  <h3 class="h5 mb-0">Observación de cierre</h3>
+                </div>
+                <p class="mb-0" id="finalObservations"></p>
+              </div>
+            </section>
+          </div>
+
+          <div class="tab-pane fade" id="calculationPane" role="tabpanel" aria-labelledby="calculationTab" tabindex="0">
+            <section class="card border-0 shadow-sm mb-3 section-card section-presentation">
+              <div class="card-body p-4">
+                <div class="d-flex flex-column flex-lg-row justify-content-between gap-2 mb-3">
+                  <h3 class="h5 mb-0">Cálculo de la nota de presentación</h3>
+                  <p class="text-secondary small mb-0">EvG no aparece aquí; cuando aplica, modifica una de estas evaluaciones.</p>
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-sm table-hover align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th>Evaluación</th>
+                      <th class="text-end">Nota base</th>
+                      <th>Ajustes</th>
+                      <th class="text-end">Nota considerada</th>
+                      <th class="text-end">Pondera</th>
+                      <th class="text-end">Aporte a NP</th>
+                    </tr>
+                  </thead>
+                  <tbody id="evaluationsBody"></tbody>
+                  <tfoot id="evaluationsFoot"></tfoot>
+                  </table>
+                </div>
+                <div id="evaluationsPagination" class="d-none"></div>
+              </div>
+            </section>
+
+            <section class="card border-0 shadow-sm mb-3 section-card section-final">
+              <div class="card-body p-4">
+                <div class="d-flex flex-column flex-lg-row justify-content-between gap-2 mb-3">
+                  <h3 class="h5 mb-0">Cálculo de la nota final</h3>
+                  <p class="text-secondary small mb-0">Tu nota final se obtiene con NP * 60% + ET * 40%.</p>
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-sm table-hover align-middle mb-0">
+                    <thead>
+                      <tr>
+                        <th>Componente</th>
+                        <th class="text-end">Nota</th>
+                        <th class="text-end">Pondera</th>
+                        <th class="text-end">Aporte a nota final</th>
+                      </tr>
+                    </thead>
+                    <tbody id="finalGradeBody"></tbody>
+                    <tfoot id="finalGradeFoot"></tfoot>
+                  </table>
+                </div>
+              </div>
+            </section>
+
+            <section class="card border-0 shadow-sm mb-3 section-card section-benefits" id="benefitsSection">
+              <div class="card-body p-4">
+                <div class="d-flex flex-column flex-lg-row justify-content-between gap-2 mb-3">
+                  <h3 class="h5 mb-0">Beneficios aplicados</h3>
+                  <p class="text-secondary small mb-0">Décimas y ajustes considerados en tu resultado.</p>
+                </div>
+                <div id="benefitsList" class="list-group"></div>
+              </div>
+            </section>
+          </div>
+
+          <div class="tab-pane fade" id="progressPane" role="tabpanel" aria-labelledby="progressTab" tabindex="0">
+            <section class="card border-0 shadow-sm mb-3 section-card section-dashboard">
+              <div class="card-body p-4">
+                <div class="d-flex flex-column flex-lg-row justify-content-between gap-2 mb-3">
+                  <div>
+                    <h3 class="h5 mb-1">Dashboard del curso</h3>
+                    <p class="text-secondary small mb-0">Compara tus resultados con los promedios del curso. No se muestran nombres ni notas individuales de otros estudiantes.</p>
+                  </div>
+                  <span class="badge rounded-pill text-bg-light border text-secondary fw-medium" id="dashboardCount">Curso: S/I</span>
+                </div>
+                <div class="row g-3 mb-3">
+                  <div class="col-12 col-md-4">
+                    <div class="dashboard-card dashboard-card-average border rounded p-3 h-100">
+                      <span class="text-secondary small">Promedio del curso</span>
+                      <strong class="metric-value" id="dashboardAverage">S/I</strong>
+                      <small class="text-secondary d-block mt-2">Según nota final</small>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-4">
+                    <div class="dashboard-card dashboard-card-difference border rounded p-3 h-100">
+                      <span class="text-secondary small">Tu diferencia</span>
+                      <strong class="metric-value" id="dashboardDifference">S/I</strong>
+                      <small class="text-secondary d-block mt-2" id="dashboardComparison">Comparación con el promedio</small>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-4">
+                    <div class="dashboard-card dashboard-card-range border rounded p-3 h-100">
+                      <span class="text-secondary small">Rango del curso</span>
+                      <strong class="metric-value" id="dashboardRange">S/I</strong>
+                      <small class="text-secondary d-block mt-2">Nota menor y mayor del curso</small>
+                    </div>
+                  </div>
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-sm table-hover align-middle mb-0">
+                    <thead>
+                      <tr>
+                        <th>Indicador</th>
+                        <th class="text-end">Tu resultado</th>
+                        <th class="text-end">Promedio</th>
+                        <th class="text-end">Mínimo</th>
+                        <th class="text-end">Máximo</th>
+                        <th class="text-end">Diferencia</th>
+                        <th>Lectura</th>
+                      </tr>
+                    </thead>
+                    <tbody id="dashboardBody"></tbody>
+                  </table>
+                </div>
+                <div id="dashboardPagination" class="d-none"></div>
+              </div>
+            </section>
+
+            <section class="card border-0 shadow-sm mb-3 section-card section-charts">
+              <div class="card-body p-4">
+                <div class="d-flex flex-column flex-lg-row justify-content-between gap-2 mb-3">
+                  <div>
+                    <h3 class="h5 mb-1">Visualiza tu progreso</h3>
+                    <p class="text-secondary small mb-0">Estos gráficos te ayudan a mirar tu avance y tus fortalezas con los resultados de esta página.</p>
+                  </div>
+                </div>
+                <div class="row g-3">
+                  <div class="col-12 col-xl-6">
+                    <div class="chart-panel h-100">
+                      <div class="d-flex justify-content-between gap-2 mb-3">
+                        <div>
+                          <h4 class="h6 mb-1">Progreso EV1-EV4</h4>
+                          <p class="text-secondary small mb-0">Tu nota considerada para NP junto al promedio del curso.</p>
+                        </div>
+                        <div class="chart-legend text-secondary small">
+                          <span class="legend-dot legend-student"></span> Tú
+                          <span class="legend-dot legend-average ms-2"></span> Promedio
+                        </div>
+                      </div>
+                      <div id="progressLineChart" class="chart-svg-wrap"></div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-xl-6">
+                    <div class="chart-panel h-100">
+                      <h4 class="h6 mb-1">Tú vs promedio</h4>
+                      <p class="text-secondary small mb-3">Compara tus principales resultados con el promedio del curso.</p>
+                      <div id="comparisonBars" class="vstack gap-3"></div>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="chart-panel">
+                      <h4 class="h6 mb-1">Aportes a tus notas</h4>
+                      <p class="text-secondary small mb-3">Mira qué componentes aportan a la NP y a la nota final.</p>
+                      <div id="contributionBars" class="row g-3"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <div class="tab-pane fade" id="feedbackPane" role="tabpanel" aria-labelledby="feedbackTab" tabindex="0">
+            <section class="card border-0 shadow-sm section-card section-feedback">
+              <div class="card-body p-4">
+                <div class="d-flex flex-column flex-lg-row justify-content-between gap-2 mb-3">
+                  <h3 class="h5 mb-0">Detalle y retroalimentación</h3>
+                  <p class="text-secondary small mb-0">Abre cada evaluación para revisar la rúbrica y el comentario recibido.</p>
+                </div>
+                <div class="accordion" id="feedbackAccordion"></div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
